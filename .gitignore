@@ -1,4 +1,5 @@
 src/SkylarkTerminal/bin/*
+src/SkylarkTerminal/obj/*
 src/SkylarkTerminal/obj/Release/*
 src/SkylarkTerminal/obj/Debug/*
 publish.zip
