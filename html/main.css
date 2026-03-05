@@ -1,0 +1,449 @@
+/* HexHub Mock - dark, Termius-ish */
+:root{
+  --bg:#0f1116;
+  --panel:#141821;
+  --panel2:#10131a;
+  --muted:#8a93a6;
+  --text:#e7ebf4;
+  --line:#222838;
+  --accent:#4f8cff;
+  --good:#3ddc97;
+  --warn:#ffcc66;
+  --bad:#ff6b6b;
+  --shadow: 0 12px 30px rgba(0,0,0,.35);
+  --r:14px;
+  --r2:18px;
+  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "PingFang SC","Microsoft YaHei", sans-serif;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:var(--font);
+  background: radial-gradient(1200px 800px at 10% 10%, #182035 0, transparent 60%),
+              radial-gradient(900px 600px at 85% 20%, #1a2a22 0, transparent 55%),
+              var(--bg);
+  color:var(--text);
+  overflow:hidden;
+}
+
+.AppShell{height:100%;display:flex;flex-direction:column}
+
+.TopBar{
+  height:54px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 10px;
+  border-bottom:1px solid var(--line);
+  background: linear-gradient(180deg, rgba(20,24,33,.92), rgba(15,17,22,.86));
+  backdrop-filter: blur(10px);
+}
+.TopBar-left,.TopBar-center,.TopBar-right{display:flex;align-items:center;gap:10px;}
+.drag-region{flex:1; min-width: 240px;}
+.no-drag{user-select:none;}
+.AppMark{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:12px;}
+.LogoDot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(79,140,255,.18);}
+.AppName{font-weight:700;letter-spacing:.2px}
+.EnvPill{
+  font-size:12px;
+  padding:4px 8px;
+  border-radius:999px;
+  background:rgba(79,140,255,.15);
+  border:1px solid rgba(79,140,255,.35);
+  color:#cfe0ff;
+}
+.TopBarHint{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
+
+.SearchWrap{
+  width:min(520px, 44vw);
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;
+  border-radius:14px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.06);
+}
+.Icon{opacity:.85}
+.SearchInput{
+  flex:1;
+  background:transparent;
+  border:none;outline:none;
+  color:var(--text);
+  font-size:13px;
+}
+.Kbd{
+  font-size:11px;
+  padding:2px 6px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,.14);
+  color:rgba(231,235,244,.75);
+}
+
+.IconBtn{
+  width:34px;height:34px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.04);
+  color:var(--text);
+  cursor:pointer;
+}
+.IconBtn:hover{border-color:rgba(79,140,255,.35);background:rgba(79,140,255,.10)}
+.WinControls{display:flex;gap:6px;margin-left:8px;}
+.WinBtn{
+  width:36px;height:30px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  color:rgba(231,235,244,.85);
+  cursor:pointer;
+}
+.WinBtn:hover{background:rgba(255,255,255,.06)}
+.WinBtn.danger:hover{background:rgba(255,107,107,.14);border-color:rgba(255,107,107,.35)}
+
+.MainRow{flex:1;display:flex;min-height:0}
+
+.LeftRail{
+  width:54px;
+  border-right:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(20,24,33,.9), rgba(16,19,26,.9));
+  display:flex;flex-direction:column;align-items:center;
+  padding:10px 0;gap:8px;
+}
+.RailBtn{
+  width:38px;height:38px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  color:var(--text);
+  cursor:pointer;
+}
+.RailBtn.active{border-color:rgba(79,140,255,.5);background:rgba(79,140,255,.12)}
+.RailBtn:hover{border-color:rgba(79,140,255,.35);background:rgba(79,140,255,.10)}
+.RailSpacer{flex:1}
+
+.AssetSidebar{
+  width:310px;
+  min-width:240px;
+  max-width:520px;
+  border-right:1px solid var(--line);
+  background:rgba(20,24,33,.75);
+  display:flex;flex-direction:column;
+  min-height:0;
+}
+.AssetSidebar.collapsed{width:0;min-width:0;border-right:none;overflow:hidden}
+.AssetToolbar{
+  padding:10px;
+  display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid var(--line);
+}
+.MiniInput{
+  width:100%;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  color:var(--text);
+  border-radius:12px;
+  padding:8px 10px;
+  outline:none;
+  font-size:13px;
+}
+.MiniInput:focus{border-color:rgba(79,140,255,.45)}
+.ToolBtns{display:flex;align-items:center;gap:6px}
+.ToolBtn{
+  width:34px;height:34px;border-radius:12px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  color:var(--text);
+  cursor:pointer;
+  display:grid;place-items:center;
+}
+.ToolBtn:hover{border-color:rgba(79,140,255,.35);background:rgba(79,140,255,.10)}
+.ToolBtn.primary{width:auto;padding:0 10px;border-radius:12px;background:rgba(79,140,255,.14);border-color:rgba(79,140,255,.35)}
+.Dropdown{position:relative}
+.DropdownMenu{
+  position:absolute;top:40px;right:0;
+  width:180px;
+  background:rgba(16,19,26,.98);
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:14px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  display:none;
+}
+.DropdownMenu.open{display:block}
+.MenuItem{padding:10px 12px;cursor:pointer;color:rgba(231,235,244,.92);font-size:13px}
+.MenuItem:hover{background:rgba(79,140,255,.12)}
+
+.AssetBody{flex:1;overflow:auto;padding:10px;min-height:0}
+.AssetEmpty{color:var(--muted);padding:12px;text-align:center;border:1px dashed rgba(255,255,255,.14);border-radius:14px}
+.Tree{list-style:none;padding:0;margin:0}
+.Node{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 8px;border-radius:12px;
+  cursor:pointer;
+  user-select:none;
+}
+.Node:hover{background:rgba(255,255,255,.04)}
+.Node.selected{background:rgba(79,140,255,.12);border:1px solid rgba(79,140,255,.25)}
+.Node .badge{font-size:11px;color:rgba(231,235,244,.7);padding:2px 6px;border:1px solid rgba(255,255,255,.12);border-radius:999px}
+.Children{list-style:none;margin:4px 0 6px 18px;padding:0;border-left:1px dashed rgba(255,255,255,.10)}
+.Children .Node{margin-left:10px}
+.Twist{width:16px;opacity:.8}
+
+.Splitter{
+  width:6px;
+  cursor:col-resize;
+  background:transparent;
+}
+.Splitter:hover{background:rgba(79,140,255,.10)}
+
+.Workspace{flex:1;min-width:420px;display:flex;flex-direction:column;min-height:0}
+.WorkspaceTop{
+  height:44px;
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 10px;
+  background:rgba(16,19,26,.55);
+}
+.ViewTabs{display:flex;gap:6px}
+.ViewTab{
+  border:none;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  color:rgba(231,235,244,.9);
+  padding:6px 10px;border-radius:12px;
+  cursor:pointer;
+  font-size:13px;
+}
+.ViewTab.active{background:rgba(79,140,255,.14);border-color:rgba(79,140,255,.35)}
+.WorkspaceMeta{color:var(--muted);font-size:12px}
+
+.WorkspaceBody{flex:1;min-height:0;display:flex;gap:8px;padding:10px;overflow:hidden}
+.Pane{
+  flex:1;
+  min-width:260px;
+  background:rgba(20,24,33,.6);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:18px;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.Pane.focused{border-color:rgba(79,140,255,.35);box-shadow:0 0 0 2px rgba(79,140,255,.10) inset}
+.TabBar{
+  height:42px;
+  display:flex;align-items:center;gap:6px;
+  padding:8px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  background:rgba(16,19,26,.65);
+  overflow:auto;
+}
+.Tab{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 10px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.03);
+  cursor:pointer;
+  user-select:none;
+  white-space:nowrap;
+}
+.Tab.active{background:rgba(79,140,255,.14);border-color:rgba(79,140,255,.35)}
+.Tab .dot{width:8px;height:8px;border-radius:50%;background:rgba(231,235,244,.35)}
+.Tab[data-status="connected"] .dot{background:var(--good)}
+.Tab[data-status="connecting"] .dot{background:var(--warn)}
+.Tab[data-status="disconnected"] .dot{background:var(--bad)}
+.Tab .x{opacity:.8;border:none;background:transparent;color:rgba(231,235,244,.9);cursor:pointer}
+.Tab .x:hover{opacity:1}
+
+.TerminalArea{
+  flex:1;
+  min-height:0;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.Terminal{
+  flex:1;
+  min-height:0;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(0,0,0,.35);
+  padding:10px;
+  overflow:auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size:12px;
+  line-height:1.5;
+}
+.Terminal .prompt{color:#7ee787}
+.Terminal .path{color:#a5d6ff}
+.Terminal .cmd{color:#ffd37a}
+.TermControls{display:flex;gap:8px;align-items:center}
+.Btn{
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.03);
+  color:rgba(231,235,244,.92);
+  padding:8px 10px;
+  border-radius:12px;
+  cursor:pointer;
+}
+.Btn:hover{border-color:rgba(79,140,255,.35);background:rgba(79,140,255,.10)}
+.Btn.primary{background:rgba(79,140,255,.14);border-color:rgba(79,140,255,.35)}
+.TermInput{
+  flex:1;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.03);
+  color:rgba(231,235,244,.92);
+  padding:8px 10px;
+  outline:none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size:12px;
+}
+.TermInput:focus{border-color:rgba(79,140,255,.45)}
+
+.RightPane{
+  width:360px;
+  min-width:280px;
+  max-width:620px;
+  border-left:1px solid var(--line);
+  background:rgba(20,24,33,.75);
+  display:flex;flex-direction:column;
+  min-height:0;
+}
+.RightPane.hidden{width:0;min-width:0;border-left:none;overflow:hidden}
+.RightPaneTop{padding:10px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.PathRow{display:flex;gap:8px;align-items:center}
+.RightPaneBody{flex:1;overflow:auto;padding:10px}
+.StatusLine{color:var(--muted);font-size:12px;margin-bottom:8px}
+.FileTable{width:100%;border-collapse:collapse;font-size:12px}
+.FileTable th,.FileTable td{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.06)}
+.FileTable th{color:rgba(231,235,244,.75);font-weight:600;text-align:left}
+.FileTable td{color:rgba(231,235,244,.92)}
+.FileTable td.num{text-align:right;color:rgba(231,235,244,.75)}
+.FileRow{cursor:pointer}
+.FileRow:hover{background:rgba(255,255,255,.03)}
+
+.Drawer{
+  width:420px;
+  border-left:1px solid var(--line);
+  background:rgba(16,19,26,.95);
+  display:flex;flex-direction:column;
+  min-height:0;
+}
+.DrawerTabs{display:flex;gap:6px;padding:10px;border-bottom:1px solid rgba(255,255,255,.10)}
+.DrawerTab{
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.03);
+  color:rgba(231,235,244,.9);
+  padding:6px 10px;border-radius:12px;
+  cursor:pointer;font-size:13px;
+}
+.DrawerTab.active{background:rgba(79,140,255,.14);border-color:rgba(79,140,255,.35)}
+.DrawerBody{flex:1;min-height:0;display:flex;flex-direction:column}
+.DrawerPanel{flex:1;min-height:0;display:flex;flex-direction:column}
+.DrawerToolbar{padding:10px;display:flex;gap:8px;align-items:center;border-bottom:1px solid rgba(255,255,255,.10)}
+.VaultRow{flex:1;min-height:0;display:flex;overflow:hidden}
+.Vaults{width:160px;border-right:1px solid rgba(255,255,255,.10);padding:10px;overflow:auto}
+.Snippets{flex:1;padding:10px;overflow:auto}
+.VaultItem{padding:8px 10px;border-radius:12px;cursor:pointer;color:rgba(231,235,244,.88);border:1px solid transparent}
+.VaultItem.active{background:rgba(79,140,255,.14);border-color:rgba(79,140,255,.25)}
+.SnippetCard{
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.03);
+  border-radius:16px;
+  padding:10px;
+  margin-bottom:10px;
+}
+.SnippetTitle{font-weight:700;font-size:13px;margin-bottom:6px}
+.SnippetCode{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size:12px;
+  color:rgba(231,235,244,.9);
+  white-space:pre-wrap;
+  background:rgba(0,0,0,.25);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;
+  padding:8px;
+}
+.SnippetActions{display:flex;gap:8px;margin-top:8px}
+.HistoryList{padding:10px;overflow:auto}
+.HistItem{padding:10px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.03);border-radius:16px;margin-bottom:10px}
+.HistTime{color:var(--muted);font-size:11px}
+.HistText{margin-top:4px;font-size:12px}
+
+.CtxMenu{
+  position:fixed;
+  z-index:50;
+  width:220px;
+  background:rgba(16,19,26,.98);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.CtxItem{padding:10px 12px;cursor:pointer;font-size:13px;color:rgba(231,235,244,.92);display:flex;justify-content:space-between;gap:10px}
+.CtxItem:hover{background:rgba(79,140,255,.12)}
+.CtxItem.disabled{opacity:.45;pointer-events:none}
+.CtxSep{height:1px;background:rgba(255,255,255,.08);margin:4px 0}
+
+.Overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.55);
+  display:flex;align-items:flex-start;justify-content:center;
+  padding-top:90px;
+  z-index:80;
+}
+.Palette{
+  width:min(640px, 92vw);
+  background:rgba(16,19,26,.98);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:18px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.PaletteTop{display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid rgba(255,255,255,.10)}
+.PaletteInput{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:14px}
+.PaletteList{max-height:340px;overflow:auto}
+.PaletteItem{padding:10px 12px;cursor:pointer;display:flex;justify-content:space-between;gap:10px}
+.PaletteItem:hover{background:rgba(79,140,255,.12)}
+.PaletteItem .hint{color:var(--muted);font-size:12px}
+
+.Modal{
+  width:min(860px, 94vw);
+  background:rgba(16,19,26,.98);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:20px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.ModalTop{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.10)}
+.ModalTitle{font-weight:800}
+.ModalTabs{display:flex;gap:6px;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.10)}
+.ModalTab{
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.03);
+  color:rgba(231,235,244,.9);
+  padding:6px 10px;border-radius:12px;
+  cursor:pointer;font-size:13px;
+}
+.ModalTab.active{background:rgba(79,140,255,.14);border-color:rgba(79,140,255,.35)}
+.ModalBody{padding:14px;max-height:56vh;overflow:auto}
+.ModalFooter{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-top:1px solid rgba(255,255,255,.10)}
+.ModalFooterRight{display:flex;gap:8px}
+.FormGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.Field{display:flex;flex-direction:column;gap:6px}
+.Label{font-size:12px;color:rgba(231,235,244,.75)}
+.Pills{display:flex;gap:6px;flex-wrap:wrap}
+.Pill{padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);cursor:pointer;font-size:12px}
+.Pill.active{background:rgba(79,140,255,.14);border-color:rgba(79,140,255,.35)}
+.ColorDots{display:flex;gap:8px;align-items:center}
+.Dot{width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid transparent}
+.Dot.active{border-color:rgba(231,235,244,.9)}
+.TextArea{min-height:80px;resize:vertical}
+.CheckRow{display:flex;gap:10px;flex-wrap:wrap}
+.Check{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid rgba(255,255,255,.10);border-radius:14px;background:rgba(255,255,255,.03)}
+
+.ToastHost{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:10px;z-index:120}
+.Toast{padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(16,19,26,.95);box-shadow:var(--shadow);min-width:240px}
+.Toast.good{border-color:rgba(61,220,151,.35)}
+.Toast.bad{border-color:rgba(255,107,107,.35)}
+.Toast .t{font-weight:700;margin-bottom:4px}
+.Toast .m{color:rgba(231,235,244,.82);font-size:12px}

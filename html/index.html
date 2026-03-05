@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HexHub Mock (HTML/CSS/JS)</title>
+  <link rel="stylesheet" href="./main.css" />
+</head>
+<body>
+<div id="app" class="AppShell">
+  <!-- Top Bar (custom, not native) -->
+  <header class="TopBar" id="topbar">
+    <div class="TopBar-left drag-region" id="dragRegion">
+      <div class="AppMark" aria-label="HexHub">
+        <span class="LogoDot"></span>
+        <span class="AppName">HexHub</span>
+      </div>
+      <span class="EnvPill" id="envPill">生产</span>
+      <span class="TopBarHint" id="activeHint">—</span>
+    </div>
+
+    <div class="TopBar-center no-drag">
+      <div class="SearchWrap">
+        <span class="Icon">⌕</span>
+        <input id="globalSearch" class="SearchInput" placeholder="Search connections, commands…" />
+        <span class="Kbd">Ctrl K</span>
+      </div>
+    </div>
+
+    <div class="TopBar-right no-drag">
+      <button class="IconBtn" id="btnToggleSftp" title="切换 SFTP 面板 (Alt+S)">🗂️</button>
+      <button class="IconBtn" id="btnToggleDrawer" title="切换 Drawer (Alt+D)">📌</button>
+      <button class="IconBtn" id="btnTheme" title="切换主题 (Alt+T)">🌓</button>
+      <button class="IconBtn" id="btnSettings" title="设置 (Ctrl+,)">⚙️</button>
+      <button class="IconBtn" id="btnHelp" title="快捷键/帮助 (?)">?</button>
+
+      <div class="WinControls">
+        <button class="WinBtn" title="最小化（示意）">—</button>
+        <button class="WinBtn" title="最大化（示意）">▢</button>
+        <button class="WinBtn danger" title="关闭（示意）">✕</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="MainRow">
+    <!-- Left Rail -->
+    <aside class="LeftRail">
+      <button class="RailBtn" id="railToggleLeft" title="展开/折叠侧边栏">☰</button>
+      <button class="RailBtn" id="railSessions" title="平铺所有终端连接">▦</button>
+      <button class="RailBtn" id="railTree" title="树形连接视图">🌲</button>
+      <div class="RailSpacer"></div>
+      <button class="RailBtn" id="railNew" title="新建连接 (N)">＋</button>
+    </aside>
+
+    <!-- Asset Sidebar -->
+    <section class="AssetSidebar" id="assetSidebar">
+      <div class="AssetToolbar">
+        <input id="assetSearch" class="MiniInput" placeholder="查找…" />
+        <div class="ToolBtns">
+          <button class="ToolBtn" id="btnExpandAll" title="展开全部">⤢</button>
+          <button class="ToolBtn" id="btnCollapseAll" title="收起全部">⤡</button>
+          <div class="Dropdown">
+            <button class="ToolBtn primary" id="btnCreate" title="创建">创建 ▾</button>
+            <div class="DropdownMenu" id="createMenu">
+              <div class="MenuItem" data-action="new-folder">新建文件夹</div>
+              <div class="MenuItem" data-action="new-conn">新建 SSH 连接</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="AssetBody">
+        <div class="AssetEmpty" id="assetEmpty" hidden>暂无资产</div>
+        <ul class="Tree" id="assetTree"></ul>
+      </div>
+    </section>
+
+    <!-- Splitter between sidebar and center -->
+    <div class="Splitter" id="splitLeft"></div>
+
+    <!-- Main Workspace -->
+    <main class="Workspace">
+      <div class="WorkspaceTop">
+        <div class="ViewTabs">
+          <button class="ViewTab active" id="viewTerm">终端</button>
+          <button class="ViewTab" id="viewSessionsTab">Sessions</button>
+        </div>
+        <div class="WorkspaceMeta" id="workspaceMeta">就绪</div>
+      </div>
+
+      <div class="WorkspaceBody" id="workspaceBody">
+        <!-- Single or Split Panes injected by JS -->
+      </div>
+    </main>
+
+    <!-- Splitter between center and right pane -->
+    <div class="Splitter" id="splitRight"></div>
+
+    <!-- Right SFTP Pane -->
+    <aside class="RightPane" id="rightPane">
+      <div class="RightPaneTop">
+        <div class="PathRow">
+          <button class="ToolBtn" id="btnSftpUp" title="上级">↥</button>
+          <input class="MiniInput" id="sftpPath" value="/root" />
+          <button class="ToolBtn" id="btnSftpRefresh" title="刷新">⟳</button>
+        </div>
+        <input class="MiniInput" id="sftpSearch" placeholder="搜索文件…" />
+      </div>
+      <div class="RightPaneBody">
+        <div class="StatusLine" id="sftpStatus">—</div>
+        <table class="FileTable">
+          <thead>
+            <tr><th>名称</th><th>修改时间</th><th>类型</th><th class="num">大小</th></tr>
+          </thead>
+          <tbody id="sftpTable"></tbody>
+        </table>
+      </div>
+    </aside>
+
+    <!-- Right Drawer -->
+    <aside class="Drawer" id="drawer" hidden>
+      <div class="DrawerTabs">
+        <button class="DrawerTab active" data-tab="snippets">Snippets</button>
+        <button class="DrawerTab" data-tab="history">History</button>
+      </div>
+
+      <div class="DrawerBody">
+        <div class="DrawerPanel" id="panelSnippets">
+          <div class="DrawerToolbar">
+            <input class="MiniInput" id="snippetSearch" placeholder="搜索 snippets…" />
+            <button class="ToolBtn primary" id="btnNewSnippet" title="新增 Snippet">＋</button>
+          </div>
+          <div class="VaultRow">
+            <div class="Vaults" id="vaults"></div>
+            <div class="Snippets" id="snippets"></div>
+          </div>
+        </div>
+
+        <div class="DrawerPanel" id="panelHistory" hidden>
+          <div class="DrawerToolbar">
+            <button class="ToolBtn" id="btnClearHistory">清空</button>
+          </div>
+          <div class="HistoryList" id="historyList"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- Context menu -->
+<div id="ctxMenu" class="CtxMenu" hidden></div>
+
+<!-- Command Palette -->
+<div id="paletteOverlay" class="Overlay" hidden>
+  <div class="Palette" role="dialog" aria-modal="true">
+    <div class="PaletteTop">
+      <span class="Icon">⌘</span>
+      <input id="paletteInput" class="PaletteInput" placeholder="输入命令…" />
+      <span class="Kbd">Esc</span>
+    </div>
+    <div class="PaletteList" id="paletteList"></div>
+  </div>
+</div>
+
+<!-- SSH Config Modal (mock) -->
+<div id="modalOverlay" class="Overlay" hidden>
+  <div class="Modal" role="dialog" aria-modal="true">
+    <div class="ModalTop">
+      <div class="ModalTitle">SSH 配置编辑</div>
+      <button class="IconBtn" id="modalClose" title="关闭">✕</button>
+    </div>
+
+    <div class="ModalTabs">
+      <button class="ModalTab active" data-tab="standard">标准</button>
+      <button class="ModalTab" data-tab="tunnel">隧道</button>
+      <button class="ModalTab" data-tab="proxy">代理</button>
+      <button class="ModalTab" data-tab="env">环境变量</button>
+      <button class="ModalTab" data-tab="advanced">高级</button>
+    </div>
+
+    <div class="ModalBody">
+      <div class="ModalPanel" id="mStandard"></div>
+      <div class="ModalPanel" id="mTunnel" hidden></div>
+      <div class="ModalPanel" id="mProxy" hidden></div>
+      <div class="ModalPanel" id="mEnv" hidden></div>
+      <div class="ModalPanel" id="mAdvanced" hidden></div>
+    </div>
+
+    <div class="ModalFooter">
+      <button class="Btn" id="btnTestConn">测试连接</button>
+      <div class="ModalFooterRight">
+        <button class="Btn" id="btnCancel">取消</button>
+        <button class="Btn primary" id="btnSaveConn">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ToastHost" id="toastHost"></div>
+
+<script src="./main.js"></script>
+</body>
+</html>
