@@ -8,12 +8,20 @@
 
 - 自绘标题栏（无边框窗口）+ 窗口拖拽 + 最小化/最大化/关闭
 - 顶部菜单（Settings/Language/Help/About）已接入真实命令与弹窗
-- 左侧资产区：图标导航、Tree/List 视图切换、右键菜单（新建/编辑/删除）
+- 左侧资产区：图标导航、Tree/Flat 单按钮模式切换、右键菜单（新建/编辑/删除）
 - 中间工作区：FluentAvalonia `TabView` 多标签、右键标签操作（Duplicate/Close Others/Close Right/Close All）
-- 右侧工具区：Snippet / History / SFTP 视图切换与 Mock 数据展示
-- 默认深色主题，支持顶部图标按钮切换深浅色
+- 右侧工具区：Snippet / History / SFTP 视图切换与 Mock 数据展示，支持拖拽与阈值自动收起
+- 左右侧栏可拖拽缩放，收起时 splitter 与内容列保持同步联动
+- 默认深色主题，支持顶部图标按钮切换深浅色，Settings 支持透明/不透明窗口材质切换
 
 > 说明：当前未接入真实 SSH.NET，仅提供服务接口与 Mock 实现，UI 可完整联调。
+
+## 最近迭代（Git Log 摘要）
+
+- `2f9a20e` (2026-03-05): 修复资产面板显隐状态与 splitter 联动；统一资产模式命名为 `Tree/Flat`；修复右侧栏阈值收缩后不可继续拖拽的问题。
+- `7ac6003` (2026-03-05): 重构主窗口壳层，统一资产视图切换交互，补全 Settings 弹窗返回逻辑与透明度切换状态。
+- `72c9f22` (2026-03-05): 实现自绘顶部状态栏与无边框窗口，完善顶部菜单命令链与窗口交互细节。
+- `830e20a` (2026-03-05): 完善项目 README，并清理误跟踪的 `obj` 噪音文件。
 
 ## 技术栈
 
@@ -82,7 +90,7 @@ dotnet test tests/SkylarkTerminal.Tests/SkylarkTerminal.Tests.csproj
 当前测试覆盖的核心行为包含：
 
 - 左/右侧栏展开收起状态与宽度联动
-- 资产视图模式切换（Tree/List）
+- 资产视图模式切换（Tree/Flat）
 - 资产增删改操作
 - Tab 增删改与右键操作逻辑
 - 右侧工具面板视图切换
@@ -112,9 +120,9 @@ public interface ISftpService
 
 - 顶部左侧 `Menu`：打开 Settings / Language / Help / About，其中 Settings 可切换窗口透明/不透明
 - 顶部主题按钮：月亮/太阳图标切换深浅色
-- 左侧资产栏底部按钮：展开/收起资产面板
+- 左侧资产栏底部按钮：展开/收起资产面板；资产头部单按钮在 `Tree/Flat` 两种模式间切换
 - 中央 Tab：支持右键管理与快速复制会话
-- 右上角 Tools 按钮：展开/收起右侧工具面板（保留上次选中视图）
+- 右上角 Tools 按钮：展开/收起右侧工具面板（保留上次选中视图），并支持拖拽到阈值后自动收起
 
 ## 后续开发建议
 
