@@ -4,7 +4,11 @@ namespace SkylarkTerminal.Services;
 
 public interface IAppDialogService
 {
-    Task ShowSettingsAsync(string themeMode, bool isLeftAssetsPaneOpen, bool isRightToolsPaneOpen);
+    Task<bool?> ShowSettingsAsync(
+        string themeMode,
+        bool isLeftAssetsPaneOpen,
+        bool isRightSidebarVisible,
+        bool isShellTransparent);
 
     Task<string?> ShowLanguagePickerAsync(string currentLanguageCode);
 

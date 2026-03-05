@@ -11,8 +11,18 @@ namespace SkylarkTerminal.Services;
 
 public sealed class AppDialogService : IAppDialogService
 {
-    public Task ShowSettingsAsync(string themeMode, bool isLeftAssetsPaneOpen, bool isRightToolsPaneOpen)
+    public async Task<bool?> ShowSettingsAsync(
+        string themeMode,
+        bool isLeftAssetsPaneOpen,
+        bool isRightSidebarVisible,
+        bool isShellTransparent)
     {
+        var host = ResolveHostWindow();
+        if (host is null)
+        {
+            return null;
+        }
+
         var content = new StackPanel
         {
             Spacing = 6,
@@ -20,11 +30,35 @@ public sealed class AppDialogService : IAppDialogService
             {
                 new TextBlock { Text = $"Theme: {themeMode}" },
                 new TextBlock { Text = $"Left Assets Pane: {(isLeftAssetsPaneOpen ? "Open" : "Closed")}" },
-                new TextBlock { Text = $"Right Tools Pane: {(isRightToolsPaneOpen ? "Open" : "Closed")}" },
+                new TextBlock { Text = $"Right Sidebar: {(isRightSidebarVisible ? "Open" : "Closed")}" },
+                new TextBlock { Text = $"Window Material: {(isShellTransparent ? "Transparent" : "Opaque")}" },
+                new TextBlock
+                {
+                    Text = "Choose Transparent or Opaque shell style for this session.",
+                    TextWrapping = TextWrapping.Wrap,
+                },
             },
         };
 
-        return ShowSimpleDialogAsync("Settings", content);
+        var dialog = new ContentDialog
+        {
+            Title = "Settings",
+            Content = content,
+            PrimaryButtonText = "Opaque",
+            SecondaryButtonText = "Transparent",
+            CloseButtonText = "Cancel",
+            DefaultButton = isShellTransparent
+                ? ContentDialogButton.Secondary
+                : ContentDialogButton.Primary,
+        };
+
+        var result = await dialog.ShowAsync(host);
+        return result switch
+        {
+            ContentDialogResult.Primary => false,
+            ContentDialogResult.Secondary => true,
+            _ => null,
+        };
     }
 
     public async Task<string?> ShowLanguagePickerAsync(string currentLanguageCode)

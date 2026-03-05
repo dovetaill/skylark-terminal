@@ -17,12 +17,26 @@
             <StackPanel Orientation="Horizontal"
                         Spacing="8"
                         VerticalAlignment="Center">
-                <Button Classes="TitleBarButton"
-                        Command="{Binding ToggleLeftSidebarCommand}"
-                        ToolTip.Tip="展开或收起左侧资产面板">
-                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                               Text="&#xE700;"/>
-                </Button>
+                <Menu Background="Transparent">
+                    <MenuItem ToolTip.Tip="主菜单">
+                        <MenuItem.Header>
+                            <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                       Text="&#xE700;"/>
+                        </MenuItem.Header>
+                        <MenuItem Header="Settings"
+                                  ToolTip.Tip="打开设置对话框"
+                                  Command="{Binding OpenSettingsCommand}"/>
+                        <MenuItem Header="Language"
+                                  ToolTip.Tip="切换界面语言"
+                                  Command="{Binding OpenLanguageCommand}"/>
+                        <MenuItem Header="Help"
+                                  ToolTip.Tip="查看帮助与快捷键"
+                                  Command="{Binding OpenHelpCommand}"/>
+                        <MenuItem Header="About"
+                                  ToolTip.Tip="查看版本与技术栈"
+                                  Command="{Binding OpenAboutCommand}"/>
+                    </MenuItem>
+                </Menu>
                 <Border Width="20"
                         Height="20"
                         CornerRadius="4"
@@ -55,12 +69,6 @@
                         Orientation="Horizontal"
                         Spacing="4"
                         VerticalAlignment="Center">
-                <Button Classes="TitleBarButton"
-                        IsEnabled="False"
-                        ToolTip.Tip="全局状态占位">
-                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                               Text="&#xE73E;"/>
-                </Button>
                 <Button Classes="TitleBarButton"
                         Command="{Binding ToggleThemeCommand}"
                         ToolTip.Tip="{Binding ThemeToggleToolTip}">

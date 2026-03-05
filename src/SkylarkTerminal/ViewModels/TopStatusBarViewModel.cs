@@ -60,15 +60,33 @@ public partial class TopStatusBarViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void ToggleLeftSidebar()
+    private void OpenSettings()
     {
-        _shell.ToggleLeftAssetsPaneCommand.Execute(null);
+        _shell.OpenSettingsCommand.Execute(null);
+    }
+
+    [RelayCommand]
+    private void OpenLanguage()
+    {
+        _shell.OpenLanguageCommand.Execute(null);
+    }
+
+    [RelayCommand]
+    private void OpenHelp()
+    {
+        _shell.OpenHelpCommand.Execute(null);
+    }
+
+    [RelayCommand]
+    private void OpenAbout()
+    {
+        _shell.OpenAboutCommand.Execute(null);
     }
 
     [RelayCommand]
     private void ToggleRightSidebar()
     {
-        _shell.ToggleRightToolsPaneCommand.Execute(null);
+        _shell.ToggleRightSidebarCommand.Execute(null);
     }
 
     [RelayCommand]

@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -7,8 +8,6 @@ public partial class WorkspaceTabItemViewModel : ObservableObject
 {
     private static readonly IBrush ActiveHeaderBackground = new SolidColorBrush(Color.Parse("#22000000"));
     private static readonly IBrush InactiveHeaderBackground = new SolidColorBrush(Color.Parse("#14000000"));
-    private static readonly IBrush ActiveHeaderBorderBrush = new SolidColorBrush(Color.Parse("#FF74B9FF"));
-    private static readonly IBrush InactiveHeaderBorderBrush = new SolidColorBrush(Color.Parse("#00000000"));
 
     public WorkspaceTabItemViewModel(
         string id,
@@ -42,7 +41,9 @@ public partial class WorkspaceTabItemViewModel : ObservableObject
 
     public IBrush HeaderBackgroundBrush => IsActive ? ActiveHeaderBackground : InactiveHeaderBackground;
 
-    public IBrush HeaderBorderBrush => IsActive ? ActiveHeaderBorderBrush : InactiveHeaderBorderBrush;
+    public Thickness HeaderBottomBorderThickness => IsActive
+        ? new Thickness(0, 0, 0, 2)
+        : new Thickness(0);
 
     public FontWeight HeaderFontWeight => IsActive ? FontWeight.SemiBold : FontWeight.Normal;
 
@@ -61,7 +62,7 @@ public partial class WorkspaceTabItemViewModel : ObservableObject
     partial void OnIsActiveChanged(bool value)
     {
         OnPropertyChanged(nameof(HeaderBackgroundBrush));
-        OnPropertyChanged(nameof(HeaderBorderBrush));
+        OnPropertyChanged(nameof(HeaderBottomBorderThickness));
         OnPropertyChanged(nameof(HeaderFontWeight));
         OnPropertyChanged(nameof(HeaderOpacity));
     }

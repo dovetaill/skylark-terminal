@@ -110,7 +110,7 @@ public interface ISftpService
 
 ## UI 交互说明
 
-- 顶部左侧 `Menu`：打开 Settings / Language / Help / About
+- 顶部左侧 `Menu`：打开 Settings / Language / Help / About，其中 Settings 可切换窗口透明/不透明
 - 顶部主题按钮：月亮/太阳图标切换深浅色
 - 左侧资产栏底部按钮：展开/收起资产面板
 - 中央 Tab：支持右键管理与快速复制会话

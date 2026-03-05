@@ -4,9 +4,13 @@ namespace SkylarkTerminal.Services.Mock;
 
 public sealed class MockAppDialogService : IAppDialogService
 {
-    public Task ShowSettingsAsync(string themeMode, bool isLeftAssetsPaneOpen, bool isRightToolsPaneOpen)
+    public Task<bool?> ShowSettingsAsync(
+        string themeMode,
+        bool isLeftAssetsPaneOpen,
+        bool isRightSidebarVisible,
+        bool isShellTransparent)
     {
-        return Task.CompletedTask;
+        return Task.FromResult<bool?>(isShellTransparent);
     }
 
     public Task<string?> ShowLanguagePickerAsync(string currentLanguageCode)

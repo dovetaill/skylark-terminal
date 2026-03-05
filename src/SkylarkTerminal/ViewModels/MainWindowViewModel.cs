@@ -18,7 +18,8 @@ namespace SkylarkTerminal.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase
 {
     public const double ExpandedLeftAssetsPaneWidth = 300d;
-    public const double ExpandedRightToolsPaneWidth = 340d;
+    public const double ExpandedRightSidebarWidth = 340d;
+    public const double DefaultAssetsPanelWidth = 320d;
 
     private static readonly Color[] WorkspaceAccentPalette =
     [
@@ -72,7 +73,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private bool isLeftAssetsPaneOpen = true;
 
     [ObservableProperty]
-    private bool isRightToolsPaneOpen;
+    private bool isRightSidebarVisible;
 
     [ObservableProperty]
     private AssetsPaneKind selectedAssetsPane = AssetsPaneKind.Hosts;
@@ -95,13 +96,20 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string currentLanguageCode = "zh-CN";
 
-    public double LeftAssetsPaneWidth => IsLeftAssetsPaneOpen ? ExpandedLeftAssetsPaneWidth : 0d;
+    [ObservableProperty]
+    private bool isShellTransparent;
 
-    public double RightToolsPaneWidth => IsRightToolsPaneOpen ? ExpandedRightToolsPaneWidth : 0d;
+    public double LeftAssetsPaneWidth => IsLeftAssetsPaneOpen ? ExpandedLeftAssetsPaneWidth : 0d;
 
     public bool IsTreeViewMode => AssetsViewMode == AssetsViewMode.Tree;
 
     public bool IsListViewMode => AssetsViewMode == AssetsViewMode.List;
+
+    public string AssetsViewModeGlyph => IsTreeViewMode ? "\uE8D2" : "\uE8FD";
+
+    public string AssetsViewModeToolTip => IsTreeViewMode
+        ? "当前为树形视图，点击切换为列表视图"
+        : "当前为列表视图，点击切换为树形视图";
 
     public string AssetsPanelTitle => SelectedAssetsPane switch
     {
@@ -121,6 +129,12 @@ public partial class MainWindowViewModel : ViewModelBase
         : "当前为浅色主题，点击切换为深色主题";
 
     public string CurrentLanguageLabel => CurrentLanguageCode == "zh-CN" ? "中文" : "English";
+
+    public string LeftAssetsPaneToggleGlyph => IsLeftAssetsPaneOpen ? "\uE76B" : "\uE76C";
+
+    public string LeftAssetsPaneToggleToolTip => IsLeftAssetsPaneOpen
+        ? "收起资产列"
+        : "展开资产列";
 
     public bool IsSnippetsView => SelectedRightToolsView == RightToolsViewKind.Snippets;
 
@@ -161,29 +175,29 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void ToggleRightToolsPane()
+    private void ToggleRightSidebar()
     {
-        IsRightToolsPaneOpen = !IsRightToolsPaneOpen;
+        IsRightSidebarVisible = !IsRightSidebarVisible;
     }
 
     [RelayCommand]
     private void ShowSnippetsTools()
     {
-        IsRightToolsPaneOpen = true;
+        IsRightSidebarVisible = true;
         SelectedRightToolsView = RightToolsViewKind.Snippets;
     }
 
     [RelayCommand]
     private void ShowHistoryTools()
     {
-        IsRightToolsPaneOpen = true;
+        IsRightSidebarVisible = true;
         SelectedRightToolsView = RightToolsViewKind.History;
     }
 
     [RelayCommand]
     private async Task ShowSftpTools()
     {
-        IsRightToolsPaneOpen = true;
+        IsRightSidebarVisible = true;
         SelectedRightToolsView = RightToolsViewKind.Sftp;
         SftpItems.Clear();
 
@@ -197,7 +211,21 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private async Task OpenSettings()
     {
-        await _appDialogService.ShowSettingsAsync(ThemeModeLabel, IsLeftAssetsPaneOpen, IsRightToolsPaneOpen);
+        var selectedTransparency = await _appDialogService.ShowSettingsAsync(
+            ThemeModeLabel,
+            IsLeftAssetsPaneOpen,
+            IsRightSidebarVisible,
+            IsShellTransparent);
+
+        if (!selectedTransparency.HasValue || selectedTransparency.Value == IsShellTransparent)
+        {
+            return;
+        }
+
+        IsShellTransparent = selectedTransparency.Value;
+        LastAssetActionMessage = IsShellTransparent
+            ? "窗口已切换为透明材质"
+            : "窗口已切换为不透明样式";
     }
 
     [RelayCommand]
@@ -262,6 +290,14 @@ public partial class MainWindowViewModel : ViewModelBase
     private void SetListViewMode()
     {
         AssetsViewMode = AssetsViewMode.List;
+    }
+
+    [RelayCommand]
+    private void ToggleAssetsViewMode()
+    {
+        AssetsViewMode = AssetsViewMode == AssetsViewMode.Tree
+            ? AssetsViewMode.List
+            : AssetsViewMode.Tree;
     }
 
     [RelayCommand]
@@ -427,12 +463,12 @@ public partial class MainWindowViewModel : ViewModelBase
     partial void OnIsLeftAssetsPaneOpenChanged(bool value)
     {
         OnPropertyChanged(nameof(LeftAssetsPaneWidth));
+        OnPropertyChanged(nameof(LeftAssetsPaneToggleGlyph));
+        OnPropertyChanged(nameof(LeftAssetsPaneToggleToolTip));
     }
 
-    partial void OnIsRightToolsPaneOpenChanged(bool value)
-    {
-        OnPropertyChanged(nameof(RightToolsPaneWidth));
-    }
+    partial void OnIsRightSidebarVisibleChanged(bool value)
+    { }
 
     partial void OnSelectedAssetsPaneChanged(AssetsPaneKind value)
     {
@@ -445,6 +481,8 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         OnPropertyChanged(nameof(IsTreeViewMode));
         OnPropertyChanged(nameof(IsListViewMode));
+        OnPropertyChanged(nameof(AssetsViewModeGlyph));
+        OnPropertyChanged(nameof(AssetsViewModeToolTip));
     }
 
     partial void OnSelectedRightToolsViewChanged(RightToolsViewKind value)
