@@ -203,8 +203,8 @@
             </Border>
 
             <Border Grid.Column="1"
-                    IsVisible="{Binding IsLeftAssetsPaneOpen}"
-                    IsHitTestVisible="{Binding IsLeftAssetsPaneOpen}"
+                    IsVisible="{Binding IsAssetsPanelVisible}"
+                    IsHitTestVisible="{Binding IsAssetsPanelVisible}"
                     Background="{DynamicResource ShellAssetsBrush}"
                     BorderBrush="{DynamicResource ShellBorderBrush}"
                     BorderThickness="0"
@@ -229,6 +229,8 @@
                                         Command="{Binding ToggleAssetsViewModeCommand}"
                                         ToolTip.Tip="{Binding AssetsViewModeToolTip}">
                                     <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
                                                Text="{Binding AssetsViewModeGlyph}"/>
                                 </Button>
                             </StackPanel>
@@ -268,7 +270,7 @@
 
                         <ListBox ItemsSource="{Binding CurrentAssetFlatList}"
                                  SelectedItem="{Binding SelectedAssetNode, Mode=TwoWay}"
-                                 IsVisible="{Binding IsListViewMode}">
+                                 IsVisible="{Binding IsFlatViewMode}">
                             <ListBox.ContextMenu>
                                 <ContextMenu DataContext="{Binding #RootWindow.DataContext}">
                                     <MenuItem Header="新建"
@@ -302,6 +304,8 @@
                           Classes="ShellColumnSplitter"
                           ResizeDirection="Columns"
                           ResizeBehavior="PreviousAndNext"
+                          IsVisible="{Binding IsAssetsPanelVisible}"
+                          IsHitTestVisible="{Binding IsAssetsPanelVisible}"
                           PointerReleased="OnAssetsPanelSplitterPointerReleased"/>
 
             <Border Grid.Column="3"

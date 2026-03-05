@@ -13,7 +13,9 @@ namespace SkylarkTerminal.Views;
 public partial class MainWindow : Window
 {
     private const double AssetsPanelAutoCollapseThreshold = 180d;
+    private const double AssetsPanelSplitterWidth = 8d;
     private const double RightSidebarAutoCollapseThreshold = 220d;
+    private const double RightSidebarSplitterWidth = 8d;
     private MainWindowViewModel? _boundViewModel;
     private Grid? _mainContentGrid;
 
@@ -24,6 +26,8 @@ public partial class MainWindow : Window
     }
 
     private ColumnDefinition AssetsPanelColumnDefinition => ResolveMainContentGrid().ColumnDefinitions[1];
+    private ColumnDefinition AssetsPanelSplitterColumnDefinition => ResolveMainContentGrid().ColumnDefinitions[2];
+    private ColumnDefinition RightSidebarSplitterColumnDefinition => ResolveMainContentGrid().ColumnDefinitions[4];
     private ColumnDefinition RightSidebarColumnDefinition => ResolveMainContentGrid().ColumnDefinitions[5];
 
     private Grid ResolveMainContentGrid()
@@ -56,7 +60,8 @@ public partial class MainWindow : Window
             toggleMaximizeRestoreWindowAction: ToggleMaximizeRestoreWindow,
             closeWindowAction: Close);
         vm.TopStatusBar.SetWindowState(WindowState);
-        vm.IsLeftAssetsPaneOpen = AssetsPanelColumnDefinition.Width.Value > 0d;
+        vm.IsAssetsPanelVisible = AssetsPanelColumnDefinition.Width.Value > 0d;
+        SyncAssetsPanelColumnVisibility(vm.IsAssetsPanelVisible);
         SyncRightSidebarColumnVisibility(vm.IsRightSidebarVisible);
         ApplyShellVisualMode(vm.IsShellTransparent);
     }
@@ -149,9 +154,9 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (e.PropertyName == nameof(MainWindowViewModel.IsLeftAssetsPaneOpen))
+        if (e.PropertyName == nameof(MainWindowViewModel.IsAssetsPanelVisible))
         {
-            SyncAssetsPanelColumnVisibility(_boundViewModel.IsLeftAssetsPaneOpen);
+            SyncAssetsPanelColumnVisibility(_boundViewModel.IsAssetsPanelVisible);
         }
         else if (e.PropertyName == nameof(MainWindowViewModel.IsRightSidebarVisible))
         {
@@ -175,13 +180,13 @@ public partial class MainWindow : Window
         if (currentWidth <= AssetsPanelAutoCollapseThreshold)
         {
             AssetsPanelColumnDefinition.Width = new GridLength(0d);
-            _boundViewModel.IsLeftAssetsPaneOpen = false;
+            _boundViewModel.IsAssetsPanelVisible = false;
             return;
         }
 
-        if (!_boundViewModel.IsLeftAssetsPaneOpen)
+        if (!_boundViewModel.IsAssetsPanelVisible)
         {
-            _boundViewModel.IsLeftAssetsPaneOpen = true;
+            _boundViewModel.IsAssetsPanelVisible = true;
         }
     }
 
@@ -192,23 +197,22 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (_boundViewModel.IsLeftAssetsPaneOpen)
+        if (_boundViewModel.IsAssetsPanelVisible)
         {
             var leftWidth = AssetsPanelColumnDefinition.ActualWidth;
             if (leftWidth > 0d && leftWidth <= AssetsPanelAutoCollapseThreshold)
             {
                 AssetsPanelColumnDefinition.Width = new GridLength(0d);
-                _boundViewModel.IsLeftAssetsPaneOpen = false;
+                _boundViewModel.IsAssetsPanelVisible = false;
             }
         }
 
         if (_boundViewModel.IsRightSidebarVisible)
         {
-            var rightWidth = RightSidebarColumnDefinition.ActualWidth;
-            if (rightWidth > 0d && rightWidth <= RightSidebarAutoCollapseThreshold)
+            var rightWidth = ResolveColumnWidth(RightSidebarColumnDefinition);
+            if (rightWidth <= RightSidebarAutoCollapseThreshold)
             {
-                RightSidebarColumnDefinition.Width = new GridLength(0d);
-                _boundViewModel.IsRightSidebarVisible = false;
+                CollapseRightSidebar();
             }
         }
     }
@@ -218,9 +222,11 @@ public partial class MainWindow : Window
         if (!isOpen)
         {
             AssetsPanelColumnDefinition.Width = new GridLength(0d);
+            AssetsPanelSplitterColumnDefinition.Width = new GridLength(0d);
             return;
         }
 
+        AssetsPanelSplitterColumnDefinition.Width = new GridLength(AssetsPanelSplitterWidth);
         if (AssetsPanelColumnDefinition.Width.Value <= 0d)
         {
             AssetsPanelColumnDefinition.Width = new GridLength(MainWindowViewModel.ExpandedLeftAssetsPaneWidth);
@@ -234,11 +240,10 @@ public partial class MainWindow : Window
             return;
         }
 
-        var currentWidth = RightSidebarColumnDefinition.ActualWidth;
+        var currentWidth = ResolveColumnWidth(RightSidebarColumnDefinition);
         if (currentWidth <= RightSidebarAutoCollapseThreshold)
         {
-            RightSidebarColumnDefinition.Width = new GridLength(0d);
-            _boundViewModel.IsRightSidebarVisible = false;
+            CollapseRightSidebar();
             return;
         }
 
@@ -252,14 +257,37 @@ public partial class MainWindow : Window
     {
         if (!isVisible)
         {
-            RightSidebarColumnDefinition.Width = new GridLength(0d);
+            CollapseRightSidebar();
             return;
         }
 
+        RightSidebarSplitterColumnDefinition.Width = new GridLength(RightSidebarSplitterWidth);
         if (RightSidebarColumnDefinition.Width.Value <= 0d)
         {
             RightSidebarColumnDefinition.Width = new GridLength(MainWindowViewModel.ExpandedRightSidebarWidth);
         }
+    }
+
+    private void CollapseRightSidebar()
+    {
+        RightSidebarColumnDefinition.Width = new GridLength(0d);
+        RightSidebarSplitterColumnDefinition.Width = new GridLength(0d);
+
+        if (_boundViewModel is { IsRightSidebarVisible: true })
+        {
+            _boundViewModel.IsRightSidebarVisible = false;
+        }
+    }
+
+    private static double ResolveColumnWidth(ColumnDefinition columnDefinition)
+    {
+        var defined = columnDefinition.Width;
+        if (defined.IsAbsolute && defined.Value > 0d)
+        {
+            return defined.Value;
+        }
+
+        return columnDefinition.ActualWidth;
     }
 
     private void ApplyShellVisualMode(bool isTransparent)

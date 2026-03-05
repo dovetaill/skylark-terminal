@@ -70,7 +70,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public TopStatusBarViewModel TopStatusBar { get; }
 
     [ObservableProperty]
-    private bool isLeftAssetsPaneOpen = true;
+    private bool isAssetsPanelVisible = true;
 
     [ObservableProperty]
     private bool isRightSidebarVisible;
@@ -99,11 +99,18 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private bool isShellTransparent;
 
-    public double LeftAssetsPaneWidth => IsLeftAssetsPaneOpen ? ExpandedLeftAssetsPaneWidth : 0d;
+    public double LeftAssetsPaneWidth => IsAssetsPanelVisible ? ExpandedLeftAssetsPaneWidth : 0d;
+
+    // Backward-compatible alias for existing bindings/tests during transition.
+    public bool IsLeftAssetsPaneOpen
+    {
+        get => IsAssetsPanelVisible;
+        set => IsAssetsPanelVisible = value;
+    }
 
     public bool IsTreeViewMode => AssetsViewMode == AssetsViewMode.Tree;
 
-    public bool IsListViewMode => AssetsViewMode == AssetsViewMode.List;
+    public bool IsFlatViewMode => AssetsViewMode == AssetsViewMode.Flat;
 
     public string AssetsViewModeGlyph => IsTreeViewMode ? "\uE8D2" : "\uE8FD";
 
@@ -130,11 +137,15 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public string CurrentLanguageLabel => CurrentLanguageCode == "zh-CN" ? "中文" : "English";
 
-    public string LeftAssetsPaneToggleGlyph => IsLeftAssetsPaneOpen ? "\uE76B" : "\uE76C";
+    public string LeftAssetsPaneToggleGlyph => IsAssetsPanelVisible ? "\uE76B" : "\uE76C";
 
-    public string LeftAssetsPaneToggleToolTip => IsLeftAssetsPaneOpen
+    public string LeftAssetsPaneToggleToolTip => IsAssetsPanelVisible
         ? "收起资产列"
         : "展开资产列";
+
+    public string FlatConnectionsToolTip => "平铺连接视图";
+
+    public string TreeConnectionsToolTip => "树形连接视图";
 
     public bool IsSnippetsView => SelectedRightToolsView == RightToolsViewKind.Snippets;
 
@@ -169,9 +180,15 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private void ToggleAssetsPanel()
+    {
+        IsAssetsPanelVisible = !IsAssetsPanelVisible;
+    }
+
+    [RelayCommand]
     private void ToggleLeftAssetsPane()
     {
-        IsLeftAssetsPaneOpen = !IsLeftAssetsPaneOpen;
+        ToggleAssetsPanel();
     }
 
     [RelayCommand]
@@ -213,7 +230,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var selectedTransparency = await _appDialogService.ShowSettingsAsync(
             ThemeModeLabel,
-            IsLeftAssetsPaneOpen,
+            IsAssetsPanelVisible,
             IsRightSidebarVisible,
             IsShellTransparent);
 
@@ -281,22 +298,34 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void SetTreeViewMode()
+    private void SetTreeConnectionsMode()
     {
         AssetsViewMode = AssetsViewMode.Tree;
     }
 
     [RelayCommand]
+    private void SetFlatConnectionsMode()
+    {
+        AssetsViewMode = AssetsViewMode.Flat;
+    }
+
+    [RelayCommand]
+    private void SetTreeViewMode()
+    {
+        SetTreeConnectionsMode();
+    }
+
+    [RelayCommand]
     private void SetListViewMode()
     {
-        AssetsViewMode = AssetsViewMode.List;
+        SetFlatConnectionsMode();
     }
 
     [RelayCommand]
     private void ToggleAssetsViewMode()
     {
         AssetsViewMode = AssetsViewMode == AssetsViewMode.Tree
-            ? AssetsViewMode.List
+            ? AssetsViewMode.Flat
             : AssetsViewMode.Tree;
     }
 
@@ -460,8 +489,9 @@ public partial class MainWindowViewModel : ViewModelBase
         SelectedWorkspaceTab = null;
     }
 
-    partial void OnIsLeftAssetsPaneOpenChanged(bool value)
+    partial void OnIsAssetsPanelVisibleChanged(bool value)
     {
+        OnPropertyChanged(nameof(IsLeftAssetsPaneOpen));
         OnPropertyChanged(nameof(LeftAssetsPaneWidth));
         OnPropertyChanged(nameof(LeftAssetsPaneToggleGlyph));
         OnPropertyChanged(nameof(LeftAssetsPaneToggleToolTip));
@@ -480,7 +510,7 @@ public partial class MainWindowViewModel : ViewModelBase
     partial void OnAssetsViewModeChanged(AssetsViewMode value)
     {
         OnPropertyChanged(nameof(IsTreeViewMode));
-        OnPropertyChanged(nameof(IsListViewMode));
+        OnPropertyChanged(nameof(IsFlatViewMode));
         OnPropertyChanged(nameof(AssetsViewModeGlyph));
         OnPropertyChanged(nameof(AssetsViewModeToolTip));
     }
