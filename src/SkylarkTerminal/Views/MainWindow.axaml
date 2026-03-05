@@ -1,0 +1,536 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Name="RootWindow"
+        xmlns:models="using:SkylarkTerminal.Models"
+        xmlns:vm="using:SkylarkTerminal.ViewModels"
+        xmlns:ui="using:FluentAvalonia.UI.Controls"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ani="clr-namespace:Avalonia.Animation;assembly=Avalonia.Base"
+        mc:Ignorable="d"
+        d:DesignWidth="1440"
+        d:DesignHeight="900"
+        x:Class="SkylarkTerminal.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="{Binding WindowTitle}"
+        Width="1440"
+        Height="900"
+        MinWidth="1100"
+        MinHeight="700"
+        Background="{DynamicResource ShellWindowBackground}"
+        TransparencyLevelHint="None"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="46">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="ShellWindowBackground" Color="#FF1A1A1A"/>
+                    <SolidColorBrush x:Key="ShellTopBarBrush" Color="#FF222222"/>
+                    <SolidColorBrush x:Key="ShellRailBrush" Color="#FF2A2A2A"/>
+                    <SolidColorBrush x:Key="ShellAssetsBrush" Color="#FF313131"/>
+                    <SolidColorBrush x:Key="ShellWorkspaceBrush" Color="#FF262626"/>
+                    <SolidColorBrush x:Key="ShellToolsBrush" Color="#FF2E2E2E"/>
+                    <SolidColorBrush x:Key="ShellPanelBrush" Color="#FF303030"/>
+                    <SolidColorBrush x:Key="ShellBorderBrush" Color="#FF404040"/>
+                    <SolidColorBrush x:Key="ShellDividerBrush" Color="#FF4A4A4A"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="ShellWindowBackground" Color="#FFF2F2F2"/>
+                    <SolidColorBrush x:Key="ShellTopBarBrush" Color="#FFF7F7F7"/>
+                    <SolidColorBrush x:Key="ShellRailBrush" Color="#FFF0F0F0"/>
+                    <SolidColorBrush x:Key="ShellAssetsBrush" Color="#FFEAEAEA"/>
+                    <SolidColorBrush x:Key="ShellWorkspaceBrush" Color="#FFFFFFFF"/>
+                    <SolidColorBrush x:Key="ShellToolsBrush" Color="#FFEDEDED"/>
+                    <SolidColorBrush x:Key="ShellPanelBrush" Color="#FFECECEC"/>
+                    <SolidColorBrush x:Key="ShellBorderBrush" Color="#FFCCCCCC"/>
+                    <SolidColorBrush x:Key="ShellDividerBrush" Color="#FFD7D7D7"/>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Window.Styles>
+        <Style Selector="Button.TitleBarButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="MinHeight" Value="32"/>
+        </Style>
+        <Style Selector="Button.TitleBarButton:pointerover">
+            <Setter Property="Background" Value="#33FFFFFF"/>
+        </Style>
+        <Style Selector="Button.TitleBarButton:pressed">
+            <Setter Property="Background" Value="#4DFFFFFF"/>
+        </Style>
+        <Style Selector="Button.WindowControlButton">
+            <Setter Property="Width" Value="42"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style Selector="Button.WindowControlClose:pointerover">
+            <Setter Property="Background" Value="#E81123"/>
+        </Style>
+        <Style Selector="Button.WindowControlClose:pressed">
+            <Setter Property="Background" Value="#C50F1F"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="46,*">
+        <Border x:Name="TopTitleBar"
+                Grid.Row="0"
+                Background="{DynamicResource ShellTopBarBrush}"
+                BorderBrush="{DynamicResource ShellBorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="10,6,6,6"
+                PointerPressed="OnTopTitleBarPointerPressed">
+            <Grid ColumnDefinitions="Auto,*,Auto"
+                  ColumnSpacing="6">
+                <StackPanel Orientation="Horizontal"
+                            Spacing="6"
+                            VerticalAlignment="Center">
+                    <Menu Background="Transparent">
+                        <MenuItem ToolTip.Tip="主菜单">
+                            <MenuItem.Header>
+                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                           Text="&#xE700;"/>
+                            </MenuItem.Header>
+                            <MenuItem Header="Settings"
+                                      ToolTip.Tip="打开设置对话框"
+                                      Command="{Binding OpenSettingsCommand}"/>
+                            <MenuItem Header="Language"
+                                      ToolTip.Tip="切换界面语言"
+                                      Command="{Binding OpenLanguageCommand}"/>
+                            <MenuItem Header="Help"
+                                      ToolTip.Tip="查看帮助与快捷键"
+                                      Command="{Binding OpenHelpCommand}"/>
+                            <MenuItem Header="About"
+                                      ToolTip.Tip="查看版本和技术栈"
+                                      Command="{Binding OpenAboutCommand}"/>
+                        </MenuItem>
+                    </Menu>
+                    <Button Classes="TitleBarButton"
+                            Command="{Binding ToggleThemeCommand}"
+                            ToolTip.Tip="{Binding ThemeToggleToolTip}">
+                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                   Text="{Binding ThemeIconGlyph}"/>
+                    </Button>
+                    <Border Width="30"
+                            Height="30"
+                            CornerRadius="0"
+                            Background="#40FFFFFF"
+                            VerticalAlignment="Center">
+                        <TextBlock HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontWeight="SemiBold"
+                                   Text="U"/>
+                    </Border>
+                </StackPanel>
+
+                <Border Grid.Column="1"
+                        MaxWidth="620"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Background="{DynamicResource ShellPanelBrush}"
+                        BorderBrush="{DynamicResource ShellDividerBrush}"
+                        BorderThickness="1"
+                        CornerRadius="0">
+                    <TextBox Margin="0"
+                             Height="32"
+                             Watermark="{Binding SearchPlaceholder}"
+                             Background="Transparent"
+                             BorderThickness="0"/>
+                </Border>
+
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            Spacing="6"
+                            VerticalAlignment="Center">
+                    <Button Classes="TitleBarButton"
+                            Command="{Binding ToggleRightToolsPaneCommand}"
+                            ToolTip.Tip="展开或收起右侧工具栏">
+                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                   Text="&#xE90F;"/>
+                    </Button>
+                    <Button Classes="TitleBarButton WindowControlButton"
+                            Click="OnMinimizeClick"
+                            ToolTip.Tip="最小化">
+                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                   FontSize="12"
+                                   Text="&#xE921;"/>
+                    </Button>
+                    <Button Classes="TitleBarButton WindowControlButton"
+                            Click="OnMaximizeRestoreClick"
+                            ToolTip.Tip="最大化或还原">
+                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                   FontSize="12"
+                                   Text="&#xE922;"/>
+                    </Button>
+                    <Button Classes="TitleBarButton WindowControlButton WindowControlClose"
+                            Click="OnCloseClick"
+                            ToolTip.Tip="关闭">
+                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                   FontSize="12"
+                                   Text="&#xE8BB;"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1"
+              Margin="0"
+              ColumnDefinitions="64,Auto,*,Auto"
+              ColumnSpacing="0">
+            <Border Grid.Column="0"
+                    Background="{DynamicResource ShellRailBrush}"
+                    BorderBrush="{DynamicResource ShellBorderBrush}"
+                    BorderThickness="0"
+                    CornerRadius="0"
+                    Padding="8">
+                <StackPanel Spacing="8">
+                    <Button Classes="TitleBarButton"
+                            Command="{Binding ShowHostsAssetsCommand}"
+                            ToolTip.Tip="Hosts 资产">
+                        <TextBlock Text="🖥"/>
+                    </Button>
+                    <Button Classes="TitleBarButton"
+                            Command="{Binding ShowSftpAssetsCommand}"
+                            ToolTip.Tip="SFTP 资产">
+                        <TextBlock Text="📁"/>
+                    </Button>
+                    <Button Classes="TitleBarButton"
+                            Command="{Binding ShowKeysAssetsCommand}"
+                            ToolTip.Tip="密钥资产">
+                        <TextBlock Text="🔑"/>
+                    </Button>
+                    <Button Classes="TitleBarButton"
+                            Command="{Binding ShowToolsAssetsCommand}"
+                            ToolTip.Tip="工具资产">
+                        <TextBlock Text="🧰"/>
+                    </Button>
+                    <Border Height="1"
+                            Margin="0"
+                            Background="{DynamicResource ShellDividerBrush}"/>
+                    <Button Classes="TitleBarButton"
+                            Command="{Binding ToggleLeftAssetsPaneCommand}"
+                            ToolTip.Tip="展开或收起资产面板"
+                            Content="⇆"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1"
+                    Width="{Binding LeftAssetsPaneWidth}"
+                    IsHitTestVisible="{Binding IsLeftAssetsPaneOpen}"
+                    Background="{DynamicResource ShellAssetsBrush}"
+                    BorderBrush="{DynamicResource ShellBorderBrush}"
+                    BorderThickness="0"
+                    CornerRadius="0">
+                <Border.Transitions>
+                    <Transitions>
+                        <ani:DoubleTransition Property="Width" Duration="0:0:0.24"/>
+                    </Transitions>
+                </Border.Transitions>
+                <Grid RowDefinitions="Auto,*"
+                      IsVisible="{Binding IsLeftAssetsPaneOpen}">
+                    <Border Grid.Row="0"
+                            Padding="14,10"
+                            BorderBrush="{DynamicResource ShellDividerBrush}"
+                            BorderThickness="0,0,0,1">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel>
+                                <TextBlock FontWeight="SemiBold"
+                                           Text="{Binding AssetsPanelTitle}"/>
+                                <TextBlock Opacity="0.74"
+                                           FontSize="11"
+                                           Text="{Binding LastAssetActionMessage}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal"
+                                        Spacing="6">
+                                <Button Classes="TitleBarButton"
+                                        Command="{Binding SetTreeViewModeCommand}"
+                                        ToolTip.Tip="树形视图">
+                                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                               Text="&#xE8D2;"/>
+                                </Button>
+                                <Button Classes="TitleBarButton"
+                                        Command="{Binding SetListViewModeCommand}"
+                                        ToolTip.Tip="列表视图">
+                                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                               Text="&#xE8FD;"/>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <Grid Grid.Row="1"
+                          Margin="0">
+                        <TreeView ItemsSource="{Binding CurrentAssetTree}"
+                                  SelectedItem="{Binding SelectedAssetNode, Mode=TwoWay}"
+                                  IsVisible="{Binding IsTreeViewMode}">
+                            <TreeView.ContextMenu>
+                                <ContextMenu DataContext="{Binding #RootWindow.DataContext}">
+                                    <MenuItem Header="新建"
+                                              Command="{Binding CreateAssetCommand}"
+                                              CommandParameter="{Binding #RootWindow.DataContext.SelectedAssetNode}"/>
+                                    <MenuItem Header="编辑"
+                                              Command="{Binding EditAssetCommand}"
+                                              CommandParameter="{Binding #RootWindow.DataContext.SelectedAssetNode}"/>
+                                    <MenuItem Header="删除"
+                                              Command="{Binding DeleteAssetCommand}"
+                                              CommandParameter="{Binding #RootWindow.DataContext.SelectedAssetNode}"/>
+                                </ContextMenu>
+                            </TreeView.ContextMenu>
+                            <TreeView.ItemTemplate>
+                                <TreeDataTemplate DataType="models:AssetNode"
+                                                  ItemsSource="{Binding Children}">
+                                    <StackPanel Orientation="Horizontal"
+                                                Spacing="8">
+                                        <TextBlock Text="{Binding Name}"/>
+                                        <TextBlock Opacity="0.65"
+                                                   FontSize="11"
+                                                   Text="{Binding Kind}"/>
+                                    </StackPanel>
+                                </TreeDataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
+
+                        <ListBox ItemsSource="{Binding CurrentAssetFlatList}"
+                                 SelectedItem="{Binding SelectedAssetNode, Mode=TwoWay}"
+                                 IsVisible="{Binding IsListViewMode}">
+                            <ListBox.ContextMenu>
+                                <ContextMenu DataContext="{Binding #RootWindow.DataContext}">
+                                    <MenuItem Header="新建"
+                                              Command="{Binding CreateAssetCommand}"
+                                              CommandParameter="{Binding #RootWindow.DataContext.SelectedAssetNode}"/>
+                                    <MenuItem Header="编辑"
+                                              Command="{Binding EditAssetCommand}"
+                                              CommandParameter="{Binding #RootWindow.DataContext.SelectedAssetNode}"/>
+                                    <MenuItem Header="删除"
+                                              Command="{Binding DeleteAssetCommand}"
+                                              CommandParameter="{Binding #RootWindow.DataContext.SelectedAssetNode}"/>
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate DataType="models:AssetNode">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Text="{Binding Name}"/>
+                                        <TextBlock Grid.Column="1"
+                                                   Opacity="0.65"
+                                                   FontSize="11"
+                                                   Text="{Binding Kind}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="2"
+                    Background="{DynamicResource ShellWorkspaceBrush}"
+                    BorderBrush="{DynamicResource ShellBorderBrush}"
+                    BorderThickness="0"
+                    CornerRadius="0">
+                <ui:TabView TabItems="{Binding WorkspaceTabs}"
+                            SelectedItem="{Binding SelectedWorkspaceTab, Mode=TwoWay}"
+                            Margin="0"
+                            Padding="0"
+                            IsAddTabButtonVisible="True"
+                            AddTabButtonCommand="{Binding CreateWorkspaceTabCommand}"
+                            TabWidthMode="Compact"
+                            CanReorderTabs="True"
+                            CanDragTabs="True"
+                            CloseButtonOverlayMode="OnPointerOver"
+                            TabCloseRequested="OnWorkspaceTabCloseRequested">
+                    <ui:TabView.TabItemTemplate>
+                        <DataTemplate DataType="vm:WorkspaceTabItemViewModel">
+                            <ui:TabViewItem IsClosable="True">
+                                <ui:TabViewItem.Header>
+                                    <Border Margin="0"
+                                            Padding="12,2"
+                                            CornerRadius="0"
+                                            Background="{Binding HeaderBackgroundBrush}"
+                                            BorderBrush="{Binding HeaderBorderBrush}"
+                                            BorderThickness="0,0,0,2">
+                                        <StackPanel Orientation="Horizontal"
+                                                    Spacing="6">
+                                            <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                       Opacity="{Binding HeaderOpacity}"
+                                                       Text="&#xE756;"/>
+                                            <TextBlock FontWeight="{Binding HeaderFontWeight}"
+                                                       Opacity="{Binding HeaderOpacity}"
+                                                       Text="{Binding Header}"/>
+                                        </StackPanel>
+                                    </Border>
+                                </ui:TabViewItem.Header>
+                                <ui:TabViewItem.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Duplicate"
+                                                  Tag="duplicate"
+                                                  Click="OnWorkspaceTabContextActionClick"/>
+                                        <MenuItem Header="Close"
+                                                  Tag="close"
+                                                  Click="OnWorkspaceTabContextActionClick"/>
+                                        <MenuItem Header="Close Others"
+                                                  Tag="close-others"
+                                                  Click="OnWorkspaceTabContextActionClick"/>
+                                        <MenuItem Header="Close Tabs To Right"
+                                                  Tag="close-right"
+                                                  Click="OnWorkspaceTabContextActionClick"/>
+                                        <MenuItem Header="Close All"
+                                                  Tag="close-all"
+                                                  Click="OnWorkspaceTabContextActionClick"/>
+                                    </ContextMenu>
+                                </ui:TabViewItem.ContextMenu>
+                                <Border Margin="0"
+                                        CornerRadius="0"
+                                        Background="{Binding AccentBrush}">
+                                    <Grid RowDefinitions="Auto,*">
+                                        <Border Background="#22000000"
+                                                Padding="12,8"
+                                                BorderBrush="#3FFFFFFF"
+                                                BorderThickness="0,0,0,1">
+                                            <TextBlock FontWeight="SemiBold"
+                                                       Foreground="White"
+                                                       Text="{Binding ConnectionLabel}"/>
+                                        </Border>
+                                        <StackPanel Grid.Row="1"
+                                                    Margin="8,4,8,8"
+                                                    Spacing="10">
+                                            <TextBlock FontSize="20"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="White"
+                                                       Text="{Binding Header}"/>
+                                            <TextBlock Opacity="0.92"
+                                                       Foreground="White"
+                                                       Text="{Binding PlaceholderText}"/>
+                                            <Border Height="180"
+                                                    CornerRadius="0"
+                                                    Background="#30000000"
+                                                    BorderBrush="#44FFFFFF"
+                                                    BorderThickness="1"
+                                                    Padding="12">
+                                                <TextBlock Foreground="White"
+                                                           Opacity="0.9"
+                                                           Text="ANSI terminal render placeholder"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </ui:TabViewItem>
+                        </DataTemplate>
+                    </ui:TabView.TabItemTemplate>
+                </ui:TabView>
+            </Border>
+
+            <Border Grid.Column="3"
+                    Width="{Binding RightToolsPaneWidth}"
+                    IsHitTestVisible="{Binding IsRightToolsPaneOpen}"
+                    Background="{DynamicResource ShellToolsBrush}"
+                    BorderBrush="{DynamicResource ShellBorderBrush}"
+                    BorderThickness="0"
+                    CornerRadius="0">
+                <Border.Transitions>
+                    <Transitions>
+                        <ani:DoubleTransition Property="Width" Duration="0:0:0.24"/>
+                    </Transitions>
+                </Border.Transitions>
+                <Grid RowDefinitions="Auto,*"
+                      IsVisible="{Binding IsRightToolsPaneOpen}">
+                    <Border Grid.Row="0"
+                            Padding="14,10"
+                            BorderBrush="{DynamicResource ShellDividerBrush}"
+                            BorderThickness="0,0,0,1">
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="8">
+                            <TextBlock FontWeight="SemiBold"
+                                       VerticalAlignment="Center"
+                                       Text="Tools Panel (E)"/>
+                            <Button Classes="TitleBarButton"
+                                    Command="{Binding ToggleRightToolsPaneCommand}"
+                                    Content="Hide"/>
+                        </StackPanel>
+                    </Border>
+                    <Grid Grid.Row="1"
+                          RowDefinitions="Auto,*"
+                          Margin="0">
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="6">
+                            <Button Classes="TitleBarButton"
+                                    Command="{Binding ShowSnippetsToolsCommand}"
+                                    Content="Snippet"/>
+                            <Button Classes="TitleBarButton"
+                                    Command="{Binding ShowHistoryToolsCommand}"
+                                    Content="History"/>
+                            <Button Classes="TitleBarButton"
+                                    Command="{Binding ShowSftpToolsCommand}"
+                                    Content="SFTP"/>
+                        </StackPanel>
+
+                        <Grid Grid.Row="1"
+                              Margin="0">
+                            <ListBox ItemsSource="{Binding SnippetItems}"
+                                     IsVisible="{Binding IsSnippetsView}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="models:CommandSnippet">
+                                        <StackPanel Margin="0"
+                                                    Spacing="2">
+                                            <TextBlock FontWeight="SemiBold"
+                                                       Text="{Binding Name}"/>
+                                            <TextBlock FontFamily="Consolas"
+                                                       Opacity="0.86"
+                                                       Text="{Binding Command}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <ListBox ItemsSource="{Binding HistoryItems}"
+                                     IsVisible="{Binding IsHistoryView}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="models:CommandHistoryEntry">
+                                        <Grid ColumnDefinitions="Auto,*"
+                                              Margin="0">
+                                            <TextBlock Opacity="0.72"
+                                                       FontFamily="Consolas"
+                                                       Text="{Binding Timestamp, StringFormat={}{0:HH:mm:ss}}"/>
+                                            <TextBlock Grid.Column="1"
+                                                       Margin="4,0,0,0"
+                                                       Text="{Binding Command}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <ListBox ItemsSource="{Binding SftpItems}"
+                                     IsVisible="{Binding IsSftpView}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="models:RemoteFileNode">
+                                        <Grid ColumnDefinitions="*,Auto"
+                                              Margin="0">
+                                            <TextBlock Text="{Binding Name}"/>
+                                            <TextBlock Grid.Column="1"
+                                                       Opacity="0.72"
+                                                       Text="{Binding FullPath}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+
+</Window>

@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SkylarkTerminal/SkylarkTerminal.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SkylarkTerminal.Tests/SkylarkTerminal.Tests.csproj" />
+  </Folder>
+</Solution>
