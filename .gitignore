@@ -5,3 +5,4 @@ src/SkylarkTerminal/obj/Debug/*
 publish.zip
 tests/*
 src/SkylarkTerminal/obj/project.nuget.cache
+.mcp.json

@@ -30,9 +30,19 @@ public abstract partial class AssetNode : ObservableObject
     [ObservableProperty]
     private bool isVisible = true;
 
+    [ObservableProperty]
+    private bool isRenaming;
+
+    [ObservableProperty]
+    private string editName = string.Empty;
+
     public ObservableCollection<AssetNode> Children { get; }
 
     public bool IsFolder => this is FolderNode;
+
+    public bool IsConnection => this is ConnectionNode;
+
+    public bool IsDisplayNameVisible => !IsRenaming;
 
     public string AssetTypeIcon => IsFolder ? "📁" : "🖥";
 
@@ -45,5 +55,23 @@ public abstract partial class AssetNode : ObservableObject
 
         return Name.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
                Kind.Contains(keyword, StringComparison.OrdinalIgnoreCase);
+    }
+
+    partial void OnIsRenamingChanged(bool value)
+    {
+        if (value)
+        {
+            EditName = Name;
+        }
+
+        OnPropertyChanged(nameof(IsDisplayNameVisible));
+    }
+
+    partial void OnNameChanged(string value)
+    {
+        if (!IsRenaming)
+        {
+            EditName = value;
+        }
     }
 }

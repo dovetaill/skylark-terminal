@@ -33,6 +33,7 @@
             <x:Double x:Key="TabViewItemMinHeight">30</x:Double>
             <x:Double x:Key="TabViewItemMinWidth">92</x:Double>
             <x:Double x:Key="TabViewItemMaxWidth">460</x:Double>
+            <x:Double x:Key="FlyoutThemeMinWidth">220</x:Double>
                 <ResourceDictionary.ThemeDictionaries>
                     <ResourceDictionary x:Key="Dark">
                         <SolidColorBrush x:Key="ShellWindowBackground" Color="#FF1A1D24"/>
@@ -310,7 +311,55 @@
                         <Grid Margin="0">
                         <TreeView ItemsSource="{Binding CurrentAssetTree}"
                                   SelectedItem="{Binding SelectedAssetNode, Mode=TwoWay}"
+                                  Background="Transparent"
                                   IsVisible="{Binding IsTreeViewMode}">
+                            <TreeView.ContextFlyout>
+                                <ui:FAMenuFlyout>
+                                    <ui:MenuFlyoutItem Text="新建目录"
+                                              Command="{Binding CreateFolderFromContextCommand}"
+                                              IsVisible="{Binding IsGeneralAssetsPane}"
+                                              CommandParameter="{x:Null}"/>
+                                    <ui:MenuFlyoutItem Text="新建连接"
+                                              Command="{Binding CreateConnectionFromContextCommand}"
+                                              IsVisible="{Binding IsGeneralAssetsPane}"
+                                              CommandParameter="{x:Null}"/>
+                                    <ui:MenuFlyoutItem Text="新建密码"
+                                              Command="{Binding CreatePasswordAssetCommand}"
+                                              IsVisible="{Binding IsKeysAssetsPane}"
+                                              CommandParameter="{x:Null}"/>
+                                    <ui:MenuFlyoutItem Text="新建密钥文件"
+                                              Command="{Binding CreateKeyFileAssetCommand}"
+                                              IsVisible="{Binding IsKeysAssetsPane}"
+                                              CommandParameter="{x:Null}"/>
+                                    <ui:MenuFlyoutItem Text="导入资产"
+                                              Command="{Binding ImportAssetsCommand}"
+                                              IsVisible="{Binding IsGeneralAssetsPane}"
+                                              CommandParameter="{x:Null}"/>
+                                    <ui:MenuFlyoutItem Text="导入密钥文件"
+                                              Command="{Binding ImportAssetsCommand}"
+                                              IsVisible="{Binding IsKeysAssetsPane}"
+                                              CommandParameter="{x:Null}"/>
+                                    <ui:MenuFlyoutSeparator/>
+                                    <ui:MenuFlyoutItem Text="粘贴"
+                                              Command="{Binding PasteAssetCommand}"
+                                              IsEnabled="{Binding HasAssetClipboardData}"
+                                              CommandParameter="{x:Null}"/>
+                                    <ui:MenuFlyoutItem Text="导出资产"
+                                              Command="{Binding ExportAssetsCommand}"
+                                              IsVisible="{Binding IsGeneralAssetsPane}"
+                                              IsEnabled="False"
+                                              CommandParameter="{x:Null}"/>
+                                    <ui:MenuFlyoutItem Text="导出密钥"
+                                              Command="{Binding ExportAssetsCommand}"
+                                              IsVisible="{Binding IsKeysAssetsPane}"
+                                              IsEnabled="False"
+                                              CommandParameter="{x:Null}"/>
+                                    <ui:MenuFlyoutSeparator/>
+                                    <ui:MenuFlyoutItem Text="刷新"
+                                              Command="{Binding RefreshAssetsCommand}"
+                                              CommandParameter="{x:Null}"/>
+                                </ui:FAMenuFlyout>
+                            </TreeView.ContextFlyout>
                             <TreeView.Styles>
                                 <Style Selector="TreeViewItem"
                                        x:DataType="models:AssetNode">
@@ -318,59 +367,313 @@
                                             Value="{Binding IsExpanded, Mode=TwoWay}"/>
                                     <Setter Property="IsVisible"
                                             Value="{Binding IsVisible}"/>
+                                    <Setter Property="HorizontalAlignment"
+                                            Value="Stretch"/>
                                 </Style>
                             </TreeView.Styles>
-                            <TreeView.ContextMenu>
-                                <ContextMenu DataContext="{Binding #RootWindow.DataContext}">
-                                    <MenuItem Header="新建"
-                                              Command="{Binding CreateAssetCommand}"
-                                              CommandParameter="{Binding #RootWindow.DataContext.SelectedAssetNode}"/>
-                                    <MenuItem Header="编辑"
-                                              Command="{Binding EditAssetCommand}"
-                                              CommandParameter="{Binding #RootWindow.DataContext.SelectedAssetNode}"/>
-                                    <MenuItem Header="删除"
-                                              Command="{Binding DeleteAssetCommand}"
-                                              CommandParameter="{Binding #RootWindow.DataContext.SelectedAssetNode}"/>
-                                </ContextMenu>
-                            </TreeView.ContextMenu>
                             <TreeView.ItemTemplate>
                                 <TreeDataTemplate DataType="models:AssetNode"
                                                   ItemsSource="{Binding Children}">
-                                    <StackPanel Orientation="Horizontal"
-                                                Spacing="8">
-                                        <TextBlock Text="{Binding AssetTypeIcon}"/>
-                                        <TextBlock Text="{Binding Name}"/>
-                                    </StackPanel>
+                                    <Border Background="Transparent"
+                                            HorizontalAlignment="Stretch"
+                                            Padding="2,0">
+                                        <Border.ContextFlyout>
+                                            <ui:FAMenuFlyout>
+                                                <ui:MenuFlyoutItem Text="新建目录"
+                                                          Command="{Binding $parent[Window].DataContext.CreateFolderFromContextCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="新建连接"
+                                                          Command="{Binding $parent[Window].DataContext.CreateConnectionFromContextCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="新建密码"
+                                                          Command="{Binding $parent[Window].DataContext.CreatePasswordAssetCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsKeysAssetsPane}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="新建密钥文件"
+                                                          Command="{Binding $parent[Window].DataContext.CreateKeyFileAssetCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsKeysAssetsPane}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="导入资产"
+                                                          Command="{Binding $parent[Window].DataContext.ImportAssetsCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="导入密钥文件"
+                                                          Command="{Binding $parent[Window].DataContext.ImportAssetsCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsKeysAssetsPane}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutSeparator/>
+                                                <ui:MenuFlyoutItem Text="在新标签打开"
+                                                          Command="{Binding $parent[Window].DataContext.OpenAssetInNewTabCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="复制"
+                                                          Command="{Binding $parent[Window].DataContext.CopyAssetCommand}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="剪切"
+                                                          Command="{Binding $parent[Window].DataContext.CutAssetCommand}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="粘贴"
+                                                          Command="{Binding $parent[Window].DataContext.PasteAssetCommand}"
+                                                          IsEnabled="{Binding $parent[Window].DataContext.HasAssetClipboardData}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutSeparator/>
+                                                <ui:MenuFlyoutItem Text="删除"
+                                                          Command="{Binding $parent[Window].DataContext.DeleteAssetCommand}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="克隆"
+                                                          Command="{Binding $parent[Window].DataContext.CloneAssetCommand}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="重命名"
+                                                          Command="{Binding $parent[Window].DataContext.RenameAssetCommand}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutSeparator/>
+                                                <ui:MenuFlyoutItem Text="导出资产"
+                                                          Command="{Binding $parent[Window].DataContext.ExportAssetsCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="导出密钥"
+                                                          Command="{Binding $parent[Window].DataContext.ExportAssetsCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsKeysAssetsPane}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="刷新"
+                                                          Command="{Binding $parent[Window].DataContext.RefreshAssetsCommand}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutSeparator/>
+                                                <ui:MenuFlyoutItem Text="复制Host"
+                                                          Command="{Binding $parent[Window].DataContext.CopyHostCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
+                                                          IsEnabled="{Binding IsConnection}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                            </ui:FAMenuFlyout>
+                                        </Border.ContextFlyout>
+                                        <StackPanel Orientation="Horizontal"
+                                                    Spacing="8">
+                                            <TextBlock Text="{Binding AssetTypeIcon}"/>
+                                            <Grid MinWidth="160">
+                                                <TextBlock Text="{Binding Name}"
+                                                           IsVisible="{Binding IsDisplayNameVisible}"/>
+                                                <TextBox IsVisible="{Binding IsRenaming}"
+                                                         Text="{Binding EditName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         BorderThickness="1"
+                                                         Padding="4,0"
+                                                         MinHeight="24"
+                                                         KeyDown="OnAssetRenameTextBoxKeyDown"
+                                                         LostFocus="OnAssetRenameTextBoxLostFocus"
+                                                         AttachedToVisualTree="OnAssetRenameTextBoxAttachedToVisualTree"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
                                 </TreeDataTemplate>
                             </TreeView.ItemTemplate>
                         </TreeView>
 
-                        <ListBox ItemsSource="{Binding CurrentAssetFlatList}"
+                        <ListBox x:Name="AssetsFlatListBox"
+                                 ItemsSource="{Binding CurrentAssetFlatList}"
                                  SelectedItem="{Binding SelectedAssetNode, Mode=TwoWay}"
+                                 Background="Transparent"
+                                 SelectionMode="Multiple"
+                                 SelectionChanged="OnFlatAssetSelectionChanged"
+                                 PointerPressed="OnAssetsFlatListPointerPressed"
+                                 PointerMoved="OnAssetsFlatListPointerMoved"
+                                 PointerReleased="OnAssetsFlatListPointerReleased"
                                  IsVisible="{Binding IsFlatViewMode}">
-                            <ListBox.ContextMenu>
-                                <ContextMenu DataContext="{Binding #RootWindow.DataContext}">
-                                    <MenuItem Header="新建"
-                                              Command="{Binding CreateAssetCommand}"
-                                              CommandParameter="{Binding #RootWindow.DataContext.SelectedAssetNode}"/>
-                                    <MenuItem Header="编辑"
-                                              Command="{Binding EditAssetCommand}"
-                                              CommandParameter="{Binding #RootWindow.DataContext.SelectedAssetNode}"/>
-                                    <MenuItem Header="删除"
-                                              Command="{Binding DeleteAssetCommand}"
-                                              CommandParameter="{Binding #RootWindow.DataContext.SelectedAssetNode}"/>
-                                </ContextMenu>
-                            </ListBox.ContextMenu>
+                            <ListBox.Styles>
+                                <Style Selector="ListBoxItem">
+                                    <Setter Property="HorizontalContentAlignment"
+                                            Value="Stretch"/>
+                                </Style>
+                            </ListBox.Styles>
+                            <ListBox.ContextFlyout>
+                                <ui:FAMenuFlyout>
+                                    <ui:MenuFlyoutItem Text="新建目录"
+                                              Command="{Binding CreateFolderFromContextCommand}"
+                                              IsVisible="{Binding IsGeneralAssetsPane}"
+                                              CommandParameter="{x:Null}"/>
+                                    <ui:MenuFlyoutItem Text="新建连接"
+                                              Command="{Binding CreateConnectionFromContextCommand}"
+                                              IsVisible="{Binding IsGeneralAssetsPane}"
+                                              CommandParameter="{x:Null}"/>
+                                    <ui:MenuFlyoutItem Text="新建密码"
+                                              Command="{Binding CreatePasswordAssetCommand}"
+                                              IsVisible="{Binding IsKeysAssetsPane}"
+                                              CommandParameter="{x:Null}"/>
+                                    <ui:MenuFlyoutItem Text="新建密钥文件"
+                                              Command="{Binding CreateKeyFileAssetCommand}"
+                                              IsVisible="{Binding IsKeysAssetsPane}"
+                                              CommandParameter="{x:Null}"/>
+                                    <ui:MenuFlyoutItem Text="导入资产"
+                                              Command="{Binding ImportAssetsCommand}"
+                                              IsVisible="{Binding IsGeneralAssetsPane}"
+                                              CommandParameter="{x:Null}"/>
+                                    <ui:MenuFlyoutItem Text="导入密钥文件"
+                                              Command="{Binding ImportAssetsCommand}"
+                                              IsVisible="{Binding IsKeysAssetsPane}"
+                                              CommandParameter="{x:Null}"/>
+                                    <ui:MenuFlyoutSeparator/>
+                                    <ui:MenuFlyoutItem Text="粘贴"
+                                              Command="{Binding PasteAssetCommand}"
+                                              IsEnabled="{Binding HasAssetClipboardData}"
+                                              CommandParameter="{x:Null}"/>
+                                    <ui:MenuFlyoutItem Text="导出资产"
+                                              Command="{Binding ExportAssetsCommand}"
+                                              IsVisible="{Binding IsGeneralAssetsPane}"
+                                              IsEnabled="False"
+                                              CommandParameter="{x:Null}"/>
+                                    <ui:MenuFlyoutItem Text="导出密钥"
+                                              Command="{Binding ExportAssetsCommand}"
+                                              IsVisible="{Binding IsKeysAssetsPane}"
+                                              IsEnabled="False"
+                                              CommandParameter="{x:Null}"/>
+                                    <ui:MenuFlyoutSeparator/>
+                                    <ui:MenuFlyoutItem Text="刷新"
+                                              Command="{Binding RefreshAssetsCommand}"
+                                              CommandParameter="{x:Null}"/>
+                                </ui:FAMenuFlyout>
+                            </ListBox.ContextFlyout>
                             <ListBox.ItemTemplate>
                                 <DataTemplate DataType="models:AssetNode">
-                                    <StackPanel Orientation="Horizontal"
-                                                Spacing="8">
-                                        <TextBlock Text="{Binding AssetTypeIcon}"/>
-                                        <TextBlock Text="{Binding Name}"/>
-                                    </StackPanel>
+                                    <Border Background="Transparent"
+                                            HorizontalAlignment="Stretch"
+                                            PointerPressed="OnAssetListItemPointerPressed"
+                                            Padding="2,0">
+                                        <Border.ContextFlyout>
+                                            <ui:FAMenuFlyout>
+                                                <ui:MenuFlyoutItem Text="新建目录"
+                                                          Command="{Binding $parent[Window].DataContext.CreateFolderFromContextCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="新建连接"
+                                                          Command="{Binding $parent[Window].DataContext.CreateConnectionFromContextCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="新建密码"
+                                                          Command="{Binding $parent[Window].DataContext.CreatePasswordAssetCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsKeysAssetsPane}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="新建密钥文件"
+                                                          Command="{Binding $parent[Window].DataContext.CreateKeyFileAssetCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsKeysAssetsPane}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="导入资产"
+                                                          Command="{Binding $parent[Window].DataContext.ImportAssetsCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="导入密钥文件"
+                                                          Command="{Binding $parent[Window].DataContext.ImportAssetsCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsKeysAssetsPane}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutSeparator/>
+                                                <ui:MenuFlyoutItem Text="在新标签打开"
+                                                          Command="{Binding $parent[Window].DataContext.OpenAssetInNewTabCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="复制"
+                                                          Command="{Binding $parent[Window].DataContext.CopyAssetCommand}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="剪切"
+                                                          Command="{Binding $parent[Window].DataContext.CutAssetCommand}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="粘贴"
+                                                          Command="{Binding $parent[Window].DataContext.PasteAssetCommand}"
+                                                          IsEnabled="{Binding $parent[Window].DataContext.HasAssetClipboardData}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutSeparator/>
+                                                <ui:MenuFlyoutItem Text="删除"
+                                                          Command="{Binding $parent[Window].DataContext.DeleteAssetCommand}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="克隆"
+                                                          Command="{Binding $parent[Window].DataContext.CloneAssetCommand}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="重命名"
+                                                          Command="{Binding $parent[Window].DataContext.RenameAssetCommand}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutSeparator/>
+                                                <ui:MenuFlyoutItem Text="导出资产"
+                                                          Command="{Binding $parent[Window].DataContext.ExportAssetsCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="导出密钥"
+                                                          Command="{Binding $parent[Window].DataContext.ExportAssetsCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsKeysAssetsPane}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutItem Text="刷新"
+                                                          Command="{Binding $parent[Window].DataContext.RefreshAssetsCommand}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                                <ui:MenuFlyoutSeparator/>
+                                                <ui:MenuFlyoutItem Text="复制Host"
+                                                          Command="{Binding $parent[Window].DataContext.CopyHostCommand}"
+                                                          IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
+                                                          IsEnabled="{Binding IsConnection}"
+                                                          CommandParameter="{Binding}">
+                                                </ui:MenuFlyoutItem>
+                                            </ui:FAMenuFlyout>
+                                        </Border.ContextFlyout>
+                                        <StackPanel Orientation="Horizontal"
+                                                    Spacing="8">
+                                            <TextBlock Text="{Binding AssetTypeIcon}"/>
+                                            <Grid MinWidth="160">
+                                                <TextBlock Text="{Binding Name}"
+                                                           IsVisible="{Binding IsDisplayNameVisible}"/>
+                                                <TextBox IsVisible="{Binding IsRenaming}"
+                                                         Text="{Binding EditName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         BorderThickness="1"
+                                                         Padding="4,0"
+                                                         MinHeight="24"
+                                                         KeyDown="OnAssetRenameTextBoxKeyDown"
+                                                         LostFocus="OnAssetRenameTextBoxLostFocus"
+                                                         AttachedToVisualTree="OnAssetRenameTextBoxAttachedToVisualTree"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
+                        <Canvas IsHitTestVisible="False"
+                                IsVisible="{Binding IsFlatViewMode}">
+                            <Border x:Name="AssetsSelectionMarquee"
+                                    IsVisible="False"
+                                    Width="0"
+                                    Height="0"
+                                    Background="#163B82F6"
+                                    BorderBrush="#8A3B82F6"
+                                    BorderThickness="1"
+                                    CornerRadius="2"/>
+                        </Canvas>
                         </Grid>
                     </Border>
                 </Grid>
@@ -389,16 +692,61 @@
                     BorderBrush="{DynamicResource ShellBorderBrush}"
                     BorderThickness="0"
                     CornerRadius="0">
+                <Border.ContextFlyout>
+                    <ui:FAMenuFlyout>
+                        <ui:MenuFlyoutItem Text="新建标签"
+                                  Command="{Binding CreateWorkspaceTabCommand}"/>
+                        <ui:MenuFlyoutItem Text="关闭当前标签"
+                                  Command="{Binding CloseTabCommand}"
+                                  CommandParameter="{x:Null}"/>
+                        <ui:MenuFlyoutSeparator/>
+                        <ui:MenuFlyoutItem Text="关闭其他标签"
+                                  Command="{Binding CloseOtherTabsCommand}"
+                                  CommandParameter="{x:Null}"/>
+                        <ui:MenuFlyoutItem Text="关闭全部标签"
+                                  Command="{Binding CloseAllTabsCommand}"/>
+                        <ui:MenuFlyoutSeparator/>
+                        <ui:MenuFlyoutItem Text="显示 Snippets"
+                                  Command="{Binding ShowSnippetsToolsCommand}"/>
+                        <ui:MenuFlyoutItem Text="显示 History"
+                                  Command="{Binding ShowHistoryToolsCommand}"/>
+                        <ui:MenuFlyoutItem Text="显示 SFTP"
+                                  Command="{Binding ShowSftpToolsCommand}"/>
+                    </ui:FAMenuFlyout>
+                </Border.ContextFlyout>
                 <ui:TabView TabItems="{Binding WorkspaceTabs}"
                             SelectedItem="{Binding SelectedWorkspaceTab, Mode=TwoWay}"
                             Margin="0"
                             Padding="0"
+                            Background="Transparent"
                             IsAddTabButtonVisible="False"
                             TabWidthMode="SizeToContent"
                             CanReorderTabs="True"
                             CanDragTabs="True"
                             CloseButtonOverlayMode="OnPointerOver"
                             TabCloseRequested="OnWorkspaceTabCloseRequested">
+                    <ui:TabView.ContextFlyout>
+                        <ui:FAMenuFlyout>
+                            <ui:MenuFlyoutItem Text="新建标签"
+                                      Command="{Binding CreateWorkspaceTabCommand}"/>
+                            <ui:MenuFlyoutItem Text="关闭当前标签"
+                                      Command="{Binding CloseTabCommand}"
+                                      CommandParameter="{x:Null}"/>
+                            <ui:MenuFlyoutSeparator/>
+                            <ui:MenuFlyoutItem Text="关闭其他标签"
+                                      Command="{Binding CloseOtherTabsCommand}"
+                                      CommandParameter="{x:Null}"/>
+                            <ui:MenuFlyoutItem Text="关闭全部标签"
+                                      Command="{Binding CloseAllTabsCommand}"/>
+                            <ui:MenuFlyoutSeparator/>
+                            <ui:MenuFlyoutItem Text="显示 Snippets"
+                                      Command="{Binding ShowSnippetsToolsCommand}"/>
+                            <ui:MenuFlyoutItem Text="显示 History"
+                                      Command="{Binding ShowHistoryToolsCommand}"/>
+                            <ui:MenuFlyoutItem Text="显示 SFTP"
+                                      Command="{Binding ShowSftpToolsCommand}"/>
+                        </ui:FAMenuFlyout>
+                    </ui:TabView.ContextFlyout>
                     <ui:TabView.TabStripFooter>
                         <Button Classes="TabStripActionButton"
                                 Command="{Binding CreateWorkspaceTabCommand}"
@@ -441,25 +789,27 @@
                                         </StackPanel>
                                     </Border>
                                 </ui:TabViewItem.Header>
-                                <ui:TabViewItem.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem Header="Duplicate"
+                                <ui:TabViewItem.ContextFlyout>
+                                    <ui:FAMenuFlyout>
+                                        <ui:MenuFlyoutItem Text="Duplicate"
                                                   Tag="duplicate"
                                                   Click="OnWorkspaceTabContextActionClick"/>
-                                        <MenuItem Header="Close"
+                                        <ui:MenuFlyoutSeparator/>
+                                        <ui:MenuFlyoutItem Text="Close"
                                                   Tag="close"
                                                   Click="OnWorkspaceTabContextActionClick"/>
-                                        <MenuItem Header="Close Others"
+                                        <ui:MenuFlyoutItem Text="Close Others"
                                                   Tag="close-others"
                                                   Click="OnWorkspaceTabContextActionClick"/>
-                                        <MenuItem Header="Close Tabs To Right"
+                                        <ui:MenuFlyoutItem Text="Close Tabs To Right"
                                                   Tag="close-right"
                                                   Click="OnWorkspaceTabContextActionClick"/>
-                                        <MenuItem Header="Close All"
+                                        <ui:MenuFlyoutSeparator/>
+                                        <ui:MenuFlyoutItem Text="Close All"
                                                   Tag="close-all"
                                                   Click="OnWorkspaceTabContextActionClick"/>
-                                    </ContextMenu>
-                                </ui:TabViewItem.ContextMenu>
+                                    </ui:FAMenuFlyout>
+                                </ui:TabViewItem.ContextFlyout>
                                 <Border Margin="0"
                                         CornerRadius="0"
                                         Background="{DynamicResource ShellTerminalBrush}">
@@ -498,6 +848,19 @@
                     BorderBrush="{DynamicResource ShellBorderBrush}"
                     BorderThickness="0"
                     CornerRadius="0">
+                <Border.ContextFlyout>
+                    <ui:FAMenuFlyout>
+                        <ui:MenuFlyoutItem Text="Snippet 视图"
+                                  Command="{Binding ShowSnippetsToolsCommand}"/>
+                        <ui:MenuFlyoutItem Text="History 视图"
+                                  Command="{Binding ShowHistoryToolsCommand}"/>
+                        <ui:MenuFlyoutItem Text="SFTP 视图"
+                                  Command="{Binding ShowSftpToolsCommand}"/>
+                        <ui:MenuFlyoutSeparator/>
+                        <ui:MenuFlyoutItem Text="隐藏工具栏"
+                                  Command="{Binding ToggleRightSidebarCommand}"/>
+                    </ui:FAMenuFlyout>
+                </Border.ContextFlyout>
                 <Grid RowDefinitions="Auto,*">
                     <Border Grid.Row="0"
                             Padding="14,10"
@@ -516,6 +879,19 @@
                     <Grid Grid.Row="1"
                           RowDefinitions="Auto,*"
                           Margin="0">
+                        <Grid.ContextFlyout>
+                            <ui:FAMenuFlyout>
+                                <ui:MenuFlyoutItem Text="Snippet 视图"
+                                          Command="{Binding ShowSnippetsToolsCommand}"/>
+                                <ui:MenuFlyoutItem Text="History 视图"
+                                          Command="{Binding ShowHistoryToolsCommand}"/>
+                                <ui:MenuFlyoutItem Text="SFTP 视图"
+                                          Command="{Binding ShowSftpToolsCommand}"/>
+                                <ui:MenuFlyoutSeparator/>
+                                <ui:MenuFlyoutItem Text="隐藏工具栏"
+                                          Command="{Binding ToggleRightSidebarCommand}"/>
+                            </ui:FAMenuFlyout>
+                        </Grid.ContextFlyout>
                         <StackPanel Orientation="Horizontal"
                                     Spacing="6">
                             <Button Classes="TitleBarButton"

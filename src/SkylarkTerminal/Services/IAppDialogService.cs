@@ -15,4 +15,6 @@ public interface IAppDialogService
     Task ShowHelpAsync(string languageCode);
 
     Task ShowAboutAsync(string appTitle, string appVersion);
+
+    Task<bool> ShowDeleteAssetConfirmAsync(string assetName, bool isFolder);
 }

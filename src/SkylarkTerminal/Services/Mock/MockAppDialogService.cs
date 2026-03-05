@@ -27,4 +27,9 @@ public sealed class MockAppDialogService : IAppDialogService
     {
         return Task.CompletedTask;
     }
+
+    public Task<bool> ShowDeleteAssetConfirmAsync(string assetName, bool isFolder)
+    {
+        return Task.FromResult(true);
+    }
 }

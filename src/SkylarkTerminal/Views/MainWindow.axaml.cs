@@ -4,10 +4,14 @@ using Avalonia.Interactivity;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using FluentAvalonia.UI.Controls;
+using SkylarkTerminal.Models;
 using SkylarkTerminal.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace SkylarkTerminal.Views;
 
@@ -17,14 +21,23 @@ public partial class MainWindow : Window
     private const double AssetsPanelSplitterWidth = 8d;
     private const double RightSidebarAutoCollapseThreshold = 220d;
     private const double RightSidebarSplitterWidth = 8d;
+    private const int ContextMenuOverlaySuppressionWindowMs = 160;
+    private const double AssetsSelectionDragActivationDistance = 4d;
     private MainWindowViewModel? _boundViewModel;
     private Grid? _mainContentGrid;
+    private DateTimeOffset _lastContextMenuOpenedAt = DateTimeOffset.MinValue;
+    private bool _isFlatSelectionDragPending;
+    private bool _isFlatSelectionDragging;
+    private bool _isFlatSelectionAdditive;
+    private Point _flatSelectionDragStart;
+    private List<AssetNode> _flatSelectionBaseline = [];
 
     public MainWindow()
     {
         InitializeComponent();
         ResolveMainContentGrid().LayoutUpdated += OnMainContentGridLayoutUpdated;
         AddHandler(PointerPressedEvent, OnWindowPointerPressed, RoutingStrategies.Tunnel);
+        AddHandler(ContextRequestedEvent, OnWindowContextRequested, RoutingStrategies.Tunnel | RoutingStrategies.Bubble, true);
     }
 
     private ColumnDefinition AssetsPanelColumnDefinition => ResolveMainContentGrid().ColumnDefinitions[1];
@@ -86,6 +99,7 @@ public partial class MainWindow : Window
         }
 
         RemoveHandler(PointerPressedEvent, OnWindowPointerPressed);
+        RemoveHandler(ContextRequestedEvent, OnWindowContextRequested);
 
         if (_boundViewModel is not null)
         {
@@ -111,13 +125,28 @@ public partial class MainWindow : Window
 
     private void OnWorkspaceTabContextActionClick(object? sender, RoutedEventArgs e)
     {
-        if (sender is not MenuItem menuItem || DataContext is not MainWindowViewModel vm)
+        if (DataContext is not MainWindowViewModel vm)
         {
             return;
         }
 
-        var tab = menuItem.DataContext as WorkspaceTabItemViewModel;
-        var action = menuItem.Tag?.ToString();
+        WorkspaceTabItemViewModel? tab = null;
+        string? action = null;
+
+        if (sender is MenuItem menuItem)
+        {
+            tab = menuItem.DataContext as WorkspaceTabItemViewModel;
+            action = menuItem.Tag?.ToString();
+        }
+        else if (sender is MenuFlyoutItem flyoutItem)
+        {
+            tab = flyoutItem.DataContext as WorkspaceTabItemViewModel;
+            action = flyoutItem.Tag?.ToString();
+        }
+        else
+        {
+            return;
+        }
 
         switch (action)
         {
@@ -408,9 +437,7 @@ public partial class MainWindow : Window
 
     private void OnWindowPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (_boundViewModel is null ||
-            !_boundViewModel.IsAssetsSearchOpen ||
-            !string.IsNullOrWhiteSpace(_boundViewModel.AssetsSearchText))
+        if (_boundViewModel is null)
         {
             return;
         }
@@ -418,12 +445,46 @@ public partial class MainWindow : Window
         var sourceElement = e.Source as StyledElement;
         var searchBox = this.FindControl<TextBox>("AssetsSearchTextBox");
         var searchToggleButton = this.FindControl<Button>("AssetsSearchToggleButton");
-        if (IsSourceWithin(searchBox, sourceElement) || IsSourceWithin(searchToggleButton, sourceElement))
+        var pointProperties = e.GetCurrentPoint(this).Properties;
+        if (pointProperties.IsRightButtonPressed)
+        {
+            if (sourceElement?.GetType().Name == "LightDismissOverlayLayer")
+            {
+                var elapsed = DateTimeOffset.UtcNow - _lastContextMenuOpenedAt;
+                if (elapsed.TotalMilliseconds >= 0d &&
+                    elapsed.TotalMilliseconds <= ContextMenuOverlaySuppressionWindowMs)
+                {
+                    e.Handled = true;
+                    return;
+                }
+            }
+        }
+
+        var shouldCloseSearch = MainWindowInteractionPolicy.ShouldCloseAssetsSearchOnPointerPressed(
+            isAssetsSearchOpen: _boundViewModel.IsAssetsSearchOpen,
+            assetsSearchText: _boundViewModel.AssetsSearchText,
+            isLeftButtonPressed: pointProperties.IsLeftButtonPressed,
+            isPointerInsideSearchBox: IsSourceWithin(searchBox, sourceElement),
+            isPointerInsideSearchToggleButton: IsSourceWithin(searchToggleButton, sourceElement));
+
+        if (!shouldCloseSearch)
         {
             return;
         }
 
         _boundViewModel.CloseAssetsSearchIfEmptyCommand.Execute(null);
+    }
+
+    private void OnWindowContextRequested(object? sender, ContextRequestedEventArgs e)
+    {
+        var sourceElement = e.Source as StyledElement;
+        var hostControl = TryResolveContextHost(sourceElement);
+        var hasContextMenu = hostControl?.ContextMenu is not null;
+        var hasContextFlyout = hostControl?.ContextFlyout is not null;
+        if (hasContextMenu || hasContextFlyout)
+        {
+            _lastContextMenuOpenedAt = DateTimeOffset.UtcNow;
+        }
     }
 
     private static bool IsSourceWithin(Control? control, StyledElement? source)
@@ -450,6 +511,331 @@ public partial class MainWindow : Window
     private void OnAssetsSearchBoxLostFocus(object? sender, RoutedEventArgs e)
     {
         _boundViewModel?.CloseAssetsSearchIfEmptyCommand.Execute(null);
+    }
+
+    private static Control? TryResolveContextHost(StyledElement? source)
+    {
+        var current = source;
+        while (current is not null)
+        {
+            if (current is Control control &&
+                (control.ContextMenu is not null || control.ContextFlyout is not null))
+            {
+                return control;
+            }
+
+            current = current.Parent as StyledElement;
+        }
+
+        return null;
+    }
+
+    private void OnFlatAssetSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        _ = e;
+        if (_boundViewModel is null ||
+            sender is not ListBox listBox ||
+            !listBox.IsVisible)
+        {
+            return;
+        }
+
+        var selected = listBox.SelectedItems?.OfType<AssetNode>() ?? [];
+        _boundViewModel.SetSelectedAssets(selected);
+    }
+
+    private void OnAssetsFlatListPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (_boundViewModel is null ||
+            !_boundViewModel.IsFlatViewMode ||
+            sender is not ListBox listBox)
+        {
+            return;
+        }
+
+        var pointProperties = e.GetCurrentPoint(listBox).Properties;
+        if (!pointProperties.IsLeftButtonPressed)
+        {
+            return;
+        }
+
+        if (e.Source is StyledElement sourceElement &&
+            IsSourceWithinListBoxItem(sourceElement))
+        {
+            return;
+        }
+
+        _flatSelectionDragStart = ClampPointToControlBounds(e.GetPosition(listBox), listBox);
+        _isFlatSelectionDragPending = true;
+        _isFlatSelectionDragging = false;
+        _isFlatSelectionAdditive = e.KeyModifiers.HasFlag(KeyModifiers.Control);
+        _flatSelectionBaseline = _isFlatSelectionAdditive
+            ? listBox.SelectedItems?.OfType<AssetNode>().Distinct().ToList() ?? []
+            : [];
+        e.Pointer.Capture(listBox);
+    }
+
+    private void OnAssetsFlatListPointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (_boundViewModel is null ||
+            !_boundViewModel.IsFlatViewMode ||
+            sender is not ListBox listBox ||
+            (!_isFlatSelectionDragPending && !_isFlatSelectionDragging))
+        {
+            return;
+        }
+
+        var pointProperties = e.GetCurrentPoint(listBox).Properties;
+        if (!pointProperties.IsLeftButtonPressed)
+        {
+            StopFlatSelectionDrag(listBox, e.Pointer);
+            return;
+        }
+
+        var currentPoint = ClampPointToControlBounds(e.GetPosition(listBox), listBox);
+        if (_isFlatSelectionDragPending)
+        {
+            var dragDistance = Math.Abs(currentPoint.X - _flatSelectionDragStart.X) +
+                               Math.Abs(currentPoint.Y - _flatSelectionDragStart.Y);
+            if (dragDistance < AssetsSelectionDragActivationDistance)
+            {
+                return;
+            }
+
+            _isFlatSelectionDragPending = false;
+            _isFlatSelectionDragging = true;
+            if (!_isFlatSelectionAdditive && listBox.SelectedItems is not null)
+            {
+                listBox.SelectedItems.Clear();
+            }
+        }
+
+        if (!_isFlatSelectionDragging)
+        {
+            return;
+        }
+
+        var selectionRect = BuildNormalizedRect(_flatSelectionDragStart, currentPoint);
+        UpdateAssetsSelectionMarquee(selectionRect);
+
+        var hitNodes = ResolveNodesInsideSelectionRect(listBox, selectionRect);
+        var targetNodes = _isFlatSelectionAdditive
+            ? _flatSelectionBaseline.Concat(hitNodes).Distinct().ToList()
+            : hitNodes;
+        ApplyFlatSelection(listBox, targetNodes);
+        e.Handled = true;
+    }
+
+    private void OnAssetsFlatListPointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (sender is not ListBox listBox ||
+            (!_isFlatSelectionDragPending && !_isFlatSelectionDragging))
+        {
+            return;
+        }
+
+        var wasDragging = _isFlatSelectionDragging;
+        StopFlatSelectionDrag(listBox, e.Pointer);
+        e.Handled = wasDragging;
+    }
+
+    private void OnAssetListItemPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (_boundViewModel is null ||
+            sender is not Border border ||
+            border.DataContext is not AssetNode assetNode ||
+            !_boundViewModel.IsFlatViewMode ||
+            !e.GetCurrentPoint(border).Properties.IsRightButtonPressed)
+        {
+            return;
+        }
+
+        var listBox = this.FindControl<ListBox>("AssetsFlatListBox");
+        if (listBox?.SelectedItems is null)
+        {
+            return;
+        }
+
+        if (listBox.SelectedItems.Contains(assetNode))
+        {
+            return;
+        }
+
+        listBox.SelectedItems.Clear();
+        listBox.SelectedItems.Add(assetNode);
+        _boundViewModel.SetSelectedAssets(listBox.SelectedItems.OfType<AssetNode>());
+    }
+
+    private void StopFlatSelectionDrag(ListBox listBox, IPointer? pointer)
+    {
+        if (pointer is not null)
+        {
+            pointer.Capture(null);
+        }
+
+        _isFlatSelectionDragPending = false;
+        _isFlatSelectionDragging = false;
+        _isFlatSelectionAdditive = false;
+        _flatSelectionBaseline = [];
+        HideAssetsSelectionMarquee();
+    }
+
+    private static bool IsSourceWithinListBoxItem(StyledElement source)
+    {
+        var current = source;
+        while (current is not null)
+        {
+            if (current is ListBoxItem)
+            {
+                return true;
+            }
+
+            current = current.Parent as StyledElement;
+        }
+
+        return false;
+    }
+
+    private static Point ClampPointToControlBounds(Point source, Control control)
+    {
+        return new Point(
+            Math.Clamp(source.X, 0d, control.Bounds.Width),
+            Math.Clamp(source.Y, 0d, control.Bounds.Height));
+    }
+
+    private static Rect BuildNormalizedRect(Point start, Point end)
+    {
+        var left = Math.Min(start.X, end.X);
+        var top = Math.Min(start.Y, end.Y);
+        var right = Math.Max(start.X, end.X);
+        var bottom = Math.Max(start.Y, end.Y);
+        return new Rect(left, top, Math.Max(1d, right - left), Math.Max(1d, bottom - top));
+    }
+
+    private IReadOnlyList<AssetNode> ResolveNodesInsideSelectionRect(ListBox listBox, Rect selectionRect)
+    {
+        var nodes = new List<AssetNode>();
+        foreach (var item in listBox.GetVisualDescendants().OfType<ListBoxItem>())
+        {
+            if (item.DataContext is not AssetNode node || !item.IsVisible)
+            {
+                continue;
+            }
+
+            var topLeft = item.TranslatePoint(new Point(0d, 0d), listBox);
+            if (!topLeft.HasValue)
+            {
+                continue;
+            }
+
+            var itemRect = new Rect(topLeft.Value, item.Bounds.Size);
+            if (selectionRect.Intersects(itemRect))
+            {
+                nodes.Add(node);
+            }
+        }
+
+        return nodes;
+    }
+
+    private void ApplyFlatSelection(ListBox listBox, IReadOnlyList<AssetNode> targetNodes)
+    {
+        if (listBox.SelectedItems is null)
+        {
+            return;
+        }
+
+        listBox.SelectedItems.Clear();
+        foreach (var node in targetNodes)
+        {
+            listBox.SelectedItems.Add(node);
+        }
+
+        _boundViewModel?.SetSelectedAssets(listBox.SelectedItems.OfType<AssetNode>());
+    }
+
+    private void UpdateAssetsSelectionMarquee(Rect selectionRect)
+    {
+        var marquee = this.FindControl<Border>("AssetsSelectionMarquee");
+        if (marquee is null)
+        {
+            return;
+        }
+
+        marquee.IsVisible = true;
+        marquee.Width = selectionRect.Width;
+        marquee.Height = selectionRect.Height;
+        Canvas.SetLeft(marquee, selectionRect.X);
+        Canvas.SetTop(marquee, selectionRect.Y);
+    }
+
+    private void HideAssetsSelectionMarquee()
+    {
+        var marquee = this.FindControl<Border>("AssetsSelectionMarquee");
+        if (marquee is null)
+        {
+            return;
+        }
+
+        marquee.IsVisible = false;
+        marquee.Width = 0d;
+        marquee.Height = 0d;
+        Canvas.SetLeft(marquee, 0d);
+        Canvas.SetTop(marquee, 0d);
+    }
+
+    private void OnAssetRenameTextBoxAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
+    {
+        _ = e;
+        if (sender is not TextBox textBox ||
+            textBox.DataContext is not AssetNode assetNode ||
+            !assetNode.IsRenaming)
+        {
+            return;
+        }
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            textBox.Focus();
+            textBox.SelectAll();
+        }, DispatcherPriority.Background);
+    }
+
+    private void OnAssetRenameTextBoxKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (_boundViewModel is null ||
+            sender is not TextBox textBox ||
+            textBox.DataContext is not AssetNode assetNode)
+        {
+            return;
+        }
+
+        if (e.Key == Key.Enter)
+        {
+            _boundViewModel.CommitRenameAssetCommand.Execute(assetNode);
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == Key.Escape)
+        {
+            _boundViewModel.CancelRenameAssetCommand.Execute(assetNode);
+            e.Handled = true;
+        }
+    }
+
+    private void OnAssetRenameTextBoxLostFocus(object? sender, RoutedEventArgs e)
+    {
+        _ = e;
+        if (_boundViewModel is null ||
+            sender is not TextBox textBox ||
+            textBox.DataContext is not AssetNode assetNode ||
+            !assetNode.IsRenaming)
+        {
+            return;
+        }
+
+        _boundViewModel.CommitRenameAssetCommand.Execute(assetNode);
     }
 
     private static bool ResolveIsDarkTheme()

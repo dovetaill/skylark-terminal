@@ -137,6 +137,33 @@ public sealed class AppDialogService : IAppDialogService
         return ShowSimpleDialogAsync("About", content);
     }
 
+    public async Task<bool> ShowDeleteAssetConfirmAsync(string assetName, bool isFolder)
+    {
+        var host = ResolveHostWindow();
+        if (host is null)
+        {
+            return false;
+        }
+
+        var dialog = new ContentDialog
+        {
+            Title = "删除确认",
+            Content = new TextBlock
+            {
+                Text = isFolder
+                    ? $"确定删除目录“{assetName}”及其子节点吗？"
+                    : $"确定删除连接“{assetName}”吗？",
+                TextWrapping = TextWrapping.Wrap,
+            },
+            PrimaryButtonText = "删除",
+            CloseButtonText = "取消",
+            DefaultButton = ContentDialogButton.Close,
+        };
+
+        var result = await dialog.ShowAsync(host);
+        return result == ContentDialogResult.Primary;
+    }
+
     private static async Task ShowSimpleDialogAsync(string title, Control content)
     {
         var host = ResolveHostWindow();

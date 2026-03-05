@@ -9,6 +9,7 @@ using SkylarkTerminal.Services.Mock;
 using SkylarkTerminal.ViewModels;
 using SkylarkTerminal.Views;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace SkylarkTerminal;
@@ -43,6 +44,7 @@ public partial class App : Application
     {
         services.AddSingleton<IAssetCatalogService, MockAssetCatalogService>();
         services.AddSingleton<IAppDialogService, AppDialogService>();
+        services.AddSingleton<IClipboardService, ClipboardService>();
         services.AddSingleton<ISshConnectionService, MockSshConnectionService>();
         services.AddSingleton<ISftpService, MockSftpService>();
         services.AddSingleton<MainWindowViewModel>();
@@ -52,6 +54,7 @@ public partial class App : Application
         });
     }
 
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "DataValidators is safe to access at runtime")]
     private void DisableAvaloniaDataAnnotationValidation()
     {
         // Get an array of plugins to remove

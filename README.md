@@ -8,7 +8,9 @@
 
 - 自绘标题栏（无边框窗口）+ 窗口拖拽 + 最小化/最大化/关闭
 - 顶部菜单（Settings/Language/Help/About）已接入真实命令与弹窗
-- 左侧资产区：图标导航、Tree/Flat 单按钮模式切换、右键菜单（新建/编辑/删除）
+- 左侧资产区：图标导航、Tree/Flat 单按钮模式切换、右键菜单（按功能分组，支持导入/导出、批量打开）
+- 密钥资产面板：独立右键语义（新建密码/新建密钥文件/导入密钥文件/导出密钥）
+- Flat 模式支持 Windows 风格多选：`Ctrl/Shift` 扩展选择、右键保留多选、左键拖拽框选
 - 资产面板顶部：紧凑图标工具条（搜索/展开收起/创建/模式切换），支持点击展开搜索框与空查询自动收起
 - 中间工作区：FluentAvalonia `TabView` 多标签、右键标签操作（Duplicate/Close Others/Close Right/Close All）
 - 右侧工具区：Snippet / History / SFTP 视图切换与 Mock 数据展示，支持拖拽与阈值自动收起
@@ -96,6 +98,8 @@ dotnet test tests/SkylarkTerminal.Tests/SkylarkTerminal.Tests.csproj
 - Tab 增删改与右键操作逻辑
 - 右侧工具面板视图切换
 - 顶部菜单命令（Settings/Language/Help/About）调用链
+- Flat 模式多选后的批量导出与批量打开标签行为
+- 密钥资产面板专属命令行为与可执行状态约束
 
 ## 核心接口（Mock Driven）
 
