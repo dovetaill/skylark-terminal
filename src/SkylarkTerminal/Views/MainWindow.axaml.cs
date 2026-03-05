@@ -1,9 +1,9 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Interactivity;
 using FluentAvalonia.UI.Controls;
 using SkylarkTerminal.ViewModels;
+using System;
 
 namespace SkylarkTerminal.Views;
 
@@ -14,19 +14,32 @@ public partial class MainWindow : Window
         InitializeComponent();
     }
 
-    private void OnTopTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
+    protected override void OnDataContextChanged(EventArgs e)
     {
-        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        base.OnDataContextChanged(e);
+
+        if (DataContext is not MainWindowViewModel vm)
         {
             return;
         }
 
-        if (IsPointerOnInteractiveElement(e.Source as StyledElement))
+        vm.TopStatusBar.AttachWindowActions(
+            minimizeWindowAction: () => WindowState = WindowState.Minimized,
+            toggleMaximizeRestoreWindowAction: ToggleMaximizeRestoreWindow,
+            closeWindowAction: Close);
+        vm.TopStatusBar.SetWindowState(WindowState);
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        if (change.Property != WindowStateProperty || DataContext is not MainWindowViewModel vm)
         {
             return;
         }
 
-        BeginMoveDrag(e);
+        vm.TopStatusBar.SetWindowState(change.GetNewValue<WindowState>());
     }
 
     private void OnWorkspaceTabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args)
@@ -72,41 +85,15 @@ public partial class MainWindow : Window
         }
     }
 
-    private void OnMinimizeClick(object? sender, RoutedEventArgs e)
+    private void ToggleMaximizeRestoreWindow()
     {
-        WindowState = WindowState.Minimized;
-    }
+        if (!CanMaximize)
+        {
+            return;
+        }
 
-    private void OnMaximizeRestoreClick(object? sender, RoutedEventArgs e)
-    {
         WindowState = WindowState == WindowState.Maximized
             ? WindowState.Normal
             : WindowState.Maximized;
-    }
-
-    private void OnCloseClick(object? sender, RoutedEventArgs e)
-    {
-        Close();
-    }
-
-    private static bool IsPointerOnInteractiveElement(StyledElement? element)
-    {
-        var current = element;
-        while (current is not null)
-        {
-            if (current is Button or TextBox or Menu or MenuItem)
-            {
-                return true;
-            }
-
-            if (current is Border border && border.Name == "TopTitleBar")
-            {
-                return false;
-            }
-
-            current = current.Parent as StyledElement;
-        }
-
-        return false;
     }
 }

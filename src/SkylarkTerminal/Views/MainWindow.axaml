@@ -3,6 +3,7 @@
         x:Name="RootWindow"
         xmlns:models="using:SkylarkTerminal.Models"
         xmlns:vm="using:SkylarkTerminal.ViewModels"
+        xmlns:views="using:SkylarkTerminal.Views"
         xmlns:ui="using:FluentAvalonia.UI.Controls"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -18,11 +19,11 @@
         Height="900"
         MinWidth="1100"
         MinHeight="700"
-        Background="{DynamicResource ShellWindowBackground}"
-        TransparencyLevelHint="None"
+        Background="Transparent"
+        TransparencyLevelHint="Mica, AcrylicBlur, Blur"
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"
-        ExtendClientAreaTitleBarHeightHint="46">
+        ExtendClientAreaTitleBarHeightHint="44">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
@@ -32,26 +33,26 @@
         <ResourceDictionary>
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Dark">
-                    <SolidColorBrush x:Key="ShellWindowBackground" Color="#FF1A1A1A"/>
-                    <SolidColorBrush x:Key="ShellTopBarBrush" Color="#FF222222"/>
-                    <SolidColorBrush x:Key="ShellRailBrush" Color="#FF2A2A2A"/>
-                    <SolidColorBrush x:Key="ShellAssetsBrush" Color="#FF313131"/>
-                    <SolidColorBrush x:Key="ShellWorkspaceBrush" Color="#FF262626"/>
-                    <SolidColorBrush x:Key="ShellToolsBrush" Color="#FF2E2E2E"/>
-                    <SolidColorBrush x:Key="ShellPanelBrush" Color="#FF303030"/>
-                    <SolidColorBrush x:Key="ShellBorderBrush" Color="#FF404040"/>
-                    <SolidColorBrush x:Key="ShellDividerBrush" Color="#FF4A4A4A"/>
+                    <SolidColorBrush x:Key="ShellWindowBackground" Color="#19000000"/>
+                    <SolidColorBrush x:Key="ShellTopBarBrush" Color="#B8222222"/>
+                    <SolidColorBrush x:Key="ShellRailBrush" Color="#B82A2A2A"/>
+                    <SolidColorBrush x:Key="ShellAssetsBrush" Color="#C0313131"/>
+                    <SolidColorBrush x:Key="ShellWorkspaceBrush" Color="#B8262626"/>
+                    <SolidColorBrush x:Key="ShellToolsBrush" Color="#C02E2E2E"/>
+                    <SolidColorBrush x:Key="ShellPanelBrush" Color="#AA303030"/>
+                    <SolidColorBrush x:Key="ShellBorderBrush" Color="#80404040"/>
+                    <SolidColorBrush x:Key="ShellDividerBrush" Color="#884A4A4A"/>
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Light">
-                    <SolidColorBrush x:Key="ShellWindowBackground" Color="#FFF2F2F2"/>
-                    <SolidColorBrush x:Key="ShellTopBarBrush" Color="#FFF7F7F7"/>
-                    <SolidColorBrush x:Key="ShellRailBrush" Color="#FFF0F0F0"/>
-                    <SolidColorBrush x:Key="ShellAssetsBrush" Color="#FFEAEAEA"/>
-                    <SolidColorBrush x:Key="ShellWorkspaceBrush" Color="#FFFFFFFF"/>
-                    <SolidColorBrush x:Key="ShellToolsBrush" Color="#FFEDEDED"/>
-                    <SolidColorBrush x:Key="ShellPanelBrush" Color="#FFECECEC"/>
-                    <SolidColorBrush x:Key="ShellBorderBrush" Color="#FFCCCCCC"/>
-                    <SolidColorBrush x:Key="ShellDividerBrush" Color="#FFD7D7D7"/>
+                    <SolidColorBrush x:Key="ShellWindowBackground" Color="#19FFFFFF"/>
+                    <SolidColorBrush x:Key="ShellTopBarBrush" Color="#CCF7F7F7"/>
+                    <SolidColorBrush x:Key="ShellRailBrush" Color="#CCF0F0F0"/>
+                    <SolidColorBrush x:Key="ShellAssetsBrush" Color="#CCEAEAEA"/>
+                    <SolidColorBrush x:Key="ShellWorkspaceBrush" Color="#D9FFFFFF"/>
+                    <SolidColorBrush x:Key="ShellToolsBrush" Color="#CCEDEDED"/>
+                    <SolidColorBrush x:Key="ShellPanelBrush" Color="#CCECECEC"/>
+                    <SolidColorBrush x:Key="ShellBorderBrush" Color="#80CCCCCC"/>
+                    <SolidColorBrush x:Key="ShellDividerBrush" Color="#88D7D7D7"/>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>
@@ -86,106 +87,10 @@
         </Style>
     </Window.Styles>
 
-    <Grid RowDefinitions="46,*">
-        <Border x:Name="TopTitleBar"
-                Grid.Row="0"
-                Background="{DynamicResource ShellTopBarBrush}"
-                BorderBrush="{DynamicResource ShellBorderBrush}"
-                BorderThickness="0,0,0,1"
-                Padding="10,6,6,6"
-                PointerPressed="OnTopTitleBarPointerPressed">
-            <Grid ColumnDefinitions="Auto,*,Auto"
-                  ColumnSpacing="6">
-                <StackPanel Orientation="Horizontal"
-                            Spacing="6"
-                            VerticalAlignment="Center">
-                    <Menu Background="Transparent">
-                        <MenuItem ToolTip.Tip="主菜单">
-                            <MenuItem.Header>
-                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                           Text="&#xE700;"/>
-                            </MenuItem.Header>
-                            <MenuItem Header="Settings"
-                                      ToolTip.Tip="打开设置对话框"
-                                      Command="{Binding OpenSettingsCommand}"/>
-                            <MenuItem Header="Language"
-                                      ToolTip.Tip="切换界面语言"
-                                      Command="{Binding OpenLanguageCommand}"/>
-                            <MenuItem Header="Help"
-                                      ToolTip.Tip="查看帮助与快捷键"
-                                      Command="{Binding OpenHelpCommand}"/>
-                            <MenuItem Header="About"
-                                      ToolTip.Tip="查看版本和技术栈"
-                                      Command="{Binding OpenAboutCommand}"/>
-                        </MenuItem>
-                    </Menu>
-                    <Button Classes="TitleBarButton"
-                            Command="{Binding ToggleThemeCommand}"
-                            ToolTip.Tip="{Binding ThemeToggleToolTip}">
-                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                   Text="{Binding ThemeIconGlyph}"/>
-                    </Button>
-                    <Border Width="30"
-                            Height="30"
-                            CornerRadius="0"
-                            Background="#40FFFFFF"
-                            VerticalAlignment="Center">
-                        <TextBlock HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   FontWeight="SemiBold"
-                                   Text="U"/>
-                    </Border>
-                </StackPanel>
-
-                <Border Grid.Column="1"
-                        MaxWidth="620"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Background="{DynamicResource ShellPanelBrush}"
-                        BorderBrush="{DynamicResource ShellDividerBrush}"
-                        BorderThickness="1"
-                        CornerRadius="0">
-                    <TextBox Margin="0"
-                             Height="32"
-                             Watermark="{Binding SearchPlaceholder}"
-                             Background="Transparent"
-                             BorderThickness="0"/>
-                </Border>
-
-                <StackPanel Grid.Column="2"
-                            Orientation="Horizontal"
-                            Spacing="6"
-                            VerticalAlignment="Center">
-                    <Button Classes="TitleBarButton"
-                            Command="{Binding ToggleRightToolsPaneCommand}"
-                            ToolTip.Tip="展开或收起右侧工具栏">
-                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                   Text="&#xE90F;"/>
-                    </Button>
-                    <Button Classes="TitleBarButton WindowControlButton"
-                            Click="OnMinimizeClick"
-                            ToolTip.Tip="最小化">
-                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                   FontSize="12"
-                                   Text="&#xE921;"/>
-                    </Button>
-                    <Button Classes="TitleBarButton WindowControlButton"
-                            Click="OnMaximizeRestoreClick"
-                            ToolTip.Tip="最大化或还原">
-                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                   FontSize="12"
-                                   Text="&#xE922;"/>
-                    </Button>
-                    <Button Classes="TitleBarButton WindowControlButton WindowControlClose"
-                            Click="OnCloseClick"
-                            ToolTip.Tip="关闭">
-                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                   FontSize="12"
-                                   Text="&#xE8BB;"/>
-                    </Button>
-                </StackPanel>
-            </Grid>
-        </Border>
+    <Grid Background="{DynamicResource ShellWindowBackground}"
+          RowDefinitions="44,*">
+        <views:TopStatusBarView Grid.Row="0"
+                                DataContext="{Binding TopStatusBar}"/>
 
         <Grid Grid.Row="1"
               Margin="0"

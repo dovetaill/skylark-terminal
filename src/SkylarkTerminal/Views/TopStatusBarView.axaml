@@ -1,0 +1,100 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:SkylarkTerminal.ViewModels"
+             mc:Ignorable="d"
+             d:DesignWidth="1440"
+             d:DesignHeight="44"
+             x:Class="SkylarkTerminal.Views.TopStatusBarView"
+             x:DataType="vm:TopStatusBarViewModel">
+    <Border Background="{DynamicResource ShellTopBarBrush}"
+            BorderBrush="{DynamicResource ShellBorderBrush}"
+            BorderThickness="0,0,0,1"
+            Padding="10,6,6,6">
+        <Grid ColumnDefinitions="Auto,*,Auto"
+              ColumnSpacing="8">
+            <StackPanel Orientation="Horizontal"
+                        Spacing="8"
+                        VerticalAlignment="Center">
+                <Button Classes="TitleBarButton"
+                        Command="{Binding ToggleLeftSidebarCommand}"
+                        ToolTip.Tip="展开或收起左侧资产面板">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               Text="&#xE700;"/>
+                </Button>
+                <Border Width="20"
+                        Height="20"
+                        CornerRadius="4"
+                        Background="{DynamicResource SystemAccentColor}">
+                    <TextBlock HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Text="S"/>
+                </Border>
+                <TextBlock VerticalAlignment="Center"
+                           FontWeight="SemiBold"
+                           Text="{Binding AppDisplayName}"/>
+            </StackPanel>
+
+            <Border Grid.Column="1"
+                    Background="Transparent"
+                    PointerPressed="OnDragRegionPointerPressed"
+                    DoubleTapped="OnDragRegionDoubleTapped">
+                <Grid IsHitTestVisible="False">
+                    <TextBlock HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Opacity="0.64"
+                               FontSize="11"
+                               Text="{Binding SessionStatusText}"/>
+                </Grid>
+            </Border>
+
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        Spacing="4"
+                        VerticalAlignment="Center">
+                <Button Classes="TitleBarButton"
+                        IsEnabled="False"
+                        ToolTip.Tip="全局状态占位">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               Text="&#xE73E;"/>
+                </Button>
+                <Button Classes="TitleBarButton"
+                        Command="{Binding ToggleThemeCommand}"
+                        ToolTip.Tip="{Binding ThemeToggleToolTip}">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               Text="{Binding ThemeIconGlyph}"/>
+                </Button>
+                <Button Classes="TitleBarButton"
+                        Command="{Binding ToggleRightSidebarCommand}"
+                        ToolTip.Tip="展开或收起右侧工具栏">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               Text="&#xE90F;"/>
+                </Button>
+                <Button Classes="TitleBarButton WindowControlButton"
+                        Command="{Binding MinimizeWindowCommand}"
+                        ToolTip.Tip="最小化">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               FontSize="12"
+                               Text="&#xE921;"/>
+                </Button>
+                <Button Classes="TitleBarButton WindowControlButton"
+                        Command="{Binding ToggleMaximizeRestoreWindowCommand}"
+                        ToolTip.Tip="{Binding WindowMaximizeToolTip}">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               FontSize="12"
+                               Text="{Binding WindowMaximizeGlyph}"/>
+                </Button>
+                <Button Classes="TitleBarButton WindowControlButton WindowControlClose"
+                        Command="{Binding CloseWindowCommand}"
+                        ToolTip.Tip="关闭">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               FontSize="12"
+                               Text="&#xE8BB;"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

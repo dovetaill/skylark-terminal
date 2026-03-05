@@ -59,11 +59,14 @@ public partial class MainWindowViewModel : ViewModelBase
         InitializeWorkspaceTabs();
         InitializeRightToolsData();
         SyncActiveWorkspaceTabs();
+        TopStatusBar = new TopStatusBarViewModel(this);
     }
 
     public string WindowTitle { get; } = "Skylark Terminal";
 
     public string SearchPlaceholder { get; } = "搜索主机、命令或会话";
+
+    public TopStatusBarViewModel TopStatusBar { get; }
 
     [ObservableProperty]
     private bool isLeftAssetsPaneOpen = true;
