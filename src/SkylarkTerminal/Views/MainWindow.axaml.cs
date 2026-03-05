@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Threading;
 using FluentAvalonia.UI.Controls;
 using SkylarkTerminal.ViewModels;
 using System;
@@ -23,6 +24,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         ResolveMainContentGrid().LayoutUpdated += OnMainContentGridLayoutUpdated;
+        AddHandler(PointerPressedEvent, OnWindowPointerPressed, RoutingStrategies.Tunnel);
     }
 
     private ColumnDefinition AssetsPanelColumnDefinition => ResolveMainContentGrid().ColumnDefinitions[1];
@@ -82,6 +84,8 @@ public partial class MainWindow : Window
         {
             _mainContentGrid.LayoutUpdated -= OnMainContentGridLayoutUpdated;
         }
+
+        RemoveHandler(PointerPressedEvent, OnWindowPointerPressed);
 
         if (_boundViewModel is not null)
         {
@@ -166,6 +170,16 @@ public partial class MainWindow : Window
                  e.PropertyName == nameof(MainWindowViewModel.ThemeModeLabel))
         {
             ApplyShellVisualMode(_boundViewModel.IsShellTransparent);
+        }
+        else if (e.PropertyName == nameof(MainWindowViewModel.IsAssetsSearchOpen) &&
+                 _boundViewModel.IsAssetsSearchOpen)
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                var searchBox = this.FindControl<TextBox>("AssetsSearchTextBox");
+                searchBox?.Focus();
+                searchBox?.SelectAll();
+            }, DispatcherPriority.Background);
         }
     }
 
@@ -301,13 +315,15 @@ public partial class MainWindow : Window
 
     private void ApplyShellPalette(bool isDarkTheme, bool isTransparent)
     {
-        (var window, var topBar, var rail, var assets, var workspace, var tools, var panel, var border, var divider, var tabActive, var tabInactive, var tabSelectionBorder, var terminal) =
+        (var window, var topBar, var rail, var assetsToolbar, var assetsHeaderSeparator, var assets, var workspace, var tools, var panel, var border, var divider, var tabActive, var tabInactive, var tabSelectionBorder, var terminal) =
             (isDarkTheme, isTransparent) switch
             {
                 (true, true) => (
                     "#1A10141A",
                     "#CC1E222A",
                     "#B821262F",
+                    "#C4262B34",
+                    "#A0485362",
                     "#C0282D36",
                     "#B8171B22",
                     "#C01F242D",
@@ -322,6 +338,8 @@ public partial class MainWindow : Window
                     "#1AFFFFFF",
                     "#CCF5F6F8",
                     "#CCE8ECF1",
+                    "#CCECF0F4",
+                    "#80C7D0DC",
                     "#CCEEF1F4",
                     "#D9FDFEFF",
                     "#CCF0F3F6",
@@ -336,6 +354,8 @@ public partial class MainWindow : Window
                     "#FF1A1D24",
                     "#FF1E222A",
                     "#FF21262F",
+                    "#FF262B34",
+                    "#FF3A4250",
                     "#FF282D36",
                     "#FF171B22",
                     "#FF1F242D",
@@ -350,6 +370,8 @@ public partial class MainWindow : Window
                     "#FFF2F4F7",
                     "#FFF5F6F8",
                     "#FFE8ECF1",
+                    "#FFEBEFF3",
+                    "#FFD1D8E2",
                     "#FFEEF1F4",
                     "#FFFDFEFF",
                     "#FFF0F3F6",
@@ -365,6 +387,8 @@ public partial class MainWindow : Window
         SetBrushResource("ShellWindowBackground", window);
         SetBrushResource("ShellTopBarBrush", topBar);
         SetBrushResource("ShellRailBrush", rail);
+        SetBrushResource("ShellAssetsToolbarBrush", assetsToolbar);
+        SetBrushResource("ShellAssetsHeaderSeparatorBrush", assetsHeaderSeparator);
         SetBrushResource("ShellAssetsBrush", assets);
         SetBrushResource("ShellWorkspaceBrush", workspace);
         SetBrushResource("ShellToolsBrush", tools);
@@ -380,6 +404,52 @@ public partial class MainWindow : Window
     private void SetBrushResource(string key, string hexColor)
     {
         Resources[key] = new SolidColorBrush(Color.Parse(hexColor));
+    }
+
+    private void OnWindowPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (_boundViewModel is null ||
+            !_boundViewModel.IsAssetsSearchOpen ||
+            !string.IsNullOrWhiteSpace(_boundViewModel.AssetsSearchText))
+        {
+            return;
+        }
+
+        var sourceElement = e.Source as StyledElement;
+        var searchBox = this.FindControl<TextBox>("AssetsSearchTextBox");
+        var searchToggleButton = this.FindControl<Button>("AssetsSearchToggleButton");
+        if (IsSourceWithin(searchBox, sourceElement) || IsSourceWithin(searchToggleButton, sourceElement))
+        {
+            return;
+        }
+
+        _boundViewModel.CloseAssetsSearchIfEmptyCommand.Execute(null);
+    }
+
+    private static bool IsSourceWithin(Control? control, StyledElement? source)
+    {
+        if (control is null || source is null)
+        {
+            return false;
+        }
+
+        var current = source;
+        while (current is not null)
+        {
+            if (ReferenceEquals(current, control))
+            {
+                return true;
+            }
+
+            current = current.Parent as StyledElement;
+        }
+
+        return false;
+    }
+
+    private void OnAssetsSearchBoxLostFocus(object? sender, RoutedEventArgs e)
+    {
+        _boundViewModel?.CloseAssetsSearchIfEmptyCommand.Execute(null);
     }
 
     private static bool ResolveIsDarkTheme()

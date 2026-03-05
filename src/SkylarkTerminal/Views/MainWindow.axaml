@@ -33,15 +33,17 @@
             <x:Double x:Key="TabViewItemMinHeight">30</x:Double>
             <x:Double x:Key="TabViewItemMinWidth">92</x:Double>
             <x:Double x:Key="TabViewItemMaxWidth">460</x:Double>
-            <ResourceDictionary.ThemeDictionaries>
-                <ResourceDictionary x:Key="Dark">
-                    <SolidColorBrush x:Key="ShellWindowBackground" Color="#FF1A1D24"/>
-                    <SolidColorBrush x:Key="ShellTopBarBrush" Color="#FF1E222A"/>
-                    <SolidColorBrush x:Key="ShellRailBrush" Color="#FF21262F"/>
-                    <SolidColorBrush x:Key="ShellAssetsBrush" Color="#FF282D36"/>
-                    <SolidColorBrush x:Key="ShellWorkspaceBrush" Color="#FF171B22"/>
-                    <SolidColorBrush x:Key="ShellToolsBrush" Color="#FF1F242D"/>
-                    <SolidColorBrush x:Key="ShellPanelBrush" Color="#FF262B34"/>
+                <ResourceDictionary.ThemeDictionaries>
+                    <ResourceDictionary x:Key="Dark">
+                        <SolidColorBrush x:Key="ShellWindowBackground" Color="#FF1A1D24"/>
+                        <SolidColorBrush x:Key="ShellTopBarBrush" Color="#FF1E222A"/>
+                        <SolidColorBrush x:Key="ShellRailBrush" Color="#FF21262F"/>
+                        <SolidColorBrush x:Key="ShellAssetsToolbarBrush" Color="#FF2A303A"/>
+                        <SolidColorBrush x:Key="ShellAssetsHeaderSeparatorBrush" Color="#FF3A4250"/>
+                        <SolidColorBrush x:Key="ShellAssetsBrush" Color="#FF282D36"/>
+                        <SolidColorBrush x:Key="ShellWorkspaceBrush" Color="#FF171B22"/>
+                        <SolidColorBrush x:Key="ShellToolsBrush" Color="#FF1F242D"/>
+                        <SolidColorBrush x:Key="ShellPanelBrush" Color="#FF262B34"/>
                     <SolidColorBrush x:Key="ShellBorderBrush" Color="#FF323843"/>
                     <SolidColorBrush x:Key="ShellDividerBrush" Color="#FF2A313B"/>
                     <SolidColorBrush x:Key="ShellTabActiveBrush" Color="#FF2A303B"/>
@@ -49,14 +51,16 @@
                     <SolidColorBrush x:Key="ShellTabSelectionBorderBrush" Color="#FFFFFFFF"/>
                     <SolidColorBrush x:Key="ShellTerminalBrush" Color="#FF10141A"/>
                 </ResourceDictionary>
-                <ResourceDictionary x:Key="Light">
-                    <SolidColorBrush x:Key="ShellWindowBackground" Color="#FFF2F4F7"/>
-                    <SolidColorBrush x:Key="ShellTopBarBrush" Color="#FFF5F6F8"/>
-                    <SolidColorBrush x:Key="ShellRailBrush" Color="#FFE8ECF1"/>
-                    <SolidColorBrush x:Key="ShellAssetsBrush" Color="#FFEEF1F4"/>
-                    <SolidColorBrush x:Key="ShellWorkspaceBrush" Color="#FFFDFEFF"/>
-                    <SolidColorBrush x:Key="ShellToolsBrush" Color="#FFF0F3F6"/>
-                    <SolidColorBrush x:Key="ShellPanelBrush" Color="#FFF1F3F6"/>
+                    <ResourceDictionary x:Key="Light">
+                        <SolidColorBrush x:Key="ShellWindowBackground" Color="#FFF2F4F7"/>
+                        <SolidColorBrush x:Key="ShellTopBarBrush" Color="#FFF5F6F8"/>
+                        <SolidColorBrush x:Key="ShellRailBrush" Color="#FFE8ECF1"/>
+                        <SolidColorBrush x:Key="ShellAssetsToolbarBrush" Color="#FFE8EDF2"/>
+                        <SolidColorBrush x:Key="ShellAssetsHeaderSeparatorBrush" Color="#FFD1D8E2"/>
+                        <SolidColorBrush x:Key="ShellAssetsBrush" Color="#FFEEF1F4"/>
+                        <SolidColorBrush x:Key="ShellWorkspaceBrush" Color="#FFFDFEFF"/>
+                        <SolidColorBrush x:Key="ShellToolsBrush" Color="#FFF0F3F6"/>
+                        <SolidColorBrush x:Key="ShellPanelBrush" Color="#FFF1F3F6"/>
                     <SolidColorBrush x:Key="ShellBorderBrush" Color="#FFD5DBE4"/>
                     <SolidColorBrush x:Key="ShellDividerBrush" Color="#FFE0E4EB"/>
                     <SolidColorBrush x:Key="ShellTabActiveBrush" Color="#FFE5EAF0"/>
@@ -176,19 +180,9 @@
                         <TextBlock Text="🖥"/>
                     </Button>
                     <Button Classes="TitleBarButton"
-                            Command="{Binding ShowSftpAssetsCommand}"
-                            ToolTip.Tip="SFTP 资产">
-                        <TextBlock Text="📁"/>
-                    </Button>
-                    <Button Classes="TitleBarButton"
                             Command="{Binding ShowKeysAssetsCommand}"
                             ToolTip.Tip="密钥资产">
                         <TextBlock Text="🔑"/>
-                    </Button>
-                    <Button Classes="TitleBarButton"
-                            Command="{Binding ShowToolsAssetsCommand}"
-                            ToolTip.Tip="工具资产">
-                        <TextBlock Text="🧰"/>
                     </Button>
                     <Border Height="1"
                             Margin="0"
@@ -205,42 +199,127 @@
             <Border Grid.Column="1"
                     IsVisible="{Binding IsAssetsPanelVisible}"
                     IsHitTestVisible="{Binding IsAssetsPanelVisible}"
-                    Background="{DynamicResource ShellAssetsBrush}"
+                    Background="Transparent"
                     BorderBrush="{DynamicResource ShellBorderBrush}"
                     BorderThickness="0"
                     CornerRadius="0">
-                <Grid RowDefinitions="Auto,*">
+                <Grid RowDefinitions="Auto,1,*">
                     <Border Grid.Row="0"
-                            Padding="14,10"
+                            Background="{DynamicResource ShellAssetsToolbarBrush}"
+                            Padding="10,6"
                             BorderBrush="{DynamicResource ShellDividerBrush}"
-                            BorderThickness="0,0,0,1">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <StackPanel>
-                                <TextBlock FontWeight="SemiBold"
-                                           Text="{Binding AssetsPanelTitle}"/>
-                                <TextBlock Opacity="0.74"
-                                           FontSize="11"
-                                           Text="{Binding LastAssetActionMessage}"/>
-                            </StackPanel>
-                            <StackPanel Grid.Column="1"
-                                        Orientation="Horizontal"
-                                        Spacing="6">
-                                <Button Classes="TitleBarButton"
-                                        Command="{Binding ToggleAssetsViewModeCommand}"
-                                        ToolTip.Tip="{Binding AssetsViewModeToolTip}">
-                                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               Text="{Binding AssetsViewModeGlyph}"/>
-                                </Button>
-                            </StackPanel>
+                            BorderThickness="0">
+                        <Grid RowDefinitions="Auto,Auto"
+                              RowSpacing="6">
+                            <Grid Grid.Row="0"
+                                  ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0"
+                                           VerticalAlignment="Center"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           Opacity="0.9"
+                                           Text="资产列表"/>
+                                <StackPanel Grid.Column="1"
+                                            Orientation="Horizontal"
+                                            Spacing="4">
+                                    <Button Classes="TitleBarButton"
+                                            x:Name="AssetsSearchToggleButton"
+                                            MinWidth="26"
+                                            MinHeight="26"
+                                            Padding="0"
+                                            Command="{Binding ToggleAssetsSearchCommand}"
+                                            ToolTip.Tip="搜索资产">
+                                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   Text="&#xE721;"/>
+                                    </Button>
+                                    <Button Classes="TitleBarButton"
+                                            MinWidth="26"
+                                            MinHeight="26"
+                                            Padding="0"
+                                            IsVisible="{Binding IsTreeViewMode}"
+                                            Command="{Binding ToggleAssetsExpandCollapseCommand}"
+                                            ToolTip.Tip="{Binding AssetsExpandCollapseToolTip}">
+                                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding AssetsExpandCollapseGlyph}"/>
+                                    </Button>
+                                    <Button Classes="TitleBarButton"
+                                            MinWidth="26"
+                                            MinHeight="26"
+                                            Padding="0"
+                                            ToolTip.Tip="创建资产">
+                                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   Text="&#xE8FE;"/>
+                                        <Button.Flyout>
+                                            <ui:FAMenuFlyout Placement="Bottom">
+                                                <ui:MenuFlyoutItem Text="新建文件夹"
+                                                                   Command="{Binding CreateFolderAssetCommand}"/>
+                                                <ui:MenuFlyoutItem Text="新建 SSH 连接"
+                                                                   Command="{Binding CreateSshConnectionAssetCommand}"/>
+                                            </ui:FAMenuFlyout>
+                                        </Button.Flyout>
+                                    </Button>
+                                    <Button Classes="TitleBarButton"
+                                            MinWidth="26"
+                                            MinHeight="26"
+                                            Padding="0"
+                                            Command="{Binding ToggleAssetsViewModeCommand}"
+                                            ToolTip.Tip="{Binding AssetsViewModeToolTip}">
+                                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding AssetsViewModeGlyph}"/>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+
+                            <Border Grid.Row="1"
+                                    IsVisible="{Binding IsAssetsSearchOpen}"
+                                    Background="#12000000"
+                                    BorderBrush="{DynamicResource ShellDividerBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="6,0">
+                                <Grid ColumnDefinitions="Auto,*"
+                                      ColumnSpacing="8">
+                                    <TextBlock VerticalAlignment="Center"
+                                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                               Opacity="0.68"
+                                               Text="&#xE721;"/>
+                                    <TextBox x:Name="AssetsSearchTextBox"
+                                             Grid.Column="1"
+                                             MinHeight="26"
+                                             BorderThickness="0"
+                                             Background="Transparent"
+                                             Watermark="{Binding AssetsSearchPlaceholder}"
+                                             Text="{Binding AssetsSearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             LostFocus="OnAssetsSearchBoxLostFocus"/>
+                                </Grid>
+                            </Border>
                         </Grid>
                     </Border>
-                    <Grid Grid.Row="1"
-                          Margin="0">
+                    <Border Grid.Row="1"
+                            Background="{DynamicResource ShellAssetsHeaderSeparatorBrush}"/>
+                    <Border Grid.Row="2"
+                            Background="{DynamicResource ShellAssetsBrush}">
+                        <Grid Margin="0">
                         <TreeView ItemsSource="{Binding CurrentAssetTree}"
                                   SelectedItem="{Binding SelectedAssetNode, Mode=TwoWay}"
                                   IsVisible="{Binding IsTreeViewMode}">
+                            <TreeView.Styles>
+                                <Style Selector="TreeViewItem"
+                                       x:DataType="models:AssetNode">
+                                    <Setter Property="IsExpanded"
+                                            Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                                    <Setter Property="IsVisible"
+                                            Value="{Binding IsVisible}"/>
+                                </Style>
+                            </TreeView.Styles>
                             <TreeView.ContextMenu>
                                 <ContextMenu DataContext="{Binding #RootWindow.DataContext}">
                                     <MenuItem Header="新建"
@@ -259,10 +338,8 @@
                                                   ItemsSource="{Binding Children}">
                                     <StackPanel Orientation="Horizontal"
                                                 Spacing="8">
+                                        <TextBlock Text="{Binding AssetTypeIcon}"/>
                                         <TextBlock Text="{Binding Name}"/>
-                                        <TextBlock Opacity="0.65"
-                                                   FontSize="11"
-                                                   Text="{Binding Kind}"/>
                                     </StackPanel>
                                 </TreeDataTemplate>
                             </TreeView.ItemTemplate>
@@ -286,17 +363,16 @@
                             </ListBox.ContextMenu>
                             <ListBox.ItemTemplate>
                                 <DataTemplate DataType="models:AssetNode">
-                                    <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Orientation="Horizontal"
+                                                Spacing="8">
+                                        <TextBlock Text="{Binding AssetTypeIcon}"/>
                                         <TextBlock Text="{Binding Name}"/>
-                                        <TextBlock Grid.Column="1"
-                                                   Opacity="0.65"
-                                                   FontSize="11"
-                                                   Text="{Binding Kind}"/>
-                                    </Grid>
+                                    </StackPanel>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
-                    </Grid>
+                        </Grid>
+                    </Border>
                 </Grid>
             </Border>
 

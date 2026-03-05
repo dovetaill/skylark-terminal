@@ -34,7 +34,8 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly ISftpService _sftpService;
     private readonly IAppDialogService _appDialogService;
     private readonly Dictionary<AssetsPaneKind, ObservableCollection<AssetNode>> _assetsByPane;
-    private int _newAssetSeed = 1;
+    private int _newFolderSeed = 1;
+    private int _newConnectionSeed = 1;
     private int _newWorkspaceTabSeed = 1;
 
     public MainWindowViewModel()
@@ -56,6 +57,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _sftpService = sftpService;
         _appDialogService = appDialogService;
         _assetsByPane = BuildAssetsMap(assetCatalogService.GetAssets());
+        ApplyAssetsSearchFilter();
         RebuildCurrentFlatList();
         InitializeWorkspaceTabs();
         InitializeRightToolsData();
@@ -98,6 +100,15 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     private bool isShellTransparent;
+
+    [ObservableProperty]
+    private string assetsSearchText = string.Empty;
+
+    [ObservableProperty]
+    private bool isAssetsSearchOpen;
+
+    [ObservableProperty]
+    private bool areAllTreeFoldersExpanded;
 
     public double LeftAssetsPaneWidth => IsAssetsPanelVisible ? ExpandedLeftAssetsPaneWidth : 0d;
 
@@ -146,6 +157,14 @@ public partial class MainWindowViewModel : ViewModelBase
     public string FlatConnectionsToolTip => "平铺连接视图";
 
     public string TreeConnectionsToolTip => "树形连接视图";
+
+    public string AssetsSearchPlaceholder => "搜索资产";
+
+    public string AssetsExpandCollapseGlyph => AreAllTreeFoldersExpanded ? "\uE70D" : "\uE70E";
+
+    public string AssetsExpandCollapseToolTip => AreAllTreeFoldersExpanded
+        ? "收起全部"
+        : "展开全部";
 
     public bool IsSnippetsView => SelectedRightToolsView == RightToolsViewKind.Snippets;
 
@@ -330,26 +349,92 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private void ToggleAssetsSearch()
+    {
+        if (IsAssetsSearchOpen)
+        {
+            if (string.IsNullOrWhiteSpace(AssetsSearchText))
+            {
+                IsAssetsSearchOpen = false;
+            }
+
+            return;
+        }
+
+        IsAssetsSearchOpen = true;
+    }
+
+    [RelayCommand]
+    private void CloseAssetsSearchIfEmpty()
+    {
+        if (!string.IsNullOrWhiteSpace(AssetsSearchText))
+        {
+            return;
+        }
+
+        IsAssetsSearchOpen = false;
+    }
+
+    [RelayCommand]
+    private void ToggleAssetsExpandCollapse()
+    {
+        if (!IsTreeViewMode)
+        {
+            return;
+        }
+
+        var shouldExpand = !AreAllTreeFoldersExpanded;
+        SetFolderExpansion(CurrentAssetTree, shouldExpand);
+        AreAllTreeFoldersExpanded = shouldExpand;
+        LastAssetActionMessage = shouldExpand
+            ? "已展开全部节点"
+            : "已收起全部节点";
+    }
+
+    [RelayCommand]
+    private void ExpandAllAssets()
+    {
+        if (!IsTreeViewMode)
+        {
+            return;
+        }
+
+        SetFolderExpansion(CurrentAssetTree, true);
+        AreAllTreeFoldersExpanded = true;
+        LastAssetActionMessage = "已展开全部节点";
+    }
+
+    [RelayCommand]
+    private void CollapseAllAssets()
+    {
+        if (!IsTreeViewMode)
+        {
+            return;
+        }
+
+        SetFolderExpansion(CurrentAssetTree, false);
+        AreAllTreeFoldersExpanded = false;
+        LastAssetActionMessage = "已收起全部节点";
+    }
+
+    [RelayCommand]
+    private void CreateFolderAsset()
+    {
+        CreateFolderCore(null);
+        Console.WriteLine($"[Assets] Create folder: {LastAssetActionMessage}");
+    }
+
+    [RelayCommand]
+    private void CreateSshConnectionAsset()
+    {
+        CreateSshConnectionCore(null);
+        Console.WriteLine($"[Assets] Create SSH connection: {LastAssetActionMessage}");
+    }
+
+    [RelayCommand]
     private void CreateAsset(AssetNode? sourceNode)
     {
-        var targetNode = ResolveTargetNode(sourceNode);
-        var newNode = new AssetNode(
-            $"asset-{Guid.NewGuid():N}",
-            $"New {SelectedAssetsPane} {_newAssetSeed++}",
-            "Custom");
-
-        if (targetNode is null)
-        {
-            CurrentAssetTree.Add(newNode);
-        }
-        else
-        {
-            targetNode.Children.Add(newNode);
-        }
-
-        SelectedAssetNode = newNode;
-        LastAssetActionMessage = $"Created {newNode.Name}";
-        RebuildCurrentFlatList();
+        CreateFolderCore(sourceNode);
     }
 
     [RelayCommand]
@@ -367,7 +452,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         LastAssetActionMessage = $"Edited {targetNode.Name}";
-        RebuildCurrentFlatList();
+        ApplyAssetsSearchFilter();
     }
 
     [RelayCommand]
@@ -386,7 +471,7 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 SelectedAssetNode = null;
             }
-            RebuildCurrentFlatList();
+            ApplyAssetsSearchFilter();
         }
     }
 
@@ -504,7 +589,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         OnPropertyChanged(nameof(CurrentAssetTree));
         OnPropertyChanged(nameof(AssetsPanelTitle));
-        RebuildCurrentFlatList();
+        ApplyAssetsSearchFilter();
     }
 
     partial void OnAssetsViewModeChanged(AssetsViewMode value)
@@ -530,6 +615,22 @@ public partial class MainWindowViewModel : ViewModelBase
     partial void OnCurrentLanguageCodeChanged(string value)
     {
         OnPropertyChanged(nameof(CurrentLanguageLabel));
+    }
+
+    partial void OnAssetsSearchTextChanged(string value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            IsAssetsSearchOpen = true;
+        }
+
+        ApplyAssetsSearchFilter();
+    }
+
+    partial void OnAreAllTreeFoldersExpandedChanged(bool value)
+    {
+        OnPropertyChanged(nameof(AssetsExpandCollapseGlyph));
+        OnPropertyChanged(nameof(AssetsExpandCollapseToolTip));
     }
 
     private bool IsDarkTheme
@@ -615,13 +716,123 @@ public partial class MainWindowViewModel : ViewModelBase
         return sourceNode ?? SelectedAssetNode;
     }
 
+    private void CreateFolderCore(AssetNode? sourceNode)
+    {
+        var targetNode = ResolveInsertionParent(sourceNode);
+        var newNode = new FolderNode(
+            $"folder-{Guid.NewGuid():N}",
+            $"New Folder {_newFolderSeed++}",
+            "Folder");
+
+        InsertNode(targetNode, newNode);
+        LastAssetActionMessage = $"Created folder {newNode.Name}";
+    }
+
+    private void CreateSshConnectionCore(AssetNode? sourceNode)
+    {
+        var targetNode = ResolveInsertionParent(sourceNode);
+        var seed = _newConnectionSeed++;
+        var newNode = new ConnectionNode(
+            $"conn-{Guid.NewGuid():N}",
+            $"ssh-{seed:D2}",
+            $"10.0.0.{seed + 20}",
+            "root",
+            22,
+            "SSH Connection");
+
+        InsertNode(targetNode, newNode);
+        LastAssetActionMessage = $"Created SSH connection {newNode.Name}";
+    }
+
+    private void InsertNode(AssetNode? parentNode, AssetNode newNode)
+    {
+        if (parentNode is null)
+        {
+            CurrentAssetTree.Add(newNode);
+        }
+        else
+        {
+            parentNode.Children.Add(newNode);
+            parentNode.IsExpanded = true;
+        }
+
+        SelectedAssetNode = newNode;
+        ApplyAssetsSearchFilter();
+    }
+
+    private AssetNode? ResolveInsertionParent(AssetNode? sourceNode)
+    {
+        var targetNode = ResolveTargetNode(sourceNode);
+        return targetNode is FolderNode ? targetNode : null;
+    }
+
+    private void ApplyAssetsSearchFilter()
+    {
+        var keyword = AssetsSearchText.Trim();
+
+        foreach (var node in CurrentAssetTree)
+        {
+            ApplyNodeVisibility(node, keyword);
+        }
+
+        AreAllTreeFoldersExpanded = AreAllFoldersExpanded(CurrentAssetTree);
+        RebuildCurrentFlatList();
+    }
+
+    private static bool ApplyNodeVisibility(AssetNode node, string keyword)
+    {
+        var isFilteredSearch = !string.IsNullOrWhiteSpace(keyword);
+        var isSelfMatch = node.Matches(keyword);
+        var hasMatchedChild = false;
+
+        foreach (var child in node.Children)
+        {
+            if (ApplyNodeVisibility(child, keyword))
+            {
+                hasMatchedChild = true;
+            }
+        }
+
+        node.IsVisible = !isFilteredSearch || isSelfMatch || hasMatchedChild;
+        if (isFilteredSearch && node.IsFolder)
+        {
+            node.IsExpanded = hasMatchedChild;
+        }
+
+        return node.IsVisible;
+    }
+
     private void RebuildCurrentFlatList()
     {
         CurrentAssetFlatList.Clear();
-        foreach (var node in Flatten(CurrentAssetTree))
+        foreach (var node in Flatten(CurrentAssetTree).Where(node => node.IsVisible))
         {
             CurrentAssetFlatList.Add(node);
         }
+    }
+
+    private static void SetFolderExpansion(IEnumerable<AssetNode> nodes, bool isExpanded)
+    {
+        foreach (var node in nodes)
+        {
+            if (node.IsFolder)
+            {
+                node.IsExpanded = isExpanded;
+            }
+
+            SetFolderExpansion(node.Children, isExpanded);
+        }
+    }
+
+    private static bool AreAllFoldersExpanded(IEnumerable<AssetNode> nodes)
+    {
+        var folders = Flatten(nodes).Where(node => node.IsFolder).ToList();
+        if (folders.Count == 0)
+        {
+            return false;
+        }
+
+        return folders.All(node => node.IsExpanded);
     }
 
     private static IEnumerable<AssetNode> Flatten(IEnumerable<AssetNode> nodes)
