@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+  <defs>
+    <linearGradient id="brand" x1="0" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#E8845A"/>
+      <stop offset="100%" stop-color="#D4603A"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#brand)"/>
+  <g transform="translate(116,136)">
+    <!-- 上翼：长弧线，向左上扬起 -->
+    <path d="M0,0 C-20,-18 -50,-48 -72,-58"
+          stroke="white" stroke-width="16" stroke-linecap="round" fill="none"/>
+    <!-- 下翼：短弧线，向左下平展 -->
+    <path d="M0,0 C-12,10 -28,22 -42,26"
+          stroke="white" stroke-width="14" stroke-linecap="round" fill="none"/>
+    <!-- 颈部 -->
+    <path d="M0,0 C16,-8 32,-16 48,-22"
+          stroke="white" stroke-width="14" stroke-linecap="round" fill="none"/>
+    <!-- 头 -->
+    <circle cx="58" cy="-26" r="12" fill="white"/>
+  </g>
+</svg>

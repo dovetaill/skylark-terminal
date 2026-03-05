@@ -12,7 +12,7 @@
         d:DesignHeight="900"
         x:Class="SkylarkTerminal.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/skylark-logo.ico"
         Title="{Binding WindowTitle}"
         Width="1440"
         Height="900"
