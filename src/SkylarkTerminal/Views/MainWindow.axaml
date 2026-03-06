@@ -149,6 +149,75 @@
         <Style Selector="Button.TabStripActionButton:pressed">
             <Setter Property="Background" Value="#22000000"/>
         </Style>
+        <Style Selector="ui|FAMenuFlyoutPresenter.assets-tree-root-context-flyout">
+            <Setter Property="Width" Value="232"/>
+            <Setter Property="MinWidth" Value="232"/>
+            <Setter Property="MaxWidth" Value="232"/>
+        </Style>
+        <Style Selector="ui|FAMenuFlyoutPresenter.assets-flat-root-context-flyout">
+            <Setter Property="Width" Value="232"/>
+            <Setter Property="MinWidth" Value="232"/>
+            <Setter Property="MaxWidth" Value="232"/>
+        </Style>
+        <Style Selector="ui|FAMenuFlyoutPresenter.assets-tree-node-context-flyout">
+            <Setter Property="Width" Value="240"/>
+            <Setter Property="MinWidth" Value="240"/>
+            <Setter Property="MaxWidth" Value="240"/>
+        </Style>
+        <Style Selector="ui|FAMenuFlyoutPresenter.assets-flat-node-context-flyout">
+            <Setter Property="Width" Value="240"/>
+            <Setter Property="MinWidth" Value="240"/>
+            <Setter Property="MaxWidth" Value="240"/>
+        </Style>
+        <Style Selector="ui|FAMenuFlyoutPresenter.workspace-root-context-flyout">
+            <Setter Property="Width" Value="232"/>
+            <Setter Property="MinWidth" Value="232"/>
+            <Setter Property="MaxWidth" Value="232"/>
+        </Style>
+        <Style Selector="ui|FAMenuFlyoutPresenter.workspace-tabstrip-context-flyout">
+            <Setter Property="Width" Value="232"/>
+            <Setter Property="MinWidth" Value="232"/>
+            <Setter Property="MaxWidth" Value="232"/>
+        </Style>
+        <Style Selector="ui|FAMenuFlyoutPresenter.workspace-tabitem-context-flyout">
+            <Setter Property="Width" Value="240"/>
+            <Setter Property="MinWidth" Value="240"/>
+            <Setter Property="MaxWidth" Value="240"/>
+        </Style>
+        <Style Selector="ui|FAMenuFlyoutPresenter.tools-root-context-flyout">
+            <Setter Property="Width" Value="232"/>
+            <Setter Property="MinWidth" Value="232"/>
+            <Setter Property="MaxWidth" Value="232"/>
+        </Style>
+        <Style Selector="ui|FAMenuFlyoutPresenter.tools-grid-context-flyout">
+            <Setter Property="Width" Value="232"/>
+            <Setter Property="MinWidth" Value="232"/>
+            <Setter Property="MaxWidth" Value="232"/>
+        </Style>
+        <Style Selector="ui|MenuFlyoutItem.AssetsContextTitleItem">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Opacity" Value="0.86"/>
+            <Setter Property="Padding" Value="16,10,10,8"/>
+        </Style>
+        <Style Selector="ui|MenuFlyoutItem.AssetsContextActionItem">
+            <Setter Property="Padding" Value="16,9,10,9"/>
+        </Style>
+        <Style Selector="ui|MenuFlyoutItem.WorkspaceContextTitleItem">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Opacity" Value="0.86"/>
+            <Setter Property="Padding" Value="16,10,10,8"/>
+        </Style>
+        <Style Selector="ui|MenuFlyoutItem.WorkspaceContextActionItem">
+            <Setter Property="Padding" Value="16,9,10,9"/>
+        </Style>
+        <Style Selector="ui|MenuFlyoutItem.ToolsContextTitleItem">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Opacity" Value="0.86"/>
+            <Setter Property="Padding" Value="16,10,10,8"/>
+        </Style>
+        <Style Selector="ui|MenuFlyoutItem.ToolsContextActionItem">
+            <Setter Property="Padding" Value="16,9,10,9"/>
+        </Style>
     </Window.Styles>
 
     <Grid Background="{DynamicResource ShellWindowBackground}"
@@ -314,50 +383,104 @@
                                   Background="Transparent"
                                   IsVisible="{Binding IsTreeViewMode}">
                             <TreeView.ContextFlyout>
-                                <ui:FAMenuFlyout>
+                                <ui:FAMenuFlyout FlyoutPresenterClasses="assets-tree-root-context-flyout">
+                                    <ui:MenuFlyoutItem Text="操作"
+                                              IsEnabled="False"
+                                              Classes="AssetsContextTitleItem"/>
+                                    <ui:MenuFlyoutSeparator/>
                                     <ui:MenuFlyoutItem Text="新建目录"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding CreateFolderFromContextCommand}"
                                               IsVisible="{Binding IsGeneralAssetsPane}"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE710;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                     <ui:MenuFlyoutItem Text="新建连接"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding CreateConnectionFromContextCommand}"
                                               IsVisible="{Binding IsGeneralAssetsPane}"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE71D;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                     <ui:MenuFlyoutItem Text="新建密码"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding CreatePasswordAssetCommand}"
                                               IsVisible="{Binding IsKeysAssetsPane}"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE72E;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                     <ui:MenuFlyoutItem Text="新建密钥文件"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding CreateKeyFileAssetCommand}"
                                               IsVisible="{Binding IsKeysAssetsPane}"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8A5;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                     <ui:MenuFlyoutItem Text="导入资产"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding ImportAssetsCommand}"
                                               IsVisible="{Binding IsGeneralAssetsPane}"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE898;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                     <ui:MenuFlyoutItem Text="导入密钥文件"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding ImportAssetsCommand}"
                                               IsVisible="{Binding IsKeysAssetsPane}"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE898;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                     <ui:MenuFlyoutSeparator/>
                                     <ui:MenuFlyoutItem Text="粘贴"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding PasteAssetCommand}"
                                               IsEnabled="{Binding HasAssetClipboardData}"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE77F;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                     <ui:MenuFlyoutItem Text="导出资产"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding ExportAssetsCommand}"
                                               IsVisible="{Binding IsGeneralAssetsPane}"
                                               IsEnabled="False"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xEDE1;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                     <ui:MenuFlyoutItem Text="导出密钥"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding ExportAssetsCommand}"
                                               IsVisible="{Binding IsKeysAssetsPane}"
                                               IsEnabled="False"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xEDE1;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                     <ui:MenuFlyoutSeparator/>
                                     <ui:MenuFlyoutItem Text="刷新"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding RefreshAssetsCommand}"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE72C;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                 </ui:FAMenuFlyout>
                             </TreeView.ContextFlyout>
                             <TreeView.Styles>
@@ -379,90 +502,162 @@
                                             DoubleTapped="OnAssetNodeDoubleTapped"
                                             Padding="2,0">
                                         <Border.ContextFlyout>
-                                            <ui:FAMenuFlyout>
+                                            <ui:FAMenuFlyout FlyoutPresenterClasses="assets-tree-node-context-flyout">
+                                                <ui:MenuFlyoutItem Text="操作"
+                                                          IsEnabled="False"
+                                                          Classes="AssetsContextTitleItem"/>
+                                                <ui:MenuFlyoutSeparator/>
                                                 <ui:MenuFlyoutItem Text="新建目录"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.CreateFolderFromContextCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE710;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="新建连接"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.CreateConnectionFromContextCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE71D;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="新建密码"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.CreatePasswordAssetCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsKeysAssetsPane}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE72E;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="新建密钥文件"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.CreateKeyFileAssetCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsKeysAssetsPane}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8A5;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="导入资产"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.ImportAssetsCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE898;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="导入密钥文件"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.ImportAssetsCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsKeysAssetsPane}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE898;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutSeparator/>
                                                 <ui:MenuFlyoutItem Text="在新标签打开"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.OpenAssetInNewTabCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE78B;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="复制"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.CopyAssetCommand}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8C8;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="剪切"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.CutAssetCommand}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8C6;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="粘贴"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.PasteAssetCommand}"
                                                           IsEnabled="{Binding $parent[Window].DataContext.HasAssetClipboardData}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE77F;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutSeparator/>
                                                 <ui:MenuFlyoutItem Text="删除"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.DeleteAssetCommand}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE74D;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="克隆"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.CloneAssetCommand}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8C8;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="重命名"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.RenameAssetCommand}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8AC;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutSeparator/>
                                                 <ui:MenuFlyoutItem Text="导出资产"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.ExportAssetsCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xEDE1;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="导出密钥"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.ExportAssetsCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsKeysAssetsPane}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xEDE1;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="刷新"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.RefreshAssetsCommand}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE72C;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutSeparator/>
                                                 <ui:MenuFlyoutItem Text="复制Host"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.CopyHostCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
                                                           IsEnabled="{Binding IsConnection}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8C8;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                             </ui:FAMenuFlyout>
                                         </Border.ContextFlyout>
@@ -504,50 +699,104 @@
                                 </Style>
                             </ListBox.Styles>
                             <ListBox.ContextFlyout>
-                                <ui:FAMenuFlyout>
+                                <ui:FAMenuFlyout FlyoutPresenterClasses="assets-flat-root-context-flyout">
+                                    <ui:MenuFlyoutItem Text="操作"
+                                              IsEnabled="False"
+                                              Classes="AssetsContextTitleItem"/>
+                                    <ui:MenuFlyoutSeparator/>
                                     <ui:MenuFlyoutItem Text="新建目录"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding CreateFolderFromContextCommand}"
                                               IsVisible="{Binding IsGeneralAssetsPane}"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE710;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                     <ui:MenuFlyoutItem Text="新建连接"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding CreateConnectionFromContextCommand}"
                                               IsVisible="{Binding IsGeneralAssetsPane}"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE71D;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                     <ui:MenuFlyoutItem Text="新建密码"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding CreatePasswordAssetCommand}"
                                               IsVisible="{Binding IsKeysAssetsPane}"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE72E;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                     <ui:MenuFlyoutItem Text="新建密钥文件"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding CreateKeyFileAssetCommand}"
                                               IsVisible="{Binding IsKeysAssetsPane}"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8A5;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                     <ui:MenuFlyoutItem Text="导入资产"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding ImportAssetsCommand}"
                                               IsVisible="{Binding IsGeneralAssetsPane}"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE898;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                     <ui:MenuFlyoutItem Text="导入密钥文件"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding ImportAssetsCommand}"
                                               IsVisible="{Binding IsKeysAssetsPane}"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE898;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                     <ui:MenuFlyoutSeparator/>
                                     <ui:MenuFlyoutItem Text="粘贴"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding PasteAssetCommand}"
                                               IsEnabled="{Binding HasAssetClipboardData}"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE77F;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                     <ui:MenuFlyoutItem Text="导出资产"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding ExportAssetsCommand}"
                                               IsVisible="{Binding IsGeneralAssetsPane}"
                                               IsEnabled="False"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xEDE1;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                     <ui:MenuFlyoutItem Text="导出密钥"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding ExportAssetsCommand}"
                                               IsVisible="{Binding IsKeysAssetsPane}"
                                               IsEnabled="False"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xEDE1;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                     <ui:MenuFlyoutSeparator/>
                                     <ui:MenuFlyoutItem Text="刷新"
+                                              Classes="AssetsContextActionItem"
                                               Command="{Binding RefreshAssetsCommand}"
-                                              CommandParameter="{x:Null}"/>
+                                              CommandParameter="{x:Null}">
+                                        <ui:MenuFlyoutItem.IconSource>
+                                            <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE72C;"/>
+                                        </ui:MenuFlyoutItem.IconSource>
+                                    </ui:MenuFlyoutItem>
                                 </ui:FAMenuFlyout>
                             </ListBox.ContextFlyout>
                             <ListBox.ItemTemplate>
@@ -558,90 +807,162 @@
                                             DoubleTapped="OnAssetNodeDoubleTapped"
                                             Padding="2,0">
                                         <Border.ContextFlyout>
-                                            <ui:FAMenuFlyout>
+                                            <ui:FAMenuFlyout FlyoutPresenterClasses="assets-flat-node-context-flyout">
+                                                <ui:MenuFlyoutItem Text="操作"
+                                                          IsEnabled="False"
+                                                          Classes="AssetsContextTitleItem"/>
+                                                <ui:MenuFlyoutSeparator/>
                                                 <ui:MenuFlyoutItem Text="新建目录"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.CreateFolderFromContextCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE710;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="新建连接"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.CreateConnectionFromContextCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE71D;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="新建密码"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.CreatePasswordAssetCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsKeysAssetsPane}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE72E;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="新建密钥文件"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.CreateKeyFileAssetCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsKeysAssetsPane}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8A5;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="导入资产"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.ImportAssetsCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE898;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="导入密钥文件"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.ImportAssetsCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsKeysAssetsPane}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE898;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutSeparator/>
                                                 <ui:MenuFlyoutItem Text="在新标签打开"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.OpenAssetInNewTabCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE78B;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="复制"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.CopyAssetCommand}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8C8;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="剪切"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.CutAssetCommand}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8C6;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="粘贴"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.PasteAssetCommand}"
                                                           IsEnabled="{Binding $parent[Window].DataContext.HasAssetClipboardData}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE77F;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutSeparator/>
                                                 <ui:MenuFlyoutItem Text="删除"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.DeleteAssetCommand}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE74D;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="克隆"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.CloneAssetCommand}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8C8;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="重命名"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.RenameAssetCommand}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8AC;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutSeparator/>
                                                 <ui:MenuFlyoutItem Text="导出资产"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.ExportAssetsCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xEDE1;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="导出密钥"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.ExportAssetsCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsKeysAssetsPane}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xEDE1;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutItem Text="刷新"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.RefreshAssetsCommand}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE72C;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                                 <ui:MenuFlyoutSeparator/>
                                                 <ui:MenuFlyoutItem Text="复制Host"
+                                                          Classes="AssetsContextActionItem"
                                                           Command="{Binding $parent[Window].DataContext.CopyHostCommand}"
                                                           IsVisible="{Binding $parent[Window].DataContext.IsGeneralAssetsPane}"
                                                           IsEnabled="{Binding IsConnection}"
                                                           CommandParameter="{Binding}">
+                                                    <ui:MenuFlyoutItem.IconSource>
+                                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8C8;"/>
+                                                    </ui:MenuFlyoutItem.IconSource>
                                                 </ui:MenuFlyoutItem>
                                             </ui:FAMenuFlyout>
                                         </Border.ContextFlyout>
@@ -695,25 +1016,64 @@
                     BorderThickness="0"
                     CornerRadius="0">
                 <Border.ContextFlyout>
-                    <ui:FAMenuFlyout>
+                    <ui:FAMenuFlyout FlyoutPresenterClasses="workspace-root-context-flyout">
+                        <ui:MenuFlyoutItem Text="操作"
+                                          IsEnabled="False"
+                                          Classes="WorkspaceContextTitleItem"/>
+                        <ui:MenuFlyoutSeparator/>
                         <ui:MenuFlyoutItem Text="新建标签"
-                                  Command="{Binding CreateWorkspaceTabCommand}"/>
+                                          Classes="WorkspaceContextActionItem"
+                                          Command="{Binding CreateWorkspaceTabCommand}">
+                            <ui:MenuFlyoutItem.IconSource>
+                                <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE710;"/>
+                            </ui:MenuFlyoutItem.IconSource>
+                        </ui:MenuFlyoutItem>
                         <ui:MenuFlyoutItem Text="关闭当前标签"
-                                  Command="{Binding CloseTabCommand}"
-                                  CommandParameter="{x:Null}"/>
+                                          Classes="WorkspaceContextActionItem"
+                                          Command="{Binding CloseTabCommand}"
+                                          CommandParameter="{x:Null}">
+                            <ui:MenuFlyoutItem.IconSource>
+                                <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE711;"/>
+                            </ui:MenuFlyoutItem.IconSource>
+                        </ui:MenuFlyoutItem>
                         <ui:MenuFlyoutSeparator/>
                         <ui:MenuFlyoutItem Text="关闭其他标签"
-                                  Command="{Binding CloseOtherTabsCommand}"
-                                  CommandParameter="{x:Null}"/>
+                                          Classes="WorkspaceContextActionItem"
+                                          Command="{Binding CloseOtherTabsCommand}"
+                                          CommandParameter="{x:Null}">
+                            <ui:MenuFlyoutItem.IconSource>
+                                <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE74D;"/>
+                            </ui:MenuFlyoutItem.IconSource>
+                        </ui:MenuFlyoutItem>
                         <ui:MenuFlyoutItem Text="关闭全部标签"
-                                  Command="{Binding CloseAllTabsCommand}"/>
+                                          Classes="WorkspaceContextActionItem"
+                                          Command="{Binding CloseAllTabsCommand}">
+                            <ui:MenuFlyoutItem.IconSource>
+                                <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8BB;"/>
+                            </ui:MenuFlyoutItem.IconSource>
+                        </ui:MenuFlyoutItem>
                         <ui:MenuFlyoutSeparator/>
                         <ui:MenuFlyoutItem Text="显示 Snippets"
-                                  Command="{Binding ShowSnippetsToolsCommand}"/>
+                                          Classes="WorkspaceContextActionItem"
+                                          Command="{Binding ShowSnippetsToolsCommand}">
+                            <ui:MenuFlyoutItem.IconSource>
+                                <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8D2;"/>
+                            </ui:MenuFlyoutItem.IconSource>
+                        </ui:MenuFlyoutItem>
                         <ui:MenuFlyoutItem Text="显示 History"
-                                  Command="{Binding ShowHistoryToolsCommand}"/>
+                                          Classes="WorkspaceContextActionItem"
+                                          Command="{Binding ShowHistoryToolsCommand}">
+                            <ui:MenuFlyoutItem.IconSource>
+                                <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE81C;"/>
+                            </ui:MenuFlyoutItem.IconSource>
+                        </ui:MenuFlyoutItem>
                         <ui:MenuFlyoutItem Text="显示 SFTP"
-                                  Command="{Binding ShowSftpToolsCommand}"/>
+                                          Classes="WorkspaceContextActionItem"
+                                          Command="{Binding ShowSftpToolsCommand}">
+                            <ui:MenuFlyoutItem.IconSource>
+                                <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8B7;"/>
+                            </ui:MenuFlyoutItem.IconSource>
+                        </ui:MenuFlyoutItem>
                     </ui:FAMenuFlyout>
                 </Border.ContextFlyout>
                 <ui:TabView TabItems="{Binding Tabs}"
@@ -728,25 +1088,64 @@
                             CloseButtonOverlayMode="OnPointerOver"
                             TabCloseRequested="OnWorkspaceTabCloseRequested">
                     <ui:TabView.ContextFlyout>
-                        <ui:FAMenuFlyout>
+                        <ui:FAMenuFlyout FlyoutPresenterClasses="workspace-tabstrip-context-flyout">
+                            <ui:MenuFlyoutItem Text="操作"
+                                              IsEnabled="False"
+                                              Classes="WorkspaceContextTitleItem"/>
+                            <ui:MenuFlyoutSeparator/>
                             <ui:MenuFlyoutItem Text="新建标签"
-                                      Command="{Binding CreateWorkspaceTabCommand}"/>
+                                              Classes="WorkspaceContextActionItem"
+                                              Command="{Binding CreateWorkspaceTabCommand}">
+                                <ui:MenuFlyoutItem.IconSource>
+                                    <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE710;"/>
+                                </ui:MenuFlyoutItem.IconSource>
+                            </ui:MenuFlyoutItem>
                             <ui:MenuFlyoutItem Text="关闭当前标签"
-                                      Command="{Binding CloseTabCommand}"
-                                      CommandParameter="{x:Null}"/>
+                                              Classes="WorkspaceContextActionItem"
+                                              Command="{Binding CloseTabCommand}"
+                                              CommandParameter="{x:Null}">
+                                <ui:MenuFlyoutItem.IconSource>
+                                    <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE711;"/>
+                                </ui:MenuFlyoutItem.IconSource>
+                            </ui:MenuFlyoutItem>
                             <ui:MenuFlyoutSeparator/>
                             <ui:MenuFlyoutItem Text="关闭其他标签"
-                                      Command="{Binding CloseOtherTabsCommand}"
-                                      CommandParameter="{x:Null}"/>
+                                              Classes="WorkspaceContextActionItem"
+                                              Command="{Binding CloseOtherTabsCommand}"
+                                              CommandParameter="{x:Null}">
+                                <ui:MenuFlyoutItem.IconSource>
+                                    <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE74D;"/>
+                                </ui:MenuFlyoutItem.IconSource>
+                            </ui:MenuFlyoutItem>
                             <ui:MenuFlyoutItem Text="关闭全部标签"
-                                      Command="{Binding CloseAllTabsCommand}"/>
+                                              Classes="WorkspaceContextActionItem"
+                                              Command="{Binding CloseAllTabsCommand}">
+                                <ui:MenuFlyoutItem.IconSource>
+                                    <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8BB;"/>
+                                </ui:MenuFlyoutItem.IconSource>
+                            </ui:MenuFlyoutItem>
                             <ui:MenuFlyoutSeparator/>
                             <ui:MenuFlyoutItem Text="显示 Snippets"
-                                      Command="{Binding ShowSnippetsToolsCommand}"/>
+                                              Classes="WorkspaceContextActionItem"
+                                              Command="{Binding ShowSnippetsToolsCommand}">
+                                <ui:MenuFlyoutItem.IconSource>
+                                    <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8D2;"/>
+                                </ui:MenuFlyoutItem.IconSource>
+                            </ui:MenuFlyoutItem>
                             <ui:MenuFlyoutItem Text="显示 History"
-                                      Command="{Binding ShowHistoryToolsCommand}"/>
+                                              Classes="WorkspaceContextActionItem"
+                                              Command="{Binding ShowHistoryToolsCommand}">
+                                <ui:MenuFlyoutItem.IconSource>
+                                    <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE81C;"/>
+                                </ui:MenuFlyoutItem.IconSource>
+                            </ui:MenuFlyoutItem>
                             <ui:MenuFlyoutItem Text="显示 SFTP"
-                                      Command="{Binding ShowSftpToolsCommand}"/>
+                                              Classes="WorkspaceContextActionItem"
+                                              Command="{Binding ShowSftpToolsCommand}">
+                                <ui:MenuFlyoutItem.IconSource>
+                                    <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8B7;"/>
+                                </ui:MenuFlyoutItem.IconSource>
+                            </ui:MenuFlyoutItem>
                         </ui:FAMenuFlyout>
                     </ui:TabView.ContextFlyout>
                     <ui:TabView.TabStripFooter>
@@ -792,27 +1191,61 @@
                                     </Border>
                                 </ui:TabViewItem.Header>
                                 <ui:TabViewItem.ContextFlyout>
-                                    <ui:FAMenuFlyout>
-                                        <ui:MenuFlyoutItem Text="Duplicate"
-                                                  Tag="duplicate"
-                                                  Click="OnWorkspaceTabContextActionClick"/>
+                                    <ui:FAMenuFlyout FlyoutPresenterClasses="workspace-tabitem-context-flyout">
+                                        <ui:MenuFlyoutItem Text="操作"
+                                                          IsEnabled="False"
+                                                          Classes="WorkspaceContextTitleItem"/>
                                         <ui:MenuFlyoutSeparator/>
-                                        <ui:MenuFlyoutItem Text="Close"
-                                                  Tag="close"
-                                                  Click="OnWorkspaceTabContextActionClick"/>
-                                        <ui:MenuFlyoutItem Text="Close Others"
-                                                  Tag="close-others"
-                                                  Click="OnWorkspaceTabContextActionClick"/>
-                                        <ui:MenuFlyoutItem Text="Close Tabs To Left"
-                                                  Tag="close-left"
-                                                  Click="OnWorkspaceTabContextActionClick"/>
-                                        <ui:MenuFlyoutItem Text="Close Tabs To Right"
-                                                  Tag="close-right"
-                                                  Click="OnWorkspaceTabContextActionClick"/>
+                                        <ui:MenuFlyoutItem Text="复制标签"
+                                                          Classes="WorkspaceContextActionItem"
+                                                          Tag="duplicate"
+                                                          Click="OnWorkspaceTabContextActionClick">
+                                            <ui:MenuFlyoutItem.IconSource>
+                                                <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8C8;"/>
+                                            </ui:MenuFlyoutItem.IconSource>
+                                        </ui:MenuFlyoutItem>
                                         <ui:MenuFlyoutSeparator/>
-                                        <ui:MenuFlyoutItem Text="Close All"
-                                                  Tag="close-all"
-                                                  Click="OnWorkspaceTabContextActionClick"/>
+                                        <ui:MenuFlyoutItem Text="关闭当前标签"
+                                                          Classes="WorkspaceContextActionItem"
+                                                          Tag="close"
+                                                          Click="OnWorkspaceTabContextActionClick">
+                                            <ui:MenuFlyoutItem.IconSource>
+                                                <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE711;"/>
+                                            </ui:MenuFlyoutItem.IconSource>
+                                        </ui:MenuFlyoutItem>
+                                        <ui:MenuFlyoutItem Text="关闭其他标签"
+                                                          Classes="WorkspaceContextActionItem"
+                                                          Tag="close-others"
+                                                          Click="OnWorkspaceTabContextActionClick">
+                                            <ui:MenuFlyoutItem.IconSource>
+                                                <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE74D;"/>
+                                            </ui:MenuFlyoutItem.IconSource>
+                                        </ui:MenuFlyoutItem>
+                                        <ui:MenuFlyoutItem Text="关闭左侧标签页"
+                                                          Classes="WorkspaceContextActionItem"
+                                                          Tag="close-left"
+                                                          Click="OnWorkspaceTabContextActionClick">
+                                            <ui:MenuFlyoutItem.IconSource>
+                                                <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE76B;"/>
+                                            </ui:MenuFlyoutItem.IconSource>
+                                        </ui:MenuFlyoutItem>
+                                        <ui:MenuFlyoutItem Text="关闭右侧标签页"
+                                                          Classes="WorkspaceContextActionItem"
+                                                          Tag="close-right"
+                                                          Click="OnWorkspaceTabContextActionClick">
+                                            <ui:MenuFlyoutItem.IconSource>
+                                                <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE76C;"/>
+                                            </ui:MenuFlyoutItem.IconSource>
+                                        </ui:MenuFlyoutItem>
+                                        <ui:MenuFlyoutSeparator/>
+                                        <ui:MenuFlyoutItem Text="关闭全部标签"
+                                                          Classes="WorkspaceContextActionItem"
+                                                          Tag="close-all"
+                                                          Click="OnWorkspaceTabContextActionClick">
+                                            <ui:MenuFlyoutItem.IconSource>
+                                                <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8BB;"/>
+                                            </ui:MenuFlyoutItem.IconSource>
+                                        </ui:MenuFlyoutItem>
                                     </ui:FAMenuFlyout>
                                 </ui:TabViewItem.ContextFlyout>
                                 <Border Margin="0"
@@ -854,16 +1287,40 @@
                     BorderThickness="0"
                     CornerRadius="0">
                 <Border.ContextFlyout>
-                    <ui:FAMenuFlyout>
-                        <ui:MenuFlyoutItem Text="Snippet 视图"
-                                  Command="{Binding ShowSnippetsToolsCommand}"/>
-                        <ui:MenuFlyoutItem Text="History 视图"
-                                  Command="{Binding ShowHistoryToolsCommand}"/>
-                        <ui:MenuFlyoutItem Text="SFTP 视图"
-                                  Command="{Binding ShowSftpToolsCommand}"/>
+                    <ui:FAMenuFlyout FlyoutPresenterClasses="tools-root-context-flyout">
+                        <ui:MenuFlyoutItem Text="操作"
+                                          IsEnabled="False"
+                                          Classes="ToolsContextTitleItem"/>
+                        <ui:MenuFlyoutSeparator/>
+                        <ui:MenuFlyoutItem Text="切换到 Snippets"
+                                          Classes="ToolsContextActionItem"
+                                          Command="{Binding ShowSnippetsToolsCommand}">
+                            <ui:MenuFlyoutItem.IconSource>
+                                <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8D2;"/>
+                            </ui:MenuFlyoutItem.IconSource>
+                        </ui:MenuFlyoutItem>
+                        <ui:MenuFlyoutItem Text="切换到 History"
+                                          Classes="ToolsContextActionItem"
+                                          Command="{Binding ShowHistoryToolsCommand}">
+                            <ui:MenuFlyoutItem.IconSource>
+                                <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE81C;"/>
+                            </ui:MenuFlyoutItem.IconSource>
+                        </ui:MenuFlyoutItem>
+                        <ui:MenuFlyoutItem Text="切换到 SFTP"
+                                          Classes="ToolsContextActionItem"
+                                          Command="{Binding ShowSftpToolsCommand}">
+                            <ui:MenuFlyoutItem.IconSource>
+                                <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8B7;"/>
+                            </ui:MenuFlyoutItem.IconSource>
+                        </ui:MenuFlyoutItem>
                         <ui:MenuFlyoutSeparator/>
                         <ui:MenuFlyoutItem Text="隐藏工具栏"
-                                  Command="{Binding ToggleRightSidebarCommand}"/>
+                                          Classes="ToolsContextActionItem"
+                                          Command="{Binding ToggleRightSidebarCommand}">
+                            <ui:MenuFlyoutItem.IconSource>
+                                <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE76B;"/>
+                            </ui:MenuFlyoutItem.IconSource>
+                        </ui:MenuFlyoutItem>
                     </ui:FAMenuFlyout>
                 </Border.ContextFlyout>
                 <Grid RowDefinitions="Auto,*">
@@ -885,16 +1342,40 @@
                           RowDefinitions="Auto,*"
                           Margin="0">
                         <Grid.ContextFlyout>
-                            <ui:FAMenuFlyout>
-                                <ui:MenuFlyoutItem Text="Snippet 视图"
-                                          Command="{Binding ShowSnippetsToolsCommand}"/>
-                                <ui:MenuFlyoutItem Text="History 视图"
-                                          Command="{Binding ShowHistoryToolsCommand}"/>
-                                <ui:MenuFlyoutItem Text="SFTP 视图"
-                                          Command="{Binding ShowSftpToolsCommand}"/>
+                            <ui:FAMenuFlyout FlyoutPresenterClasses="tools-grid-context-flyout">
+                                <ui:MenuFlyoutItem Text="操作"
+                                                  IsEnabled="False"
+                                                  Classes="ToolsContextTitleItem"/>
+                                <ui:MenuFlyoutSeparator/>
+                                <ui:MenuFlyoutItem Text="切换到 Snippets"
+                                                  Classes="ToolsContextActionItem"
+                                                  Command="{Binding ShowSnippetsToolsCommand}">
+                                    <ui:MenuFlyoutItem.IconSource>
+                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8D2;"/>
+                                    </ui:MenuFlyoutItem.IconSource>
+                                </ui:MenuFlyoutItem>
+                                <ui:MenuFlyoutItem Text="切换到 History"
+                                                  Classes="ToolsContextActionItem"
+                                                  Command="{Binding ShowHistoryToolsCommand}">
+                                    <ui:MenuFlyoutItem.IconSource>
+                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE81C;"/>
+                                    </ui:MenuFlyoutItem.IconSource>
+                                </ui:MenuFlyoutItem>
+                                <ui:MenuFlyoutItem Text="切换到 SFTP"
+                                                  Classes="ToolsContextActionItem"
+                                                  Command="{Binding ShowSftpToolsCommand}">
+                                    <ui:MenuFlyoutItem.IconSource>
+                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8B7;"/>
+                                    </ui:MenuFlyoutItem.IconSource>
+                                </ui:MenuFlyoutItem>
                                 <ui:MenuFlyoutSeparator/>
                                 <ui:MenuFlyoutItem Text="隐藏工具栏"
-                                          Command="{Binding ToggleRightSidebarCommand}"/>
+                                                  Classes="ToolsContextActionItem"
+                                                  Command="{Binding ToggleRightSidebarCommand}">
+                                    <ui:MenuFlyoutItem.IconSource>
+                                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE76B;"/>
+                                    </ui:MenuFlyoutItem.IconSource>
+                                </ui:MenuFlyoutItem>
                             </ui:FAMenuFlyout>
                         </Grid.ContextFlyout>
                         <StackPanel Orientation="Horizontal"
