@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
+using SkylarkTerminal.Models;
 
 namespace SkylarkTerminal.ViewModels;
 
@@ -14,13 +15,15 @@ public partial class WorkspaceTabItemViewModel : ObservableObject
         string header,
         string connectionLabel,
         string placeholderText,
-        IBrush accentBrush)
+        IBrush accentBrush,
+        ConnectionConfig? connectionConfig = null)
     {
         Id = id;
         this.header = header;
         this.connectionLabel = connectionLabel;
         this.placeholderText = placeholderText;
         AccentBrush = accentBrush;
+        ConnectionConfig = connectionConfig;
     }
 
     public string Id { get; }
@@ -39,6 +42,8 @@ public partial class WorkspaceTabItemViewModel : ObservableObject
 
     public IBrush AccentBrush { get; }
 
+    public ConnectionConfig? ConnectionConfig { get; }
+
     public IBrush HeaderBackgroundBrush => IsActive ? ActiveHeaderBackground : InactiveHeaderBackground;
 
     public Thickness HeaderBottomBorderThickness => IsActive
@@ -51,12 +56,25 @@ public partial class WorkspaceTabItemViewModel : ObservableObject
 
     public WorkspaceTabItemViewModel DuplicateAs(string duplicatedId)
     {
+        var duplicatedConfig = ConnectionConfig is null
+            ? null
+            : new ConnectionConfig
+            {
+                ConnectionId = ConnectionConfig.ConnectionId,
+                Host = ConnectionConfig.Host,
+                Port = ConnectionConfig.Port,
+                Username = ConnectionConfig.Username,
+                Password = ConnectionConfig.Password,
+                PrivateKeyPath = ConnectionConfig.PrivateKeyPath,
+            };
+
         return new WorkspaceTabItemViewModel(
             duplicatedId,
             $"{Header} Copy",
             ConnectionLabel,
             $"{PlaceholderText} (duplicated)",
-            AccentBrush);
+            AccentBrush,
+            duplicatedConfig);
     }
 
     partial void OnIsActiveChanged(bool value)

@@ -159,6 +159,9 @@ public partial class MainWindow : Window
             case "close-others":
                 vm.CloseOtherTabsCommand.Execute(tab);
                 break;
+            case "close-left":
+                vm.CloseTabsToLeftCommand.Execute(tab);
+                break;
             case "close-right":
                 vm.CloseTabsToRightCommand.Execute(tab);
                 break;
@@ -664,6 +667,22 @@ public partial class MainWindow : Window
         listBox.SelectedItems.Clear();
         listBox.SelectedItems.Add(assetNode);
         _boundViewModel.SetSelectedAssets(listBox.SelectedItems.OfType<AssetNode>());
+    }
+
+    private void OnAssetNodeDoubleTapped(object? sender, TappedEventArgs e)
+    {
+        if (_boundViewModel is null ||
+            sender is not Control control ||
+            control.DataContext is not ConnectionNode connectionNode)
+        {
+            return;
+        }
+
+        if (_boundViewModel.OpenAssetInNewTabCommand.CanExecute(connectionNode))
+        {
+            _boundViewModel.OpenAssetInNewTabCommand.Execute(connectionNode);
+            e.Handled = true;
+        }
     }
 
     private void StopFlatSelectionDrag(ListBox listBox, IPointer? pointer)

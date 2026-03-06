@@ -376,6 +376,7 @@
                                                   ItemsSource="{Binding Children}">
                                     <Border Background="Transparent"
                                             HorizontalAlignment="Stretch"
+                                            DoubleTapped="OnAssetNodeDoubleTapped"
                                             Padding="2,0">
                                         <Border.ContextFlyout>
                                             <ui:FAMenuFlyout>
@@ -554,6 +555,7 @@
                                     <Border Background="Transparent"
                                             HorizontalAlignment="Stretch"
                                             PointerPressed="OnAssetListItemPointerPressed"
+                                            DoubleTapped="OnAssetNodeDoubleTapped"
                                             Padding="2,0">
                                         <Border.ContextFlyout>
                                             <ui:FAMenuFlyout>
@@ -714,8 +716,8 @@
                                   Command="{Binding ShowSftpToolsCommand}"/>
                     </ui:FAMenuFlyout>
                 </Border.ContextFlyout>
-                <ui:TabView TabItems="{Binding WorkspaceTabs}"
-                            SelectedItem="{Binding SelectedWorkspaceTab, Mode=TwoWay}"
+                <ui:TabView TabItems="{Binding Tabs}"
+                            SelectedItem="{Binding SelectedTab, Mode=TwoWay}"
                             Margin="0"
                             Padding="0"
                             Background="Transparent"
@@ -800,6 +802,9 @@
                                                   Click="OnWorkspaceTabContextActionClick"/>
                                         <ui:MenuFlyoutItem Text="Close Others"
                                                   Tag="close-others"
+                                                  Click="OnWorkspaceTabContextActionClick"/>
+                                        <ui:MenuFlyoutItem Text="Close Tabs To Left"
+                                                  Tag="close-left"
                                                   Click="OnWorkspaceTabContextActionClick"/>
                                         <ui:MenuFlyoutItem Text="Close Tabs To Right"
                                                   Tag="close-right"

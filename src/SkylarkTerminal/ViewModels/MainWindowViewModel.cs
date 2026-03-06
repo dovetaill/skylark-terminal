@@ -208,6 +208,13 @@ public partial class MainWindowViewModel : ViewModelBase
     public ObservableCollection<AssetNode> CurrentAssetTree => _assetsByPane[SelectedAssetsPane];
 
     public ObservableCollection<WorkspaceTabItemViewModel> WorkspaceTabs { get; } = [];
+    public ObservableCollection<WorkspaceTabItemViewModel> Tabs => WorkspaceTabs;
+
+    public WorkspaceTabItemViewModel? SelectedTab
+    {
+        get => SelectedWorkspaceTab;
+        set => SelectedWorkspaceTab = value;
+    }
 
     public ObservableCollection<CommandSnippet> SnippetItems { get; } = [];
 
@@ -530,7 +537,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         foreach (var connection in connections)
         {
-            var newTab = BuildWorkspaceTab(connection.Name);
+            var newTab = BuildWorkspaceTab(connection);
             WorkspaceTabs.Add(newTab);
             SelectedWorkspaceTab = newTab;
         }
@@ -822,8 +829,37 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
+        var targetIndex = WorkspaceTabs.IndexOf(targetTab);
+        if (targetIndex < 0)
+        {
+            return;
+        }
+
         WorkspaceTabs.Clear();
         WorkspaceTabs.Add(targetTab);
+        SelectedWorkspaceTab = targetTab;
+    }
+
+    [RelayCommand]
+    private void CloseTabsToLeft(WorkspaceTabItemViewModel? sourceTab)
+    {
+        var targetTab = sourceTab ?? SelectedWorkspaceTab;
+        if (targetTab is null)
+        {
+            return;
+        }
+
+        var targetIndex = WorkspaceTabs.IndexOf(targetTab);
+        if (targetIndex < 0)
+        {
+            return;
+        }
+
+        for (var i = targetIndex - 1; i >= 0; i--)
+        {
+            WorkspaceTabs.RemoveAt(i);
+        }
+
         SelectedWorkspaceTab = targetTab;
     }
 
@@ -902,6 +938,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     partial void OnSelectedWorkspaceTabChanged(WorkspaceTabItemViewModel? value)
     {
+        OnPropertyChanged(nameof(SelectedTab));
         SyncActiveWorkspaceTabs();
     }
 
@@ -991,17 +1028,40 @@ public partial class MainWindowViewModel : ViewModelBase
         });
     }
 
+    private WorkspaceTabItemViewModel BuildWorkspaceTab(ConnectionNode connectionNode)
+    {
+        return BuildWorkspaceTab(
+            connectionNode.Name,
+            connectionNode.Name,
+            new ConnectionConfig
+            {
+                ConnectionId = connectionNode.Id,
+                Host = connectionNode.Host,
+                Port = connectionNode.Port,
+                Username = connectionNode.User,
+            });
+    }
+
     private WorkspaceTabItemViewModel BuildWorkspaceTab(string connectionLabel)
+    {
+        return BuildWorkspaceTab(connectionLabel, connectionLabel);
+    }
+
+    private WorkspaceTabItemViewModel BuildWorkspaceTab(
+        string header,
+        string connectionLabel,
+        ConnectionConfig? connectionConfig = null)
     {
         var index = _newWorkspaceTabSeed++;
         var accentBrush = new SolidColorBrush(WorkspaceAccentPalette[(index - 1) % WorkspaceAccentPalette.Length]);
 
         return new WorkspaceTabItemViewModel(
             $"tab-{Guid.NewGuid():N}",
-            $"Session {index}",
+            header,
             connectionLabel,
             $"Terminal placeholder for {connectionLabel}",
-            accentBrush);
+            accentBrush,
+            connectionConfig);
     }
 
     private static string GetAppVersion()

@@ -12,7 +12,7 @@
 - 密钥资产面板：独立右键语义（新建密码/新建密钥文件/导入密钥文件/导出密钥）
 - Flat 模式支持 Windows 风格多选：`Ctrl/Shift` 扩展选择、右键保留多选、左键拖拽框选
 - 资产面板顶部：紧凑图标工具条（搜索/展开收起/创建/模式切换），支持点击展开搜索框与空查询自动收起
-- 中间工作区：FluentAvalonia `TabView` 多标签、右键标签操作（Duplicate/Close Others/Close Right/Close All）
+- 中间工作区：FluentAvalonia `TabView` 多标签；支持双击资产连接开新标签、标签标题显示连接名、右键标签操作（Duplicate/Close Others/Close Left/Close Right/Close All）
 - 右侧工具区：Snippet / History / SFTP 视图切换与 Mock 数据展示，支持拖拽与阈值自动收起
 - 左右侧栏可拖拽缩放，收起时 splitter 与内容列保持同步联动
 - 默认深色主题，支持顶部图标按钮切换深浅色，Settings 支持透明/不透明窗口材质切换
@@ -95,7 +95,7 @@ dotnet test tests/SkylarkTerminal.Tests/SkylarkTerminal.Tests.csproj
 - 左/右侧栏展开收起状态与宽度联动
 - 资产视图模式切换（Tree/Flat）
 - 资产增删改操作
-- Tab 增删改与右键操作逻辑
+- Tab 增删改与右键操作逻辑（含 Close Left/Right/Others/All）
 - 右侧工具面板视图切换
 - 顶部菜单命令（Settings/Language/Help/About）调用链
 - Flat 模式多选后的批量导出与批量打开标签行为
@@ -128,7 +128,7 @@ public interface ISftpService
 - 左侧资产栏底部按钮：展开/收起资产面板；资产头部单按钮在 `Tree/Flat` 两种模式间切换
 - 资产工具条：`资产列表` 标题 + 图标操作区，顶部与列表通过独立分割线和轻色阶区分，符合 Win11 低对比层次
 - 搜索交互：点击搜索图标展开输入框；空内容时点击任意非搜索区域自动收起；有内容时保持展开并实时过滤
-- 中央 Tab：支持右键管理与快速复制会话
+- 中央 Tab：支持双击左侧连接快速开页签、右键批量管理与会话复制
 - 右上角 Tools 按钮：展开/收起右侧工具面板（保留上次选中视图），并支持拖拽到阈值后自动收起
 
 ## 后续开发建议
