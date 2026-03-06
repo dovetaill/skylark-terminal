@@ -4,7 +4,7 @@
 
 ## 项目现状
 
-当前仓库已完成 UI 壳层与交互主流程（Mock 驱动）：
+当前仓库已完成 UI 壳层、终端会话主流程以及基础 SSH 接入：
 
 - 自绘标题栏（无边框窗口）+ 窗口拖拽 + 最小化/最大化/关闭
 - 顶部菜单（Settings/Language/Help/About）已接入真实命令与弹窗
@@ -13,11 +13,15 @@
 - Flat 模式支持 Windows 风格多选：`Ctrl/Shift` 扩展选择、右键保留多选、左键拖拽框选
 - 资产面板顶部：紧凑图标工具条（搜索/展开收起/创建/模式切换），支持点击展开搜索框与空查询自动收起
 - 中间工作区：FluentAvalonia `TabView` 多标签；支持双击资产连接开新标签、标签标题显示连接名、右键标签操作（Duplicate/Close Others/Close Left/Close Right/Close All）
+- 启动默认页：单个 `Quick Start` 标签页（不再自动打开默认连接标签）
+- 真实终端会话：已接入 `SSH.NET` + `Iciclecreek.Avalonia.Terminal`，支持连接状态流转（Connecting/Connected/Disconnected/Faulted）
+- 终端交互：支持 ANSI/VT100 基础键位映射、右键复制/粘贴/清屏、窗口尺寸变化同步到远端 PTY
 - 右侧工具区：Snippet / History / SFTP 视图切换与 Mock 数据展示，支持拖拽与阈值自动收起
 - 左右侧栏可拖拽缩放，收起时 splitter 与内容列保持同步联动
 - 默认深色主题，支持顶部图标按钮切换深浅色，Settings 支持透明/不透明窗口材质切换
+- 日志策略：默认只写入错误级别日志（`ERROR`），用于保留异常与崩溃定位信息
 
-> 说明：当前未接入真实 SSH.NET，仅提供服务接口与 Mock 实现，UI 可完整联调。
+> 说明：为避免敏感信息落库，仓库默认资产不再内置任何硬编码测试连接数据。
 
 ## 最近迭代（Git Log 摘要）
 
@@ -33,6 +37,8 @@
 - Fluent 控件与主题: `FluentAvaloniaUI 2.5.0`
 - MVVM: `CommunityToolkit.Mvvm 8.4.0`
 - DI: `Microsoft.Extensions.DependencyInjection 10.0.0`
+- SSH: `SSH.NET 2025.1.0`
+- 终端控件: `Iciclecreek.Avalonia.Terminal 1.0.7`
 - 测试: `xUnit`
 
 ## 目录结构
@@ -111,6 +117,9 @@ public interface ISshConnectionService
     Task<bool> ConnectAsync(ConnectionConfig config);
     Task DisconnectAsync(string connectionId);
     Task RunCommandAsync(string connectionId, string command);
+    Task<ISshTerminalSession> CreateTerminalSessionAsync(
+        ConnectionConfig config,
+        CancellationToken cancellationToken = default);
 }
 
 public interface ISftpService
@@ -120,6 +129,7 @@ public interface ISftpService
 ```
 
 另外顶部菜单弹窗通过 `IAppDialogService` 抽象，避免 ViewModel 与具体 UI 弹窗组件强耦合。
+终端会话通过 `ISshTerminalSession` 暴露 `OutputReceived/Closed/Faulted` 事件与 `SendAsync/ResizeAsync` 操作。
 
 ## UI 交互说明
 
@@ -133,11 +143,10 @@ public interface ISftpService
 
 ## 后续开发建议
 
-1. 接入 SSH.NET：实现 `ISshConnectionService` 与 `ISftpService` 的真实版本
-2. 终端渲染：将 Tab 内容中的占位面板替换为 ANSI 终端控件
-3. 配置持久化：保存主题、语言、最近会话、工具面板状态
-4. 资产管理：接入本地加密存储或远程同步
-5. 多平台发布：完善 Windows/Linux/macOS 打包脚本
+1. 连接配置持久化：接入安全存储（避免明文），支持连接模板与最近会话
+2. SFTP 真实实现：替换当前 Mock 列表，补齐上传/下载/重命名/权限操作
+3. 终端能力完善：补齐更完整的 ANSI/VT 特性与会话恢复能力
+4. 多平台发布：完善 Windows/Linux/macOS 打包脚本与签名流程
 
 ## 许可证
 

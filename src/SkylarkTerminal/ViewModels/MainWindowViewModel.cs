@@ -90,6 +90,9 @@ public partial class MainWindowViewModel : ViewModelBase
         InitializeRightToolsData();
         SyncActiveWorkspaceTabs();
         TopStatusBar = new TopStatusBarViewModel(this);
+        RuntimeLogger.Info(
+            "vm-init",
+            $"MainWindowViewModel initialized. ssh_service={_sshConnectionService.GetType().Name}, tabs={WorkspaceTabs.Count}, selected={SelectedWorkspaceTab?.Header ?? "<null>"}");
     }
 
     public string WindowTitle { get; } = "Skylark Terminal";
@@ -532,14 +535,19 @@ public partial class MainWindowViewModel : ViewModelBase
         if (connections.Count == 0)
         {
             LastAssetActionMessage = "没有可打开的连接资产";
+            RuntimeLogger.Warn("open-tab", "No connection node can be opened.");
             return;
         }
 
+        RuntimeLogger.Info("open-tab", $"Opening terminal tabs. count={connections.Count}");
         foreach (var connection in connections)
         {
             var newTab = BuildWorkspaceTab(connection);
             WorkspaceTabs.Add(newTab);
             SelectedWorkspaceTab = newTab;
+            RuntimeLogger.Info(
+                "open-tab",
+                $"Tab created. tab_id={newTab.Id}, header={newTab.Header}, host={connection.Host}, port={connection.Port}");
         }
 
         LastAssetActionMessage = $"已打开 {connections.Count} 个会话标签";
@@ -788,6 +796,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
+        DisposeTabConnection(targetTab);
         WorkspaceTabs.RemoveAt(targetIndex);
 
         if (WorkspaceTabs.Count == 0)
@@ -835,6 +844,14 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
+        var tabsToClose = WorkspaceTabs
+            .Where(tab => !ReferenceEquals(tab, targetTab))
+            .ToArray();
+        foreach (var tab in tabsToClose)
+        {
+            DisposeTabConnection(tab);
+        }
+
         WorkspaceTabs.Clear();
         WorkspaceTabs.Add(targetTab);
         SelectedWorkspaceTab = targetTab;
@@ -857,6 +874,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         for (var i = targetIndex - 1; i >= 0; i--)
         {
+            DisposeTabConnection(WorkspaceTabs[i]);
             WorkspaceTabs.RemoveAt(i);
         }
 
@@ -880,6 +898,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         for (var i = WorkspaceTabs.Count - 1; i > targetIndex; i--)
         {
+            DisposeTabConnection(WorkspaceTabs[i]);
             WorkspaceTabs.RemoveAt(i);
         }
 
@@ -889,6 +908,11 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void CloseAllTabs()
     {
+        foreach (var tab in WorkspaceTabs)
+        {
+            DisposeTabConnection(tab);
+        }
+
         WorkspaceTabs.Clear();
         SelectedWorkspaceTab = null;
     }
@@ -940,6 +964,9 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         OnPropertyChanged(nameof(SelectedTab));
         SyncActiveWorkspaceTabs();
+        RuntimeLogger.Info(
+            "tab-selection",
+            $"selectedType={value?.GetType().Name ?? "<null>"}, header={value?.Header ?? "<null>"}, id={value?.Id ?? "<null>"}, placeholder_chars={value?.PlaceholderText.Length ?? 0}");
     }
 
     partial void OnCurrentLanguageCodeChanged(string value)
@@ -990,12 +1017,16 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void InitializeWorkspaceTabs()
     {
-        var first = BuildWorkspaceTab("prod-bastion");
-        var second = BuildWorkspaceTab("stage-api");
+        var quickStart = BuildWorkspaceTab(
+            header: "Quick Start",
+            connectionLabel: "quick-start");
 
-        WorkspaceTabs.Add(first);
-        WorkspaceTabs.Add(second);
-        SelectedWorkspaceTab = first;
+        quickStart.PlaceholderText = "双击左侧 Hosts 资产打开终端会话";
+        quickStart.SessionStatusMessage = "Ready";
+
+        WorkspaceTabs.Add(quickStart);
+        SelectedWorkspaceTab = quickStart;
+        RuntimeLogger.Info("tab-init", $"Initialized default tabs. count={WorkspaceTabs.Count}");
     }
 
     private void InitializeRightToolsData()
@@ -1030,15 +1061,17 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private WorkspaceTabItemViewModel BuildWorkspaceTab(ConnectionNode connectionNode)
     {
+        var scopedConnectionId = $"{connectionNode.Id}-{Guid.NewGuid():N}";
         return BuildWorkspaceTab(
             connectionNode.Name,
             connectionNode.Name,
             new ConnectionConfig
             {
-                ConnectionId = connectionNode.Id,
+                ConnectionId = scopedConnectionId,
                 Host = connectionNode.Host,
                 Port = connectionNode.Port,
                 Username = connectionNode.User,
+                Password = connectionNode.Password,
             });
     }
 
@@ -1055,13 +1088,29 @@ public partial class MainWindowViewModel : ViewModelBase
         var index = _newWorkspaceTabSeed++;
         var accentBrush = new SolidColorBrush(WorkspaceAccentPalette[(index - 1) % WorkspaceAccentPalette.Length]);
 
-        return new WorkspaceTabItemViewModel(
+        var tab = new WorkspaceTabItemViewModel(
             $"tab-{Guid.NewGuid():N}",
             header,
             connectionLabel,
             $"Terminal placeholder for {connectionLabel}",
             accentBrush,
             connectionConfig);
+        RuntimeLogger.Info(
+            "tab-build",
+            $"Built tab. id={tab.Id}, header={tab.Header}, has_connection={(connectionConfig is not null).ToString().ToLowerInvariant()}, host={connectionConfig?.Host ?? "<none>"}");
+        return tab;
+    }
+
+    private void DisposeTabConnection(WorkspaceTabItemViewModel tab)
+    {
+        var connectionId = tab.ConnectionConfig?.ConnectionId;
+        if (string.IsNullOrWhiteSpace(connectionId))
+        {
+            return;
+        }
+
+        _ = _sshConnectionService.DisconnectAsync(connectionId);
+        RuntimeLogger.Info("tab-dispose", $"Requested session dispose. tab_id={tab.Id}, conn_id={connectionId}");
     }
 
     private static string GetAppVersion()
@@ -1197,7 +1246,8 @@ public partial class MainWindowViewModel : ViewModelBase
                 connectionNode.Host,
                 connectionNode.User,
                 connectionNode.Port,
-                sourceNode.Kind);
+                sourceNode.Kind,
+                connectionNode.Password);
         }
 
         var childClones = sourceNode.Children

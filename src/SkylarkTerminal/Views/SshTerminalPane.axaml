@@ -1,0 +1,84 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:terminal="using:Iciclecreek.Terminal"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             x:Class="SkylarkTerminal.Views.SshTerminalPane">
+    <Grid RowDefinitions="Auto,*">
+        <ui:InfoBar x:Name="SessionInfoBar"
+                    Grid.Row="0"
+                    IsOpen="False"
+                    IsClosable="False"
+                    Severity="Warning"
+                    Title="Terminal Session">
+            <ui:InfoBar.ActionButton>
+                <Button Content="Reconnect"
+                        Click="OnReconnectClick"/>
+            </ui:InfoBar.ActionButton>
+        </ui:InfoBar>
+
+        <Grid Grid.Row="1">
+            <terminal:TerminalView x:Name="TerminalHost"
+                                   Process=""
+                                   Focusable="True"
+                                   FontFamily="Cascadia Mono, Consolas, Microsoft YaHei UI"
+                                   FontSize="13"
+                                   Background="{DynamicResource ShellTerminalBrush}"
+                                   Foreground="{DynamicResource ShellTerminalPrimaryTextBrush}">
+                <terminal:TerminalView.ContextFlyout>
+                    <ui:FAMenuFlyout>
+                        <ui:MenuFlyoutItem Text="Copy"
+                                          Click="OnCopyClick"/>
+                        <ui:MenuFlyoutItem Text="Paste"
+                                          Click="OnPasteClick"/>
+                        <ui:MenuFlyoutItem Text="Clear Screen"
+                                          Click="OnClearClick"/>
+                        <ui:MenuFlyoutSeparator/>
+                        <ui:MenuFlyoutItem Text="Reconnect"
+                                          Click="OnReconnectClick"/>
+                    </ui:FAMenuFlyout>
+                </terminal:TerminalView.ContextFlyout>
+            </terminal:TerminalView>
+
+            <Border x:Name="QuickStartOverlay"
+                    IsVisible="False"
+                    Background="{DynamicResource ShellTerminalBrush}">
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="10"
+                            MaxWidth="480">
+                    <TextBlock Text="Quick Start"
+                               FontSize="24"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center"
+                               Foreground="{DynamicResource ShellTerminalPrimaryTextBrush}"/>
+                    <TextBlock x:Name="QuickStartText"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               Foreground="{DynamicResource ShellTerminalPrimaryTextBrush}"
+                               Opacity="0.9"
+                               FontSize="14"
+                               Text="双击左侧 Hosts 资产打开 SSH 会话。"/>
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="ConnectingOverlay"
+                    Background="#A010141A"
+                    IsVisible="True">
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="10">
+                    <ui:ProgressRing x:Name="ConnectingRing"
+                                     Width="32"
+                                     Height="32"
+                                     IsActive="True"/>
+                    <TextBlock x:Name="ConnectingText"
+                               Foreground="{DynamicResource ShellTerminalPrimaryTextBrush}"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               Text="Connecting..."
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

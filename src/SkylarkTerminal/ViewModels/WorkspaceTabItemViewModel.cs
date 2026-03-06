@@ -2,6 +2,8 @@ using Avalonia;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SkylarkTerminal.Models;
+using SkylarkTerminal.Services;
+using System;
 
 namespace SkylarkTerminal.ViewModels;
 
@@ -40,6 +42,12 @@ public partial class WorkspaceTabItemViewModel : ObservableObject
     [ObservableProperty]
     private bool isActive;
 
+    [ObservableProperty]
+    private SessionState sessionState = SessionState.Disconnected;
+
+    [ObservableProperty]
+    private string sessionStatusMessage = "Session not started.";
+
     public IBrush AccentBrush { get; }
 
     public ConnectionConfig? ConnectionConfig { get; }
@@ -60,7 +68,7 @@ public partial class WorkspaceTabItemViewModel : ObservableObject
             ? null
             : new ConnectionConfig
             {
-                ConnectionId = ConnectionConfig.ConnectionId,
+                ConnectionId = $"{ConnectionConfig.ConnectionId}-dup-{Guid.NewGuid():N}",
                 Host = ConnectionConfig.Host,
                 Port = ConnectionConfig.Port,
                 Username = ConnectionConfig.Username,
@@ -83,5 +91,12 @@ public partial class WorkspaceTabItemViewModel : ObservableObject
         OnPropertyChanged(nameof(HeaderBottomBorderThickness));
         OnPropertyChanged(nameof(HeaderFontWeight));
         OnPropertyChanged(nameof(HeaderOpacity));
+    }
+
+    partial void OnPlaceholderTextChanged(string value)
+    {
+        RuntimeLogger.Info(
+            "tab-content",
+            $"Placeholder property changed. tab_id={Id}, chars={value.Length}");
     }
 }

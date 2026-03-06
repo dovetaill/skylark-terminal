@@ -7,6 +7,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using FluentAvalonia.UI.Controls;
 using SkylarkTerminal.Models;
+using SkylarkTerminal.Services;
 using SkylarkTerminal.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -119,6 +120,7 @@ public partial class MainWindow : Window
 
         if (args.Item is WorkspaceTabItemViewModel tab)
         {
+            RuntimeLogger.Info("tab-close", $"Close requested. tab_id={tab.Id}, header={tab.Header}");
             vm.CloseTabCommand.Execute(tab);
         }
     }
@@ -151,21 +153,27 @@ public partial class MainWindow : Window
         switch (action)
         {
             case "duplicate":
+                RuntimeLogger.Info("tab-context", $"Action duplicate. tab_id={tab?.Id ?? "<null>"}");
                 vm.DuplicateTabCommand.Execute(tab);
                 break;
             case "close":
+                RuntimeLogger.Info("tab-context", $"Action close. tab_id={tab?.Id ?? "<null>"}");
                 vm.CloseTabCommand.Execute(tab);
                 break;
             case "close-others":
+                RuntimeLogger.Info("tab-context", $"Action close-others. tab_id={tab?.Id ?? "<null>"}");
                 vm.CloseOtherTabsCommand.Execute(tab);
                 break;
             case "close-left":
+                RuntimeLogger.Info("tab-context", $"Action close-left. tab_id={tab?.Id ?? "<null>"}");
                 vm.CloseTabsToLeftCommand.Execute(tab);
                 break;
             case "close-right":
+                RuntimeLogger.Info("tab-context", $"Action close-right. tab_id={tab?.Id ?? "<null>"}");
                 vm.CloseTabsToRightCommand.Execute(tab);
                 break;
             case "close-all":
+                RuntimeLogger.Info("tab-context", "Action close-all.");
                 vm.CloseAllTabsCommand.Execute(null);
                 break;
         }
@@ -381,7 +389,7 @@ public partial class MainWindow : Window
                     "#CCE5EAF0",
                     "#CCF2F5F8",
                     "#FF000000",
-                    "#CCFFFFFF"),
+                    "#CC10141A"),
                 (true, false) => (
                     "#FF1A1D24",
                     "#FF1E222A",
@@ -413,7 +421,7 @@ public partial class MainWindow : Window
                     "#FFE5EAF0",
                     "#FFF2F5F8",
                     "#FF000000",
-                    "#FFFFFFFF"),
+                    "#FF10141A"),
             };
 
         SetBrushResource("ShellWindowBackground", window);
@@ -431,6 +439,9 @@ public partial class MainWindow : Window
         SetBrushResource("ShellTabInactiveBrush", tabInactive);
         SetBrushResource("ShellTabSelectionBorderBrush", tabSelectionBorder);
         SetBrushResource("ShellTerminalBrush", terminal);
+        RuntimeLogger.Info(
+            "shell-palette",
+            $"Applied palette. dark={isDarkTheme}, transparent={isTransparent}, terminal={terminal}");
     }
 
     private void SetBrushResource(string key, string hexColor)
@@ -680,8 +691,17 @@ public partial class MainWindow : Window
 
         if (_boundViewModel.OpenAssetInNewTabCommand.CanExecute(connectionNode))
         {
+            RuntimeLogger.Info(
+                "asset-doubletap",
+                $"Open tab requested by double tap. id={connectionNode.Id}, name={connectionNode.Name}, host={connectionNode.Host}, port={connectionNode.Port}");
             _boundViewModel.OpenAssetInNewTabCommand.Execute(connectionNode);
             e.Handled = true;
+        }
+        else
+        {
+            RuntimeLogger.Warn(
+                "asset-doubletap",
+                $"Open tab command rejected. id={connectionNode.Id}, name={connectionNode.Name}");
         }
     }
 

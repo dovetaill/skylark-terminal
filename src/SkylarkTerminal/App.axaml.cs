@@ -30,6 +30,7 @@ public partial class App : Application
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
             Services = serviceCollection.BuildServiceProvider();
+            RuntimeLogger.Info("app-start", $"App starting. log={RuntimeLogger.CurrentLogFilePath}");
 
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
@@ -45,7 +46,7 @@ public partial class App : Application
         services.AddSingleton<IAssetCatalogService, MockAssetCatalogService>();
         services.AddSingleton<IAppDialogService, AppDialogService>();
         services.AddSingleton<IClipboardService, ClipboardService>();
-        services.AddSingleton<ISshConnectionService, MockSshConnectionService>();
+        services.AddSingleton<ISshConnectionService, SshConnectionService>();
         services.AddSingleton<ISftpService, MockSftpService>();
         services.AddSingleton<MainWindowViewModel>();
         services.AddSingleton<MainWindow>(provider => new MainWindow

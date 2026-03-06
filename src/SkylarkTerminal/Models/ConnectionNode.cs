@@ -10,12 +10,14 @@ public sealed class ConnectionNode : AssetNode
         string host,
         string user,
         int port = 22,
-        string kind = "SSH Connection")
+        string kind = "SSH Connection",
+        string? password = null)
         : base(id, name, kind)
     {
         Host = host;
         User = user;
         Port = port;
+        Password = password;
     }
 
     public string Host { get; }
@@ -23,6 +25,8 @@ public sealed class ConnectionNode : AssetNode
     public string User { get; }
 
     public int Port { get; }
+
+    public string? Password { get; }
 
     public override bool Matches(string keyword)
     {

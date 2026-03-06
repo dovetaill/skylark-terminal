@@ -51,6 +51,8 @@
                     <SolidColorBrush x:Key="ShellTabInactiveBrush" Color="#FF1C2129"/>
                     <SolidColorBrush x:Key="ShellTabSelectionBorderBrush" Color="#FFFFFFFF"/>
                     <SolidColorBrush x:Key="ShellTerminalBrush" Color="#FF10141A"/>
+                    <SolidColorBrush x:Key="ShellTerminalPrimaryTextBrush" Color="#FFE6EDF7"/>
+                    <SolidColorBrush x:Key="ShellTerminalAccentTextBrush" Color="#FF94B8FF"/>
                 </ResourceDictionary>
                     <ResourceDictionary x:Key="Light">
                         <SolidColorBrush x:Key="ShellWindowBackground" Color="#FFF2F4F7"/>
@@ -68,6 +70,8 @@
                     <SolidColorBrush x:Key="ShellTabInactiveBrush" Color="#FFF2F5F8"/>
                     <SolidColorBrush x:Key="ShellTabSelectionBorderBrush" Color="#FF000000"/>
                     <SolidColorBrush x:Key="ShellTerminalBrush" Color="#FFFFFFFF"/>
+                    <SolidColorBrush x:Key="ShellTerminalPrimaryTextBrush" Color="#FF1A1F27"/>
+                    <SolidColorBrush x:Key="ShellTerminalAccentTextBrush" Color="#FF005A9C"/>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>
@@ -1187,9 +1191,9 @@
                                                        TextTrimming="CharacterEllipsis"
                                                        TextWrapping="NoWrap"
                                                        MaxWidth="420"/>
-                                        </StackPanel>
-                                    </Border>
-                                </ui:TabViewItem.Header>
+                                            </StackPanel>
+                                        </Border>
+                                    </ui:TabViewItem.Header>
                                 <ui:TabViewItem.ContextFlyout>
                                     <ui:FAMenuFlyout FlyoutPresenterClasses="workspace-tabitem-context-flyout">
                                         <ui:MenuFlyoutItem Text="操作"
@@ -1248,23 +1252,10 @@
                                         </ui:MenuFlyoutItem>
                                     </ui:FAMenuFlyout>
                                 </ui:TabViewItem.ContextFlyout>
-                                <Border Margin="0"
-                                        CornerRadius="0"
-                                        Background="{DynamicResource ShellTerminalBrush}">
-                                    <Grid Margin="0"
-                                          RowDefinitions="*">
-                                        <Border Grid.Row="0"
-                                                Margin="0"
-                                                Padding="12,8"
-                                                CornerRadius="0"
-                                                Background="{DynamicResource ShellTerminalBrush}">
-                                            <TextBlock FontFamily="Consolas"
-                                                       FontSize="12"
-                                                       Opacity="0.8"
-                                                       Text="{Binding PlaceholderText}"/>
-                                        </Border>
-                                    </Grid>
-                                </Border>
+                                <ui:TabViewItem.Content>
+                                    <views:SshTerminalPane Tab="{Binding}"
+                                                           DataContext="{Binding}"/>
+                                </ui:TabViewItem.Content>
                             </ui:TabViewItem>
                         </DataTemplate>
                     </ui:TabView.TabItemTemplate>

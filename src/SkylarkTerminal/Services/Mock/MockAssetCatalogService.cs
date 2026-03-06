@@ -1,5 +1,7 @@
 using SkylarkTerminal.Models;
+using SkylarkTerminal.Services;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SkylarkTerminal.Services.Mock;
 
@@ -7,7 +9,7 @@ public sealed class MockAssetCatalogService : IAssetCatalogService
 {
     public Dictionary<AssetsPaneKind, List<AssetNode>> GetAssets()
     {
-        return new Dictionary<AssetsPaneKind, List<AssetNode>>
+        var assets = new Dictionary<AssetsPaneKind, List<AssetNode>>
         {
             [AssetsPaneKind.Hosts] =
             [
@@ -90,5 +92,21 @@ public sealed class MockAssetCatalogService : IAssetCatalogService
                     ]),
             ],
         };
+
+        var hostCount = assets[AssetsPaneKind.Hosts]
+            .SelectMany(Flatten)
+            .OfType<ConnectionNode>()
+            .Count();
+        RuntimeLogger.Info("assets", $"Loaded mock assets. hosts={hostCount}");
+        return assets;
+    }
+
+    private static IEnumerable<AssetNode> Flatten(AssetNode node)
+    {
+        yield return node;
+        foreach (var child in node.Children.SelectMany(Flatten))
+        {
+            yield return child;
+        }
     }
 }
