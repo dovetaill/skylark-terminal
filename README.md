@@ -18,8 +18,10 @@
 - 无连接配置标签会稳定显示 Quick Start，不再出现 `Disconnected / invalid SSH config` 告警条
 - 真实终端会话：已接入 `SSH.NET` + `Iciclecreek.Avalonia.Terminal`，支持连接状态流转（Connecting/Connected/Disconnected/Faulted）
 - 终端交互：支持 ANSI/VT100 基础键位映射、右键复制/粘贴/清屏、窗口尺寸变化同步到远端 PTY
-- 右侧工具区：Snippet / History / SFTP 视图切换与 Mock 数据展示，支持拖拽与阈值自动收起
-- 右侧工具模式元数据：`RightToolsModeItems` + `CurrentRightToolsContent` 已接入 ViewModel，为后续 `TabStrip + ContentControl` 容器化改造提供绑定基础
+- 右侧工具区：已完成 `RightSidebarHostView` 容器化（ModeRail + DynamicActionBar + TransitioningContentControl）
+- 右侧工具模式架构：`IRightPanelModeViewModel` + `Snippets/History/Sftp` 子 ViewModel + `ModeActionDescriptor` 元数据动作模型
+- SFTP 导航：`SftpNavigationService` 已接入（Back/Forward/Address/Refresh/Up），并在单栏 Explorer 视图中提供导航条
+- 右侧快捷键：`Ctrl+1/2/3` 快速切换 `Snippets/History/SFTP`
 - 左右侧栏可拖拽缩放，收起时 splitter 与内容列保持同步联动
 - 默认深色主题，支持顶部图标按钮切换深浅色，Settings 支持透明/不透明窗口材质切换
 - 日志策略：默认只写入错误级别日志（`ERROR`），用于保留异常与崩溃定位信息
@@ -107,7 +109,8 @@ dotnet test tests/SkylarkTerminal.Tests/SkylarkTerminal.Tests.csproj
 - 资产视图模式切换（Tree/Flat）
 - 资产增删改操作
 - Tab 增删改与右键操作逻辑（含 Close Left/Right/Others/All）
-- 右侧工具面板视图切换
+- 右侧工具模式架构与动作区元数据切换
+- SFTP 导航服务路径栈（Back/Forward/Up）与地址提交解析
 - 顶部菜单命令（Settings/Language/Help/About）调用链
 - Flat 模式多选后的批量导出与批量打开标签行为
 - 密钥资产面板专属命令行为与可执行状态约束
@@ -147,7 +150,9 @@ public interface ISftpService
 - 资产工具条：`资产列表` 标题 + 图标操作区，顶部与列表通过独立分割线和轻色阶区分，符合 Win11 低对比层次
 - 搜索交互：点击搜索图标展开输入框；空内容时点击任意非搜索区域自动收起；有内容时保持展开并实时过滤
 - 中央 Tab：支持双击左侧连接快速开页签、右键批量管理与会话复制
-- 右上角 Tools 按钮：展开/收起右侧工具面板（保留上次选中视图），并支持拖拽到阈值后自动收起
+- 右上角 Tools 按钮：展开/收起右侧工具面板（保留上次选中模式），并支持拖拽到阈值后自动收起
+- 右侧 ModeRail：图标模式栏切换 `Snippets/History/SFTP`，动作条按模式动态变化
+- 右侧快捷键：`Ctrl+1/2/3` 快速切换模式
 
 ## 后续开发建议
 
