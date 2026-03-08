@@ -4,6 +4,7 @@ using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SkylarkTerminal.Models;
+using SkylarkTerminal.ViewModels.RightPanelModes;
 using SkylarkTerminal.Services;
 using SkylarkTerminal.Services.Mock;
 using System;
@@ -40,6 +41,8 @@ public partial class MainWindowViewModel : ViewModelBase
         Color.Parse("#C77800"),
         Color.Parse("#0B8F8F"),
     ];
+
+    private static readonly IRightPanelModeViewModel FallbackRightPanelMode = new SnippetsModeViewModel();
 
     private readonly ISshConnectionService _sshConnectionService;
     private readonly ISessionRegistryService _sessionRegistryService;
@@ -161,6 +164,7 @@ public partial class MainWindowViewModel : ViewModelBase
         InitializeWorkspaceTabs();
         InitializeQuickStartRecentConnections();
         InitializeRightToolsData();
+        InitializeRightPanelModes();
         SelectedRightToolsModeItem = RightToolsModeItems.FirstOrDefault(item => item.Kind == SelectedRightToolsView);
         SyncActiveWorkspaceTabs();
         TopStatusBar = new TopStatusBarViewModel(this);
@@ -339,6 +343,10 @@ public partial class MainWindowViewModel : ViewModelBase
         new(RightToolsViewKind.History, "History", "\uE81C"),
         new(RightToolsViewKind.Sftp, "SFTP", "\uE8B7"),
     ];
+
+    public ObservableCollection<IRightPanelModeViewModel> RightPanelModes { get; } = [];
+
+    public IRightPanelModeViewModel ActiveRightMode => ResolveActiveRightMode(SelectedRightToolsView);
 
     public WorkspaceLayoutNode WorkspaceLayoutRoot => _workspaceLayoutService.Root;
 
@@ -1156,6 +1164,7 @@ public partial class MainWindowViewModel : ViewModelBase
         OnPropertyChanged(nameof(IsHistoryView));
         OnPropertyChanged(nameof(IsSftpView));
         OnPropertyChanged(nameof(CurrentRightToolsContent));
+        OnPropertyChanged(nameof(ActiveRightMode));
 
         var target = RightToolsModeItems.FirstOrDefault(item => item.Kind == value);
         if (target is not null && !ReferenceEquals(target, SelectedRightToolsModeItem))
@@ -1684,6 +1693,25 @@ public partial class MainWindowViewModel : ViewModelBase
             Timestamp = DateTime.Now.AddMinutes(-2),
             Command = "sudo journalctl -u ssh --since '10 min ago'",
         });
+    }
+
+    private void InitializeRightPanelModes()
+    {
+        RightPanelModes.Clear();
+        RightPanelModes.Add(new SnippetsModeViewModel());
+        RightPanelModes.Add(new HistoryModeViewModel());
+        RightPanelModes.Add(new SftpModeViewModel());
+    }
+
+    private IRightPanelModeViewModel ResolveActiveRightMode(RightToolsViewKind kind)
+    {
+        var mode = RightPanelModes.FirstOrDefault(item => item.Kind == kind);
+        if (mode is not null)
+        {
+            return mode;
+        }
+
+        return RightPanelModes.Count > 0 ? RightPanelModes[0] : FallbackRightPanelMode;
     }
 
     private WorkspaceTabItemViewModel BuildWorkspaceTab(ConnectionNode connectionNode)
