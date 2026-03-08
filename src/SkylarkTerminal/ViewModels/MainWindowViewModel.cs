@@ -438,6 +438,71 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private void CreateSnippet()
+    {
+    }
+
+    [RelayCommand]
+    private void SearchSnippet()
+    {
+    }
+
+    [RelayCommand]
+    private void SortSnippet()
+    {
+    }
+
+    [RelayCommand]
+    private void ToggleSnippetLayout()
+    {
+    }
+
+    [RelayCommand]
+    private void SearchHistory()
+    {
+    }
+
+    [RelayCommand]
+    private void SortHistory()
+    {
+    }
+
+    [RelayCommand]
+    private void ToggleHistoryLayout()
+    {
+    }
+
+    [RelayCommand]
+    private void ClearHistory()
+    {
+    }
+
+    [RelayCommand]
+    private void NavigateSftpBack()
+    {
+    }
+
+    [RelayCommand]
+    private void NavigateSftpForward()
+    {
+    }
+
+    [RelayCommand]
+    private void RefreshSftp()
+    {
+    }
+
+    [RelayCommand]
+    private void NavigateSftpUp()
+    {
+    }
+
+    [RelayCommand]
+    private void CommitSftpAddress()
+    {
+    }
+
+    [RelayCommand]
     private async Task OpenSettings()
     {
         var selectedTransparency = await _appDialogService.ShowSettingsAsync(
@@ -1698,9 +1763,9 @@ public partial class MainWindowViewModel : ViewModelBase
     private void InitializeRightPanelModes()
     {
         RightPanelModes.Clear();
-        RightPanelModes.Add(new SnippetsModeViewModel());
-        RightPanelModes.Add(new HistoryModeViewModel());
-        RightPanelModes.Add(new SftpModeViewModel());
+        RightPanelModes.Add(new SnippetsModeViewModel(BuildSnippetModeActions()));
+        RightPanelModes.Add(new HistoryModeViewModel(BuildHistoryModeActions()));
+        RightPanelModes.Add(new SftpModeViewModel(BuildSftpModeActions()));
     }
 
     private IRightPanelModeViewModel ResolveActiveRightMode(RightToolsViewKind kind)
@@ -1712,6 +1777,40 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         return RightPanelModes.Count > 0 ? RightPanelModes[0] : FallbackRightPanelMode;
+    }
+
+    private IReadOnlyList<ModeActionDescriptor> BuildSnippetModeActions()
+    {
+        return
+        [
+            new("snippet.new", "\uE710", "New snippet", CreateSnippetCommand),
+            new("snippet.search", "\uE721", "Search snippets", SearchSnippetCommand),
+            new("snippet.sort", "\uE8CB", "Sort snippets", SortSnippetCommand),
+            new("snippet.layout", "\uE8A4", "Toggle layout", ToggleSnippetLayoutCommand, IsToggle: true),
+        ];
+    }
+
+    private IReadOnlyList<ModeActionDescriptor> BuildHistoryModeActions()
+    {
+        return
+        [
+            new("history.search", "\uE721", "Search history", SearchHistoryCommand),
+            new("history.sort", "\uE8CB", "Sort history", SortHistoryCommand),
+            new("history.layout", "\uE8A4", "Toggle layout", ToggleHistoryLayoutCommand, IsToggle: true),
+            new("history.clear", "\uE74D", "Clear history", ClearHistoryCommand),
+        ];
+    }
+
+    private IReadOnlyList<ModeActionDescriptor> BuildSftpModeActions()
+    {
+        return
+        [
+            new("sftp.back", "\uE72B", "Back", NavigateSftpBackCommand),
+            new("sftp.forward", "\uE72A", "Forward", NavigateSftpForwardCommand),
+            new("sftp.refresh", "\uE72C", "Refresh", RefreshSftpCommand),
+            new("sftp.up", "\uE74A", "Up", NavigateSftpUpCommand),
+            new("sftp.address", "\uE8B7", "Address", CommitSftpAddressCommand),
+        ];
     }
 
     private WorkspaceTabItemViewModel BuildWorkspaceTab(ConnectionNode connectionNode)

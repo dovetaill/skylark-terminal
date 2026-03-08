@@ -1,4 +1,5 @@
 using SkylarkTerminal.Models;
+using System.Collections.Generic;
 
 namespace SkylarkTerminal.ViewModels.RightPanelModes;
 
@@ -11,4 +12,6 @@ public interface IRightPanelModeViewModel
     string Glyph { get; }
 
     RightToolsContentNode ContentNode { get; }
+
+    IReadOnlyList<ModeActionDescriptor> Actions { get; }
 }
