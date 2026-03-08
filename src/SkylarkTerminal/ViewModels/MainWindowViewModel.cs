@@ -27,6 +27,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public const double ExpandedLeftAssetsPaneWidth = 300d;
     public const double ExpandedRightSidebarWidth = 340d;
     public const double DefaultAssetsPanelWidth = 320d;
+    public const int MaxQuickStartRecentConnections = 10;
 
     private static readonly Color[] WorkspaceAccentPalette =
     [
@@ -87,6 +88,7 @@ public partial class MainWindowViewModel : ViewModelBase
         ApplyAssetsSearchFilter();
         RebuildCurrentFlatList();
         InitializeWorkspaceTabs();
+        InitializeQuickStartRecentConnections();
         InitializeRightToolsData();
         SyncActiveWorkspaceTabs();
         TopStatusBar = new TopStatusBarViewModel(this);
@@ -140,6 +142,9 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private bool areAllTreeFoldersExpanded;
 
+    [ObservableProperty]
+    private string quickStartSearchText = string.Empty;
+
     public double LeftAssetsPaneWidth => IsAssetsPanelVisible ? ExpandedLeftAssetsPaneWidth : 0d;
 
     // Backward-compatible alias for existing bindings/tests during transition.
@@ -190,6 +195,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public string AssetsSearchPlaceholder => "搜索资产";
 
+    public string QuickStartSearchPlaceholder => "搜索最近连接";
+
     public string AssetsExpandCollapseGlyph => AreAllTreeFoldersExpanded ? "\uE70D" : "\uE70E";
 
     public string AssetsExpandCollapseToolTip => AreAllTreeFoldersExpanded
@@ -204,11 +211,19 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public bool IsSftpView => SelectedRightToolsView == RightToolsViewKind.Sftp;
 
+    public bool HasQuickStartRecentConnections => FilteredQuickStartRecentConnections.Count > 0;
+
+    public bool IsQuickStartRecentConnectionsEmpty => !HasQuickStartRecentConnections;
+
     public ObservableCollection<AssetNode> CurrentAssetFlatList { get; } = [];
 
     public ObservableCollection<AssetNode> SelectedAssetNodes { get; } = [];
 
     public ObservableCollection<AssetNode> CurrentAssetTree => _assetsByPane[SelectedAssetsPane];
+
+    public ObservableCollection<QuickStartRecentConnection> QuickStartRecentConnections { get; } = [];
+
+    public ObservableCollection<QuickStartRecentConnection> FilteredQuickStartRecentConnections { get; } = [];
 
     public ObservableCollection<WorkspaceTabItemViewModel> WorkspaceTabs { get; } = [];
     public ObservableCollection<WorkspaceTabItemViewModel> Tabs => WorkspaceTabs;
@@ -545,6 +560,7 @@ public partial class MainWindowViewModel : ViewModelBase
             var newTab = BuildWorkspaceTab(connection);
             WorkspaceTabs.Add(newTab);
             SelectedWorkspaceTab = newTab;
+            RegisterRecentConnection(connection);
             RuntimeLogger.Info(
                 "open-tab",
                 $"Tab created. tab_id={newTab.Id}, header={newTab.Header}, host={connection.Host}, port={connection.Port}");
@@ -776,9 +792,33 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void CreateWorkspaceTab()
     {
-        var newTab = BuildWorkspaceTab("new-session");
+        var newTab = BuildWorkspaceTab(
+            header: "Quick Start",
+            connectionLabel: "quick-start");
         WorkspaceTabs.Add(newTab);
         SelectedWorkspaceTab = newTab;
+    }
+
+    [RelayCommand]
+    private void OpenQuickStartConnection(QuickStartRecentConnection? recent)
+    {
+        if (recent is null)
+        {
+            return;
+        }
+
+        var connection = ResolveConnectionNodeByRecent(recent);
+        if (connection is null)
+        {
+            LastAssetActionMessage = $"无法定位连接 {recent.DisplayName}";
+            return;
+        }
+
+        var newTab = BuildWorkspaceTab(connection);
+        WorkspaceTabs.Add(newTab);
+        SelectedWorkspaceTab = newTab;
+        RegisterRecentConnection(connection);
+        LastAssetActionMessage = $"已从 Quick Start 打开 {connection.Name}";
     }
 
     [RelayCommand]
@@ -990,6 +1030,12 @@ public partial class MainWindowViewModel : ViewModelBase
         ApplyAssetsSearchFilter();
     }
 
+    partial void OnQuickStartSearchTextChanged(string value)
+    {
+        _ = value;
+        ApplyQuickStartRecentConnectionsFilter();
+    }
+
     partial void OnAreAllTreeFoldersExpandedChanged(bool value)
     {
         OnPropertyChanged(nameof(AssetsExpandCollapseGlyph));
@@ -1027,6 +1073,30 @@ public partial class MainWindowViewModel : ViewModelBase
         WorkspaceTabs.Add(quickStart);
         SelectedWorkspaceTab = quickStart;
         RuntimeLogger.Info("tab-init", $"Initialized default tabs. count={WorkspaceTabs.Count}");
+    }
+
+    private void InitializeQuickStartRecentConnections()
+    {
+        var seededConnections = Flatten(_assetsByPane[AssetsPaneKind.Hosts])
+            .OfType<ConnectionNode>()
+            .Take(MaxQuickStartRecentConnections)
+            .ToList();
+
+        var now = DateTimeOffset.Now;
+        for (var i = 0; i < seededConnections.Count; i++)
+        {
+            var connection = seededConnections[i];
+            QuickStartRecentConnections.Add(
+                new QuickStartRecentConnection(
+                    connection.Id,
+                    connection.Name,
+                    connection.Host,
+                    connection.User,
+                    connection.Port,
+                    now.AddMinutes(-(i + 1) * 7)));
+        }
+
+        ApplyQuickStartRecentConnectionsFilter();
     }
 
     private void InitializeRightToolsData()
@@ -1099,6 +1169,119 @@ public partial class MainWindowViewModel : ViewModelBase
             "tab-build",
             $"Built tab. id={tab.Id}, header={tab.Header}, has_connection={(connectionConfig is not null).ToString().ToLowerInvariant()}, host={connectionConfig?.Host ?? "<none>"}");
         return tab;
+    }
+
+    public void MarkConnectionAsRecentlyUsed(ConnectionConfig? config)
+    {
+        if (config is null ||
+            string.IsNullOrWhiteSpace(config.Host) ||
+            string.IsNullOrWhiteSpace(config.Username))
+        {
+            return;
+        }
+
+        var matched = Flatten(_assetsByPane[AssetsPaneKind.Hosts])
+            .OfType<ConnectionNode>()
+            .FirstOrDefault(node =>
+                node.Port == config.Port &&
+                string.Equals(node.Host, config.Host, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(node.User, config.Username, StringComparison.OrdinalIgnoreCase));
+
+        if (matched is not null)
+        {
+            RegisterRecentConnection(matched);
+            return;
+        }
+
+        var fallback = new ConnectionNode(
+            $"quick-{Guid.NewGuid():N}",
+            config.Host,
+            config.Host,
+            config.Username,
+            config.Port,
+            "SSH Connection",
+            config.Password);
+        RegisterRecentConnection(fallback);
+    }
+
+    private void RegisterRecentConnection(ConnectionNode connection)
+    {
+        var snapshot = new QuickStartRecentConnection(
+            connection.Id,
+            connection.Name,
+            connection.Host,
+            connection.User,
+            connection.Port,
+            DateTimeOffset.Now);
+
+        var existingIndex = -1;
+        for (var i = 0; i < QuickStartRecentConnections.Count; i++)
+        {
+            var item = QuickStartRecentConnections[i];
+            if (string.Equals(item.AssetId, snapshot.AssetId, StringComparison.Ordinal) ||
+                (string.Equals(item.Host, snapshot.Host, StringComparison.OrdinalIgnoreCase) &&
+                 string.Equals(item.Username, snapshot.Username, StringComparison.OrdinalIgnoreCase) &&
+                 item.Port == snapshot.Port))
+            {
+                existingIndex = i;
+                break;
+            }
+        }
+
+        if (existingIndex >= 0)
+        {
+            QuickStartRecentConnections.RemoveAt(existingIndex);
+        }
+
+        QuickStartRecentConnections.Insert(0, snapshot);
+        while (QuickStartRecentConnections.Count > MaxQuickStartRecentConnections)
+        {
+            QuickStartRecentConnections.RemoveAt(QuickStartRecentConnections.Count - 1);
+        }
+
+        ApplyQuickStartRecentConnectionsFilter();
+    }
+
+    private ConnectionNode? ResolveConnectionNodeByRecent(QuickStartRecentConnection recent)
+    {
+        var matched = Flatten(_assetsByPane[AssetsPaneKind.Hosts])
+            .OfType<ConnectionNode>()
+            .FirstOrDefault(node =>
+                string.Equals(node.Id, recent.AssetId, StringComparison.Ordinal) ||
+                (string.Equals(node.Host, recent.Host, StringComparison.OrdinalIgnoreCase) &&
+                 string.Equals(node.User, recent.Username, StringComparison.OrdinalIgnoreCase) &&
+                 node.Port == recent.Port));
+
+        if (matched is not null)
+        {
+            return matched;
+        }
+
+        return new ConnectionNode(
+            $"quick-{Guid.NewGuid():N}",
+            recent.DisplayName,
+            recent.Host,
+            recent.Username,
+            recent.Port,
+            "SSH Connection");
+    }
+
+    private void ApplyQuickStartRecentConnectionsFilter()
+    {
+        var keyword = QuickStartSearchText.Trim();
+        var filtered = QuickStartRecentConnections
+            .Where(item => item.Matches(keyword))
+            .OrderByDescending(item => item.LastUsedAt)
+            .ToList();
+
+        FilteredQuickStartRecentConnections.Clear();
+        foreach (var item in filtered)
+        {
+            FilteredQuickStartRecentConnections.Add(item);
+        }
+
+        OnPropertyChanged(nameof(HasQuickStartRecentConnections));
+        OnPropertyChanged(nameof(IsQuickStartRecentConnectionsEmpty));
     }
 
     private void DisposeTabConnection(WorkspaceTabItemViewModel tab)

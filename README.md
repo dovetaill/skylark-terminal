@@ -13,7 +13,8 @@
 - Flat 模式支持 Windows 风格多选：`Ctrl/Shift` 扩展选择、右键保留多选、左键拖拽框选
 - 资产面板顶部：紧凑图标工具条（搜索/展开收起/创建/模式切换），支持点击展开搜索框与空查询自动收起
 - 中间工作区：FluentAvalonia `TabView` 多标签；支持双击资产连接开新标签、标签标题显示连接名、右键标签操作（Duplicate/Close Others/Close Left/Close Right/Close All）
-- 启动默认页：单个 `Quick Start` 标签页（不再自动打开默认连接标签）
+- 启动默认页：`Quick Start` 入口页，支持最近连接卡片、搜索过滤、快捷跳转 Hosts 与新建标签
+- 无连接配置标签会稳定显示 Quick Start，不再出现 `Disconnected / invalid SSH config` 告警条
 - 真实终端会话：已接入 `SSH.NET` + `Iciclecreek.Avalonia.Terminal`，支持连接状态流转（Connecting/Connected/Disconnected/Faulted）
 - 终端交互：支持 ANSI/VT100 基础键位映射、右键复制/粘贴/清屏、窗口尺寸变化同步到远端 PTY
 - 右侧工具区：Snippet / History / SFTP 视图切换与 Mock 数据展示，支持拖拽与阈值自动收起

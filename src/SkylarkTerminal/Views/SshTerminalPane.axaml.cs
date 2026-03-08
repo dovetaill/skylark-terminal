@@ -90,7 +90,7 @@ public partial class SshTerminalPane : UserControl
 
     private void OnDataContextChanged(object? sender, EventArgs e)
     {
-        AttachHostViewModel(DataContext as MainWindowViewModel);
+        AttachHostViewModel(ResolveHostViewModel());
         SyncTabFromHost("data-context-changed");
         EnsureTabContext("data-context-changed");
     }
@@ -99,9 +99,10 @@ public partial class SshTerminalPane : UserControl
     {
         _isLoaded = true;
         HookTerminalEvents();
-        AttachHostViewModel(DataContext as MainWindowViewModel);
+        AttachHostViewModel(ResolveHostViewModel());
         SyncTabFromHost("loaded");
         EnsureTabContext("loaded");
+        RefreshQuickStartBindings();
         TerminalHost.Focus();
         RuntimeLogger.Info(
             "terminal-ui",
@@ -159,6 +160,7 @@ public partial class SshTerminalPane : UserControl
             var config = tab?.ConnectionConfig;
             if (tab is null || config is null)
             {
+                await DisconnectSessionAsync().ConfigureAwait(false);
                 ShowQuickStart(tab);
                 return;
             }
@@ -291,6 +293,26 @@ public partial class SshTerminalPane : UserControl
             $"Tab resolve failed. reason={reason}, data_context={DataContext?.GetType().Name ?? "<null>"}, ancestor={(tabItem is null ? "<none>" : tabItem.GetType().Name)}");
     }
 
+    private MainWindowViewModel? ResolveHostViewModel()
+    {
+        if (DataContext is MainWindowViewModel vmFromDataContext)
+        {
+            return vmFromDataContext;
+        }
+
+        if (this.FindAncestorOfType<Window>()?.DataContext is MainWindowViewModel vmFromWindow)
+        {
+            return vmFromWindow;
+        }
+
+        if (TopLevel.GetTopLevel(this)?.DataContext is MainWindowViewModel vmFromTopLevel)
+        {
+            return vmFromTopLevel;
+        }
+
+        return null;
+    }
+
     private void AttachHostViewModel(MainWindowViewModel? vm)
     {
         if (ReferenceEquals(_hostViewModel, vm))
@@ -308,24 +330,37 @@ public partial class SshTerminalPane : UserControl
         {
             _hostViewModel.PropertyChanged += OnHostViewModelPropertyChanged;
         }
+
+        RefreshQuickStartBindings();
     }
 
     private void OnHostViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName != nameof(MainWindowViewModel.SelectedWorkspaceTab) &&
-            e.PropertyName != nameof(MainWindowViewModel.SelectedTab))
+        if (e.PropertyName == nameof(MainWindowViewModel.SelectedWorkspaceTab) ||
+            e.PropertyName == nameof(MainWindowViewModel.SelectedTab))
         {
+            Dispatcher.UIThread.Post(() =>
+            {
+                SyncTabFromHost("selected-tab-changed");
+            });
             return;
         }
 
-        Dispatcher.UIThread.Post(() =>
+        if (e.PropertyName == nameof(MainWindowViewModel.QuickStartSearchText) ||
+            e.PropertyName == nameof(MainWindowViewModel.HasQuickStartRecentConnections) ||
+            e.PropertyName == nameof(MainWindowViewModel.IsQuickStartRecentConnectionsEmpty))
         {
-            SyncTabFromHost("selected-tab-changed");
-        });
+            Dispatcher.UIThread.Post(RefreshQuickStartBindings);
+        }
     }
 
     private void SyncTabFromHost(string reason)
     {
+        if (Tab is not null || DataContext is WorkspaceTabItemViewModel)
+        {
+            return;
+        }
+
         if (_hostViewModel?.SelectedTab is not WorkspaceTabItemViewModel selected)
         {
             return;
@@ -676,10 +711,79 @@ public partial class SshTerminalPane : UserControl
         await BeginConnectAsync(reconnect: true);
     }
 
+    private void OnQuickStartSearchTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        _ = sender;
+        _ = e;
+
+        if (_hostViewModel is null)
+        {
+            return;
+        }
+
+        var searchText = QuickStartSearchBox.Text ?? string.Empty;
+        if (string.Equals(_hostViewModel.QuickStartSearchText, searchText, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _hostViewModel.QuickStartSearchText = searchText;
+    }
+
+    private void OnQuickStartConnectionClick(object? sender, RoutedEventArgs e)
+    {
+        _ = e;
+        if (sender is not Button { DataContext: QuickStartRecentConnection recent } ||
+            _hostViewModel is null)
+        {
+            return;
+        }
+
+        _hostViewModel.OpenQuickStartConnectionCommand.Execute(recent);
+    }
+
+    private void OnQuickStartBrowseHostsClick(object? sender, RoutedEventArgs e)
+    {
+        _ = sender;
+        _ = e;
+        _hostViewModel?.ShowHostsAssetsCommand.Execute(null);
+    }
+
+    private void OnQuickStartNewTabClick(object? sender, RoutedEventArgs e)
+    {
+        _ = sender;
+        _ = e;
+        _hostViewModel?.CreateWorkspaceTabCommand.Execute(null);
+    }
+
+    private void RefreshQuickStartBindings()
+    {
+        if (!_isLoaded)
+        {
+            return;
+        }
+
+        QuickStartRecentItems.ItemsSource = _hostViewModel?.FilteredQuickStartRecentConnections;
+
+        var expectedSearchText = _hostViewModel?.QuickStartSearchText ?? string.Empty;
+        if (!string.Equals(QuickStartSearchBox.Text, expectedSearchText, StringComparison.Ordinal))
+        {
+            QuickStartSearchBox.Text = expectedSearchText;
+        }
+
+        QuickStartEmptyState.IsVisible = _hostViewModel?.IsQuickStartRecentConnectionsEmpty ?? true;
+    }
+
     private void SetState(SessionState state, string message)
     {
         var tab = ResolveTab();
         CaptureTabForLogs(tab);
+        if (tab?.ConnectionConfig is null)
+        {
+            ShowQuickStart(tab);
+            return;
+        }
+
         QuickStartOverlay.IsVisible = false;
         if (tab is not null)
         {
@@ -704,6 +808,7 @@ public partial class SshTerminalPane : UserControl
                 ConnectingOverlay.IsVisible = false;
                 ConnectingRing.IsActive = false;
                 SessionInfoBar.IsOpen = false;
+                _hostViewModel?.MarkConnectionAsRecentlyUsed(tab.ConnectionConfig);
                 break;
             case SessionState.Disconnected:
                 ConnectingOverlay.IsVisible = false;
@@ -737,7 +842,10 @@ public partial class SshTerminalPane : UserControl
             }
         }
 
-        QuickStartText.Text = "双击左侧 Hosts 资产打开 SSH 会话。";
+        RefreshQuickStartBindings();
+        QuickStartText.Text = _hostViewModel?.HasQuickStartRecentConnections == true
+            ? "选择最近连接即可快速进入 SSH 终端。"
+            : "暂无最近连接，双击左侧 Hosts 资产打开 SSH 会话。";
         QuickStartOverlay.IsVisible = true;
         ConnectingOverlay.IsVisible = false;
         ConnectingRing.IsActive = false;
