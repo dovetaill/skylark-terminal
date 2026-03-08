@@ -1,0 +1,111 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="using:SkylarkTerminal.Models"
+             xmlns:vm="using:SkylarkTerminal.ViewModels"
+             x:Class="SkylarkTerminal.Views.RightSidebarHostView"
+             x:DataType="vm:MainWindowViewModel">
+    <Grid RowDefinitions="Auto,Auto,*">
+        <Border Grid.Row="0"
+                Padding="10,8,10,6"
+                BorderBrush="{DynamicResource ShellDividerBrush}"
+                BorderThickness="0,0,0,1">
+            <ListBox ItemsSource="{Binding RightToolsModeItems}"
+                     SelectionMode="Single"
+                     SelectedItem="{Binding SelectedRightToolsModeItem}"
+                     BorderThickness="0"
+                     Background="Transparent">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="6"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="models:RightToolsModeItem">
+                        <Border Padding="8,6">
+                            <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                       Text="{Binding Glyph}"/>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <Border Grid.Row="1"
+                Padding="10,6"
+                BorderBrush="{DynamicResource ShellDividerBrush}"
+                BorderThickness="0,0,0,1">
+            <ItemsControl ItemsSource="{Binding ActiveRightMode.Actions}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="6"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="models:ModeActionDescriptor">
+                        <Button Classes="TitleBarButton"
+                                Command="{Binding Command}"
+                                ToolTip.Tip="{Binding Tooltip}">
+                            <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                       Text="{Binding Glyph}"/>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
+
+        <TransitioningContentControl Grid.Row="2"
+                                     Margin="0">
+            <Grid>
+                <ListBox ItemsSource="{Binding SnippetItems}"
+                         IsVisible="{Binding IsSnippetsView}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="models:CommandSnippet">
+                            <StackPanel Margin="0"
+                                        Spacing="2">
+                                <TextBlock FontWeight="SemiBold"
+                                           Text="{Binding Name}"/>
+                                <TextBlock FontFamily="Consolas"
+                                           Opacity="0.86"
+                                           Text="{Binding Command}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <ListBox ItemsSource="{Binding HistoryItems}"
+                         IsVisible="{Binding IsHistoryView}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="models:CommandHistoryEntry">
+                            <Grid ColumnDefinitions="Auto,*"
+                                  Margin="0">
+                                <TextBlock Opacity="0.72"
+                                           FontFamily="Consolas"
+                                           Text="{Binding Timestamp, StringFormat={}{0:HH:mm:ss}}"/>
+                                <TextBlock Grid.Column="1"
+                                           Margin="4,0,0,0"
+                                           Text="{Binding Command}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <ListBox ItemsSource="{Binding SftpItems}"
+                         IsVisible="{Binding IsSftpView}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="models:RemoteFileNode">
+                            <Grid ColumnDefinitions="*,Auto"
+                                  Margin="0">
+                                <TextBlock Text="{Binding Name}"/>
+                                <TextBlock Grid.Column="1"
+                                           Opacity="0.72"
+                                           Text="{Binding FullPath}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </TransitioningContentControl>
+    </Grid>
+</UserControl>
