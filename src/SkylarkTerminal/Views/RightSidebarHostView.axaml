@@ -2,8 +2,21 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:models="using:SkylarkTerminal.Models"
              xmlns:vm="using:SkylarkTerminal.ViewModels"
+             xmlns:rightModes="using:SkylarkTerminal.Views.RightModes"
              x:Class="SkylarkTerminal.Views.RightSidebarHostView"
              x:DataType="vm:MainWindowViewModel">
+    <UserControl.DataTemplates>
+        <DataTemplate DataType="models:SnippetsRightToolsContent">
+            <rightModes:SnippetsModeView/>
+        </DataTemplate>
+        <DataTemplate DataType="models:HistoryRightToolsContent">
+            <rightModes:HistoryModeView/>
+        </DataTemplate>
+        <DataTemplate DataType="models:SftpRightToolsContent">
+            <rightModes:SftpModeView/>
+        </DataTemplate>
+    </UserControl.DataTemplates>
+
     <Grid RowDefinitions="Auto,Auto,*">
         <Border Grid.Row="0"
                 Padding="10,8,10,6"
@@ -56,56 +69,7 @@
         </Border>
 
         <TransitioningContentControl Grid.Row="2"
-                                     Margin="0">
-            <Grid>
-                <ListBox ItemsSource="{Binding SnippetItems}"
-                         IsVisible="{Binding IsSnippetsView}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="models:CommandSnippet">
-                            <StackPanel Margin="0"
-                                        Spacing="2">
-                                <TextBlock FontWeight="SemiBold"
-                                           Text="{Binding Name}"/>
-                                <TextBlock FontFamily="Consolas"
-                                           Opacity="0.86"
-                                           Text="{Binding Command}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-
-                <ListBox ItemsSource="{Binding HistoryItems}"
-                         IsVisible="{Binding IsHistoryView}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="models:CommandHistoryEntry">
-                            <Grid ColumnDefinitions="Auto,*"
-                                  Margin="0">
-                                <TextBlock Opacity="0.72"
-                                           FontFamily="Consolas"
-                                           Text="{Binding Timestamp, StringFormat={}{0:HH:mm:ss}}"/>
-                                <TextBlock Grid.Column="1"
-                                           Margin="4,0,0,0"
-                                           Text="{Binding Command}"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-
-                <ListBox ItemsSource="{Binding SftpItems}"
-                         IsVisible="{Binding IsSftpView}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="models:RemoteFileNode">
-                            <Grid ColumnDefinitions="*,Auto"
-                                  Margin="0">
-                                <TextBlock Text="{Binding Name}"/>
-                                <TextBlock Grid.Column="1"
-                                           Opacity="0.72"
-                                           Text="{Binding FullPath}"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </Grid>
-        </TransitioningContentControl>
+                                     Margin="0"
+                                     Content="{Binding ActiveRightMode.ContentNode}"/>
     </Grid>
 </UserControl>

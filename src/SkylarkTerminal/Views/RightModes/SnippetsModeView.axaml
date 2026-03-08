@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="using:SkylarkTerminal.Models"
+             xmlns:views="using:SkylarkTerminal.Views"
+             x:Class="SkylarkTerminal.Views.RightModes.SnippetsModeView"
+             x:CompileBindings="False">
+    <ListBox ItemsSource="{Binding DataContext.SnippetItems, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+        <ListBox.ItemTemplate>
+            <DataTemplate DataType="models:CommandSnippet">
+                <StackPanel Margin="0"
+                            Spacing="2">
+                    <TextBlock FontWeight="SemiBold"
+                               Text="{Binding Name}"/>
+                    <TextBlock FontFamily="Consolas"
+                               Opacity="0.86"
+                               Text="{Binding Command}"/>
+                </StackPanel>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+</UserControl>
