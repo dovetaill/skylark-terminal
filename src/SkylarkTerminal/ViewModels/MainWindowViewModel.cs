@@ -29,6 +29,8 @@ public partial class MainWindowViewModel : ViewModelBase
     public const double ExpandedRightSidebarWidth = 340d;
     public const double DefaultAssetsPanelWidth = 320d;
     public const int MaxQuickStartRecentConnections = 10;
+    public const int DefaultMaxWorkspacePaneCount = 8;
+    public const double DefaultWorkspaceMinPaneSize = 340d;
 
     private static readonly Color[] WorkspaceAccentPalette =
     [
@@ -40,6 +42,9 @@ public partial class MainWindowViewModel : ViewModelBase
     ];
 
     private readonly ISshConnectionService _sshConnectionService;
+    private readonly ISessionRegistryService _sessionRegistryService;
+    private readonly IWorkspaceLayoutService _workspaceLayoutService;
+    private readonly IDragSessionService _dragSessionService;
     private readonly ISftpService _sftpService;
     private readonly IAppDialogService _appDialogService;
     private readonly IClipboardService _clipboardService;
@@ -81,14 +86,78 @@ public partial class MainWindowViewModel : ViewModelBase
         ISftpService sftpService,
         IAppDialogService appDialogService,
         IClipboardService clipboardService)
+        : this(
+            assetCatalogService,
+            sshConnectionService,
+            sftpService,
+            appDialogService,
+            clipboardService,
+            new SessionRegistryService(sshConnectionService),
+            new WorkspaceLayoutService(),
+            new DragSessionService())
+    {
+    }
+
+    public MainWindowViewModel(
+        IAssetCatalogService assetCatalogService,
+        ISshConnectionService sshConnectionService,
+        ISftpService sftpService,
+        IAppDialogService appDialogService,
+        IClipboardService clipboardService,
+        ISessionRegistryService sessionRegistryService)
+        : this(
+            assetCatalogService,
+            sshConnectionService,
+            sftpService,
+            appDialogService,
+            clipboardService,
+            sessionRegistryService,
+            new WorkspaceLayoutService(),
+            new DragSessionService())
+    {
+    }
+
+    public MainWindowViewModel(
+        IAssetCatalogService assetCatalogService,
+        ISshConnectionService sshConnectionService,
+        ISftpService sftpService,
+        IAppDialogService appDialogService,
+        IClipboardService clipboardService,
+        ISessionRegistryService sessionRegistryService,
+        IWorkspaceLayoutService workspaceLayoutService)
+        : this(
+            assetCatalogService,
+            sshConnectionService,
+            sftpService,
+            appDialogService,
+            clipboardService,
+            sessionRegistryService,
+            workspaceLayoutService,
+            new DragSessionService())
+    {
+    }
+
+    public MainWindowViewModel(
+        IAssetCatalogService assetCatalogService,
+        ISshConnectionService sshConnectionService,
+        ISftpService sftpService,
+        IAppDialogService appDialogService,
+        IClipboardService clipboardService,
+        ISessionRegistryService sessionRegistryService,
+        IWorkspaceLayoutService workspaceLayoutService,
+        IDragSessionService dragSessionService)
     {
         _sshConnectionService = sshConnectionService;
+        _sessionRegistryService = sessionRegistryService;
+        _workspaceLayoutService = workspaceLayoutService;
+        _dragSessionService = dragSessionService;
         _sftpService = sftpService;
         _appDialogService = appDialogService;
         _clipboardService = clipboardService;
         _assetsByPane = BuildAssetsMap(assetCatalogService.GetAssets());
         ApplyAssetsSearchFilter();
         RebuildCurrentFlatList();
+        InitializeWorkspacePanes();
         InitializeWorkspaceTabs();
         InitializeQuickStartRecentConnections();
         InitializeRightToolsData();
@@ -127,6 +196,9 @@ public partial class MainWindowViewModel : ViewModelBase
     private WorkspaceTabItemViewModel? selectedWorkspaceTab;
 
     [ObservableProperty]
+    private WorkspacePaneViewModel? selectedWorkspacePane;
+
+    [ObservableProperty]
     private RightToolsViewKind selectedRightToolsView = RightToolsViewKind.Snippets;
 
     [ObservableProperty]
@@ -149,6 +221,15 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     private ConnectionNode? pendingQuickStartLocateTarget;
+
+    [ObservableProperty]
+    private bool isWorkspaceDragOverlayVisible;
+
+    [ObservableProperty]
+    private string? workspaceDragHoverPaneId;
+
+    [ObservableProperty]
+    private WorkspaceDropDirection? workspaceDragHoverDirection;
 
     public double LeftAssetsPaneWidth => IsAssetsPanelVisible ? ExpandedLeftAssetsPaneWidth : 0d;
 
@@ -220,6 +301,22 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public bool IsQuickStartRecentConnectionsEmpty => !HasQuickStartRecentConnections;
 
+    public bool IsWorkspacePaneHoverActive => IsWorkspaceDragOverlayVisible && !string.IsNullOrWhiteSpace(WorkspaceDragHoverPaneId);
+
+    public bool IsWorkspaceDropSlotLeftHot => WorkspaceDragHoverDirection == WorkspaceDropDirection.Left;
+
+    public bool IsWorkspaceDropSlotRightHot => WorkspaceDragHoverDirection == WorkspaceDropDirection.Right;
+
+    public bool IsWorkspaceDropSlotTopHot => WorkspaceDragHoverDirection == WorkspaceDropDirection.Top;
+
+    public bool IsWorkspaceDropSlotBottomHot => WorkspaceDragHoverDirection == WorkspaceDropDirection.Bottom;
+
+    public bool HasWorkspaceDragSession => _dragSessionService.IsActive;
+
+    public int MaxWorkspacePaneCount => DefaultMaxWorkspacePaneCount;
+
+    public double WorkspaceMinPaneSize => DefaultWorkspaceMinPaneSize;
+
     public ObservableCollection<AssetNode> CurrentAssetFlatList { get; } = [];
 
     public ObservableCollection<AssetNode> SelectedAssetNodes { get; } = [];
@@ -230,7 +327,12 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public ObservableCollection<QuickStartRecentConnection> FilteredQuickStartRecentConnections { get; } = [];
 
-    public ObservableCollection<WorkspaceTabItemViewModel> WorkspaceTabs { get; } = [];
+    public ObservableCollection<WorkspacePaneViewModel> WorkspacePanes { get; } = [];
+
+    public WorkspaceLayoutNode WorkspaceLayoutRoot => _workspaceLayoutService.Root;
+
+    public ObservableCollection<WorkspaceTabItemViewModel> WorkspaceTabs => ResolveActiveWorkspacePane().Tabs;
+
     public ObservableCollection<WorkspaceTabItemViewModel> Tabs => WorkspaceTabs;
 
     public WorkspaceTabItemViewModel? SelectedTab
@@ -1037,8 +1139,58 @@ public partial class MainWindowViewModel : ViewModelBase
         OnPropertyChanged(nameof(IsSftpView));
     }
 
+    partial void OnSelectedWorkspacePaneChanged(WorkspacePaneViewModel? value)
+    {
+        OnPropertyChanged(nameof(WorkspaceTabs));
+        OnPropertyChanged(nameof(Tabs));
+
+        if (value is null)
+        {
+            return;
+        }
+
+        if (value.Tabs.Count == 0)
+        {
+            if (SelectedWorkspaceTab is not null &&
+                ResolvePaneByTab(SelectedWorkspaceTab) is null)
+            {
+                SelectedWorkspaceTab = null;
+            }
+
+            return;
+        }
+
+        if (value.SelectedTab is null || !value.Tabs.Contains(value.SelectedTab))
+        {
+            value.SelectedTab = value.Tabs[0];
+        }
+
+        if (!ReferenceEquals(SelectedWorkspaceTab, value.SelectedTab))
+        {
+            SelectedWorkspaceTab = value.SelectedTab;
+        }
+    }
+
     partial void OnSelectedWorkspaceTabChanged(WorkspaceTabItemViewModel? value)
     {
+        if (value is not null)
+        {
+            var owningPane = ResolvePaneByTab(value);
+            if (owningPane is not null && !ReferenceEquals(SelectedWorkspacePane, owningPane))
+            {
+                SelectedWorkspacePane = owningPane;
+            }
+
+            if (owningPane is not null && !ReferenceEquals(owningPane.SelectedTab, value))
+            {
+                owningPane.SelectedTab = value;
+            }
+        }
+        else if (SelectedWorkspacePane is not null && SelectedWorkspacePane.SelectedTab is not null)
+        {
+            SelectedWorkspacePane.SelectedTab = null;
+        }
+
         OnPropertyChanged(nameof(SelectedTab));
         SyncActiveWorkspaceTabs();
         RuntimeLogger.Info(
@@ -1079,6 +1231,27 @@ public partial class MainWindowViewModel : ViewModelBase
         OnPropertyChanged(nameof(AssetsExpandCollapseToolTip));
     }
 
+    partial void OnIsWorkspaceDragOverlayVisibleChanged(bool value)
+    {
+        _ = value;
+        OnPropertyChanged(nameof(IsWorkspacePaneHoverActive));
+    }
+
+    partial void OnWorkspaceDragHoverPaneIdChanged(string? value)
+    {
+        _ = value;
+        OnPropertyChanged(nameof(IsWorkspacePaneHoverActive));
+    }
+
+    partial void OnWorkspaceDragHoverDirectionChanged(WorkspaceDropDirection? value)
+    {
+        _ = value;
+        OnPropertyChanged(nameof(IsWorkspaceDropSlotLeftHot));
+        OnPropertyChanged(nameof(IsWorkspaceDropSlotRightHot));
+        OnPropertyChanged(nameof(IsWorkspaceDropSlotTopHot));
+        OnPropertyChanged(nameof(IsWorkspaceDropSlotBottomHot));
+    }
+
     private bool IsDarkTheme
     {
         get
@@ -1098,6 +1271,19 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
+    private void InitializeWorkspacePanes()
+    {
+        WorkspacePanes.Clear();
+
+        var rootPaneId = _workspaceLayoutService.Root is PaneNode rootPane
+            ? rootPane.PaneId
+            : "pane-1";
+        _workspaceLayoutService.InitializeRootPane(rootPaneId);
+
+        var pane = GetOrCreateWorkspacePane(rootPaneId);
+        SelectedWorkspacePane = pane;
+    }
+
     private void InitializeWorkspaceTabs()
     {
         var quickStart = BuildWorkspaceTab(
@@ -1110,6 +1296,307 @@ public partial class MainWindowViewModel : ViewModelBase
         WorkspaceTabs.Add(quickStart);
         SelectedWorkspaceTab = quickStart;
         RuntimeLogger.Info("tab-init", $"Initialized default tabs. count={WorkspaceTabs.Count}");
+    }
+
+    private WorkspacePaneViewModel ResolveActiveWorkspacePane()
+    {
+        if (SelectedWorkspacePane is not null)
+        {
+            return SelectedWorkspacePane;
+        }
+
+        if (WorkspacePanes.Count == 0)
+        {
+            GetOrCreateWorkspacePane("pane-1");
+        }
+
+        SelectedWorkspacePane = WorkspacePanes[0];
+        return WorkspacePanes[0];
+    }
+
+    public WorkspacePaneViewModel GetOrCreateWorkspacePane(string paneId)
+    {
+        if (string.IsNullOrWhiteSpace(paneId))
+        {
+            throw new ArgumentException("Pane id cannot be null or whitespace.", nameof(paneId));
+        }
+
+        foreach (var pane in WorkspacePanes)
+        {
+            if (string.Equals(pane.PaneId, paneId, StringComparison.Ordinal))
+            {
+                return pane;
+            }
+        }
+
+        var created = new WorkspacePaneViewModel(paneId);
+        WorkspacePanes.Add(created);
+        return created;
+    }
+
+    private WorkspacePaneViewModel? ResolvePaneByTab(WorkspaceTabItemViewModel tab)
+    {
+        foreach (var pane in WorkspacePanes)
+        {
+            if (pane.Tabs.Contains(tab))
+            {
+                return pane;
+            }
+        }
+
+        return null;
+    }
+
+    private WorkspacePaneViewModel? ResolvePaneById(string paneId)
+    {
+        if (string.IsNullOrWhiteSpace(paneId))
+        {
+            return null;
+        }
+
+        foreach (var pane in WorkspacePanes)
+        {
+            if (string.Equals(pane.PaneId, paneId, StringComparison.Ordinal))
+            {
+                return pane;
+            }
+        }
+
+        return null;
+    }
+
+    private WorkspaceTabItemViewModel? ResolveTabFromDragSession(WorkspaceDragSession session)
+    {
+        if (session.TabReference is WorkspaceTabItemViewModel tabFromReference)
+        {
+            return tabFromReference;
+        }
+
+        foreach (var pane in WorkspacePanes)
+        {
+            var matched = pane.Tabs.FirstOrDefault(tab =>
+                string.Equals(tab.Id, session.TabId, StringComparison.Ordinal));
+            if (matched is not null)
+            {
+                return matched;
+            }
+        }
+
+        return null;
+    }
+
+    private static int NormalizeInsertionIndex(int? index, int itemCount)
+    {
+        if (!index.HasValue)
+        {
+            return itemCount;
+        }
+
+        if (index.Value <= 0)
+        {
+            return 0;
+        }
+
+        return index.Value >= itemCount ? itemCount : index.Value;
+    }
+
+    private bool TryRecycleWorkspacePaneIfEmpty(WorkspacePaneViewModel pane)
+    {
+        if (pane.Tabs.Count > 0)
+        {
+            return false;
+        }
+
+        if (!_workspaceLayoutService.RecyclePaneIfEmpty(pane.PaneId))
+        {
+            return false;
+        }
+
+        WorkspacePanes.Remove(pane);
+        if (ReferenceEquals(SelectedWorkspacePane, pane))
+        {
+            SelectedWorkspacePane = WorkspacePanes.FirstOrDefault();
+        }
+
+        return true;
+    }
+
+    public bool CompleteWorkspaceDragDrop(string targetPaneId, WorkspaceDropDirection? dropDirection, int? targetIndex = null)
+    {
+        var session = CommitWorkspaceDragPreview();
+        if (session is null)
+        {
+            return false;
+        }
+
+        var draggedTab = ResolveTabFromDragSession(session);
+        if (draggedTab is null)
+        {
+            RuntimeLogger.Warn(
+                "workspace-drag",
+                $"Drop failed: cannot resolve dragged tab. tab_id={session.TabId}");
+            return false;
+        }
+
+        var sourcePane = ResolvePaneById(session.SourcePaneId) ?? ResolvePaneByTab(draggedTab);
+        var targetPane = ResolvePaneById(targetPaneId);
+        if (sourcePane is null || targetPane is null)
+        {
+            RuntimeLogger.Warn(
+                "workspace-drag",
+                $"Drop failed: pane missing. source={session.SourcePaneId}, target={targetPaneId}, tab_id={session.TabId}");
+            return false;
+        }
+
+        var layoutChanged = false;
+        if (dropDirection is null)
+        {
+            if (!_workspaceLayoutService.MoveTab(sourcePane.PaneId, targetPane.PaneId, draggedTab.Id, targetIndex))
+            {
+                RuntimeLogger.Warn(
+                    "workspace-drag",
+                    $"Drop move rejected by layout service. source={sourcePane.PaneId}, target={targetPane.PaneId}, tab_id={draggedTab.Id}");
+                return false;
+            }
+
+            if (ReferenceEquals(sourcePane, targetPane))
+            {
+                var currentIndex = sourcePane.Tabs.IndexOf(draggedTab);
+                if (currentIndex >= 0)
+                {
+                    sourcePane.Tabs.RemoveAt(currentIndex);
+                    var insertionIndex = NormalizeInsertionIndex(targetIndex, sourcePane.Tabs.Count);
+                    sourcePane.Tabs.Insert(insertionIndex, draggedTab);
+                }
+            }
+            else
+            {
+                sourcePane.Tabs.Remove(draggedTab);
+                var insertionIndex = NormalizeInsertionIndex(targetIndex, targetPane.Tabs.Count);
+                targetPane.Tabs.Insert(insertionIndex, draggedTab);
+                layoutChanged = TryRecycleWorkspacePaneIfEmpty(sourcePane);
+            }
+
+            SelectedWorkspacePane = targetPane;
+            SelectedWorkspaceTab = draggedTab;
+            if (layoutChanged)
+            {
+                OnPropertyChanged(nameof(WorkspaceLayoutRoot));
+            }
+
+            return true;
+        }
+
+        if (_workspaceLayoutService.PaneIds.Count >= MaxWorkspacePaneCount)
+        {
+            LastAssetActionMessage = $"已达到最多 {MaxWorkspacePaneCount} 个分屏，无法继续分屏";
+            RuntimeLogger.Warn(
+                "workspace-drag",
+                $"Split rejected by pane limit. limit={MaxWorkspacePaneCount}, current={_workspaceLayoutService.PaneIds.Count}");
+            return false;
+        }
+
+        var movedForSplitPreparation = false;
+        var sourceOriginalIndex = -1;
+        if (!ReferenceEquals(sourcePane, targetPane))
+        {
+            sourceOriginalIndex = sourcePane.Tabs.IndexOf(draggedTab);
+            if (!_workspaceLayoutService.MoveTab(sourcePane.PaneId, targetPane.PaneId, draggedTab.Id))
+            {
+                RuntimeLogger.Warn(
+                    "workspace-drag",
+                    $"Pre-split move rejected by layout service. source={sourcePane.PaneId}, target={targetPane.PaneId}, tab_id={draggedTab.Id}");
+                return false;
+            }
+
+            sourcePane.Tabs.Remove(draggedTab);
+            targetPane.Tabs.Add(draggedTab);
+            movedForSplitPreparation = true;
+        }
+
+        var knownPaneIds = _workspaceLayoutService.PaneIds.ToHashSet(StringComparer.Ordinal);
+        if (!_workspaceLayoutService.SplitAndMove(targetPane.PaneId, draggedTab.Id, dropDirection.Value))
+        {
+            RuntimeLogger.Warn(
+                "workspace-drag",
+                $"Split drop rejected by layout service. pane={targetPane.PaneId}, tab_id={draggedTab.Id}, direction={dropDirection.Value}");
+            if (movedForSplitPreparation)
+            {
+                int? rollbackIndexHint = sourceOriginalIndex >= 0 ? sourceOriginalIndex : null;
+                var rollbackIndex = NormalizeInsertionIndex(rollbackIndexHint, sourcePane.Tabs.Count);
+                _workspaceLayoutService.MoveTab(targetPane.PaneId, sourcePane.PaneId, draggedTab.Id, rollbackIndex);
+                targetPane.Tabs.Remove(draggedTab);
+                sourcePane.Tabs.Insert(rollbackIndex, draggedTab);
+                SelectedWorkspacePane = sourcePane;
+                SelectedWorkspaceTab = draggedTab;
+            }
+
+            return false;
+        }
+
+        var createdPaneId = _workspaceLayoutService.PaneIds.FirstOrDefault(id => !knownPaneIds.Contains(id));
+        if (string.IsNullOrWhiteSpace(createdPaneId))
+        {
+            RuntimeLogger.Warn(
+                "workspace-drag",
+                $"Split drop missing created pane id. pane={targetPane.PaneId}, tab_id={draggedTab.Id}, direction={dropDirection.Value}");
+            return false;
+        }
+
+        targetPane.Tabs.Remove(draggedTab);
+        var createdPane = GetOrCreateWorkspacePane(createdPaneId);
+        createdPane.Tabs.Add(draggedTab);
+        SelectedWorkspacePane = createdPane;
+        SelectedWorkspaceTab = draggedTab;
+
+        if (!ReferenceEquals(sourcePane, targetPane))
+        {
+            layoutChanged = TryRecycleWorkspacePaneIfEmpty(sourcePane);
+        }
+
+        OnPropertyChanged(nameof(WorkspaceLayoutRoot));
+        return true;
+    }
+
+    public void BeginWorkspaceDragPreview(string sourcePaneId, string tabId, WorkspaceTabItemViewModel? tabReference = null)
+    {
+        _dragSessionService.Start(sourcePaneId, tabId, tabReference);
+        IsWorkspaceDragOverlayVisible = true;
+        WorkspaceDragHoverPaneId = sourcePaneId;
+        WorkspaceDragHoverDirection = null;
+    }
+
+    public void UpdateWorkspaceDragPreview(string targetPaneId, WorkspaceDropDirection? dropDirection)
+    {
+        if (!_dragSessionService.IsActive)
+        {
+            return;
+        }
+
+        _dragSessionService.UpdateHover(targetPaneId, dropDirection);
+        IsWorkspaceDragOverlayVisible = true;
+        WorkspaceDragHoverPaneId = targetPaneId;
+        WorkspaceDragHoverDirection = dropDirection;
+    }
+
+    public WorkspaceDragSession? CommitWorkspaceDragPreview()
+    {
+        var session = _dragSessionService.Commit();
+        ClearWorkspaceDragOverlayState();
+        return session;
+    }
+
+    public void CancelWorkspaceDragPreview()
+    {
+        _dragSessionService.Cancel();
+        ClearWorkspaceDragOverlayState();
+    }
+
+    private void ClearWorkspaceDragOverlayState()
+    {
+        IsWorkspaceDragOverlayVisible = false;
+        WorkspaceDragHoverPaneId = null;
+        WorkspaceDragHoverDirection = null;
     }
 
     private void InitializeQuickStartRecentConnections()
@@ -1463,14 +1950,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void DisposeTabConnection(WorkspaceTabItemViewModel tab)
     {
-        var connectionId = tab.ConnectionConfig?.ConnectionId;
-        if (string.IsNullOrWhiteSpace(connectionId))
-        {
-            return;
-        }
-
-        _ = _sshConnectionService.DisconnectAsync(connectionId);
-        RuntimeLogger.Info("tab-dispose", $"Requested session dispose. tab_id={tab.Id}, conn_id={connectionId}");
+        _ = _sessionRegistryService.DisposeAsync(tab.Id);
+        RuntimeLogger.Info("tab-dispose", $"Requested session dispose. tab_id={tab.Id}");
     }
 
     private static string GetAppVersion()
@@ -2009,9 +2490,12 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void SyncActiveWorkspaceTabs()
     {
-        foreach (var tab in WorkspaceTabs)
+        foreach (var pane in WorkspacePanes)
         {
-            tab.IsActive = ReferenceEquals(tab, SelectedWorkspaceTab);
+            foreach (var tab in pane.Tabs)
+            {
+                tab.IsActive = ReferenceEquals(tab, SelectedWorkspaceTab);
+            }
         }
     }
 }

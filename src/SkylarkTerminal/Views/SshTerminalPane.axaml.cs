@@ -25,7 +25,7 @@ public partial class SshTerminalPane : UserControl
     public static readonly StyledProperty<WorkspaceTabItemViewModel?> TabProperty =
         AvaloniaProperty.Register<SshTerminalPane, WorkspaceTabItemViewModel?>(nameof(Tab));
 
-    private readonly ISshConnectionService _sshConnectionService;
+    private readonly ISessionRegistryService _sessionRegistryService;
     private readonly ConcurrentQueue<string> _outputQueue = new();
     private readonly SemaphoreSlim _connectLock = new(1, 1);
     private readonly DispatcherTimer _resizeDebounceTimer;
@@ -47,7 +47,8 @@ public partial class SshTerminalPane : UserControl
     public SshTerminalPane()
     {
         InitializeComponent();
-        _sshConnectionService = ResolveSshConnectionService();
+        var sshConnectionService = ResolveSshConnectionService();
+        _sessionRegistryService = ResolveSessionRegistryService(sshConnectionService);
 
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
@@ -116,6 +117,7 @@ public partial class SshTerminalPane : UserControl
         UnhookTerminalEvents();
         _resizeDebounceTimer.Stop();
         _connectCts?.Cancel();
+        DetachSessionSubscriptions();
         AttachHostViewModel(null);
         RuntimeLogger.Info("terminal-ui", $"Pane unloaded. tab_id={_tabIdForLogs}");
     }
@@ -155,20 +157,25 @@ public partial class SshTerminalPane : UserControl
         {
             _connectCts?.Cancel();
             _connectCts = new CancellationTokenSource();
+            var connectToken = _connectCts.Token;
 
             var tab = ResolveTab();
             var config = tab?.ConnectionConfig;
             if (tab is null || config is null)
             {
-                await DisconnectSessionAsync().ConfigureAwait(false);
+                DetachSessionSubscriptions();
                 ShowQuickStart(tab);
                 return;
             }
 
-            if (!reconnect &&
-                _session is not null &&
-                _session.IsConnected &&
-                string.Equals(_session.SessionId, config.ConnectionId, StringComparison.Ordinal))
+            if (reconnect)
+            {
+                DetachSessionSubscriptions();
+                await _sessionRegistryService.DisposeAsync(tab.Id).ConfigureAwait(false);
+            }
+            else if (_session is not null &&
+                     _session.IsConnected &&
+                     string.Equals(_session.SessionId, config.ConnectionId, StringComparison.Ordinal))
             {
                 SetState(
                     SessionState.Connected,
@@ -182,26 +189,21 @@ public partial class SshTerminalPane : UserControl
             }
 
             SetState(SessionState.Connecting, $"Connecting to {config.Host}:{config.Port} ...");
-            await DisconnectSessionAsync().ConfigureAwait(false);
 
             RuntimeLogger.Info(
                 "terminal-ui",
                 $"Terminal connect begin. tab_id={tab.Id}, conn_id={config.ConnectionId}, host={config.Host}, port={config.Port}");
 
-            var session = await _sshConnectionService
-                .CreateTerminalSessionAsync(config, _connectCts.Token)
+            var handle = await _sessionRegistryService
+                .GetOrCreateAsync(tab.Id, config, connectToken)
                 .ConfigureAwait(false);
 
-            if (_connectCts.IsCancellationRequested)
+            if (connectToken.IsCancellationRequested)
             {
-                session.Dispose();
                 return;
             }
 
-            session.OutputReceived += OnSessionOutputReceived;
-            session.Closed += OnSessionClosed;
-            session.Faulted += OnSessionFaulted;
-            _session = session;
+            AttachSessionSubscriptions(handle.Session);
             _lastColumns = 0;
             _lastRows = 0;
             _firstPayloadLogged = false;
@@ -384,7 +386,17 @@ public partial class SshTerminalPane : UserControl
         _tabHostForLogs = tab?.ConnectionConfig?.Host ?? "<none>";
     }
 
-    private async Task DisconnectSessionAsync()
+    private void AttachSessionSubscriptions(ISshTerminalSession session)
+    {
+        ArgumentNullException.ThrowIfNull(session);
+        DetachSessionSubscriptions();
+        session.OutputReceived += OnSessionOutputReceived;
+        session.Closed += OnSessionClosed;
+        session.Faulted += OnSessionFaulted;
+        _session = session;
+    }
+
+    private void DetachSessionSubscriptions()
     {
         var current = _session;
         if (current is null)
@@ -396,19 +408,6 @@ public partial class SshTerminalPane : UserControl
         current.OutputReceived -= OnSessionOutputReceived;
         current.Closed -= OnSessionClosed;
         current.Faulted -= OnSessionFaulted;
-
-        try
-        {
-            await current.DisconnectAsync().ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            RuntimeLogger.Error("terminal-ui", $"Disconnect session failed. session={current.SessionId}", ex);
-        }
-        finally
-        {
-            current.Dispose();
-        }
     }
 
     private void OnSessionOutputReceived(object? sender, string data)
@@ -436,7 +435,12 @@ public partial class SshTerminalPane : UserControl
     {
         if (sender is ISshTerminalSession session && ReferenceEquals(_session, session))
         {
-            _session = null;
+            DetachSessionSubscriptions();
+            var tab = ResolveTab();
+            if (tab is not null)
+            {
+                _sessionRegistryService.TryDetach(tab.Id, out _);
+            }
         }
 
         RuntimeLogger.Warn(
@@ -457,7 +461,12 @@ public partial class SshTerminalPane : UserControl
     {
         if (sender is ISshTerminalSession session && ReferenceEquals(_session, session))
         {
-            _session = null;
+            DetachSessionSubscriptions();
+            var tab = ResolveTab();
+            if (tab is not null)
+            {
+                _sessionRegistryService.TryDetach(tab.Id, out _);
+            }
         }
 
         RuntimeLogger.Error("terminal-ui", "Terminal session faulted.", exception);
@@ -983,5 +992,15 @@ public partial class SshTerminalPane : UserControl
         }
 
         return new MockSshConnectionService();
+    }
+
+    private static ISessionRegistryService ResolveSessionRegistryService(ISshConnectionService sshConnectionService)
+    {
+        if (Application.Current is App app && app.Services is not null)
+        {
+            return app.Services.GetRequiredService<ISessionRegistryService>();
+        }
+
+        return new SessionRegistryService(sshConnectionService);
     }
 }

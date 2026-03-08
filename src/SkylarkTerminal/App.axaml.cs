@@ -48,6 +48,9 @@ public partial class App : Application
         services.AddSingleton<IClipboardService, ClipboardService>();
         services.AddSingleton<ISshConnectionService, SshConnectionService>();
         services.AddSingleton<ISftpService, MockSftpService>();
+        services.AddSingleton<IWorkspaceLayoutService, WorkspaceLayoutService>();
+        services.AddSingleton<IDragSessionService, DragSessionService>();
+        services.AddSingleton<ISessionRegistryService, SessionRegistryService>();
         services.AddSingleton<MainWindowViewModel>();
         services.AddSingleton<MainWindow>(provider => new MainWindow
         {

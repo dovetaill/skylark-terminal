@@ -1,0 +1,195 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SkylarkTerminal.ViewModels"
+             xmlns:views="using:SkylarkTerminal.Views"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             x:Class="SkylarkTerminal.Views.WorkspacePaneHost"
+             x:CompileBindings="False">
+    <ui:TabView TabItems="{Binding Pane.Tabs, RelativeSource={RelativeSource AncestorType=views:WorkspacePaneHost}}"
+                SelectedItem="{Binding Pane.SelectedTab, RelativeSource={RelativeSource AncestorType=views:WorkspacePaneHost}, Mode=TwoWay}"
+                Margin="0"
+                Padding="0"
+                Background="Transparent"
+                IsAddTabButtonVisible="False"
+                TabWidthMode="SizeToContent"
+                CanReorderTabs="True"
+                CanDragTabs="True"
+                AllowDropTabs="True"
+                CloseButtonOverlayMode="OnPointerOver"
+                SelectionChanged="OnWorkspaceTabSelectionChanged"
+                PointerPressed="OnWorkspaceTabViewPointerPressed"
+                TabDragStarting="OnWorkspaceTabDragStarting"
+                TabDragCompleted="OnWorkspaceTabDragCompleted"
+                TabStripDragOver="OnWorkspaceTabStripDragOver"
+                TabStripDrop="OnWorkspaceTabStripDrop"
+                TabCloseRequested="OnWorkspaceTabCloseRequested">
+        <ui:TabView.ContextFlyout>
+            <ui:FAMenuFlyout FlyoutPresenterClasses="workspace-tabstrip-context-flyout">
+                <ui:MenuFlyoutItem Text="操作"
+                                   IsEnabled="False"
+                                   Classes="WorkspaceContextTitleItem"/>
+                <ui:MenuFlyoutSeparator/>
+                <ui:MenuFlyoutItem Text="新建标签"
+                                   Classes="WorkspaceContextActionItem"
+                                   Command="{Binding CreateWorkspaceTabCommand}">
+                    <ui:MenuFlyoutItem.IconSource>
+                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE710;"/>
+                    </ui:MenuFlyoutItem.IconSource>
+                </ui:MenuFlyoutItem>
+                <ui:MenuFlyoutItem Text="关闭当前标签"
+                                   Classes="WorkspaceContextActionItem"
+                                   Command="{Binding CloseTabCommand}"
+                                   CommandParameter="{x:Null}">
+                    <ui:MenuFlyoutItem.IconSource>
+                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE711;"/>
+                    </ui:MenuFlyoutItem.IconSource>
+                </ui:MenuFlyoutItem>
+                <ui:MenuFlyoutSeparator/>
+                <ui:MenuFlyoutItem Text="关闭其他标签"
+                                   Classes="WorkspaceContextActionItem"
+                                   Command="{Binding CloseOtherTabsCommand}"
+                                   CommandParameter="{x:Null}">
+                    <ui:MenuFlyoutItem.IconSource>
+                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE74D;"/>
+                    </ui:MenuFlyoutItem.IconSource>
+                </ui:MenuFlyoutItem>
+                <ui:MenuFlyoutItem Text="关闭全部标签"
+                                   Classes="WorkspaceContextActionItem"
+                                   Command="{Binding CloseAllTabsCommand}">
+                    <ui:MenuFlyoutItem.IconSource>
+                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8BB;"/>
+                    </ui:MenuFlyoutItem.IconSource>
+                </ui:MenuFlyoutItem>
+                <ui:MenuFlyoutSeparator/>
+                <ui:MenuFlyoutItem Text="显示 Snippets"
+                                   Classes="WorkspaceContextActionItem"
+                                   Command="{Binding ShowSnippetsToolsCommand}">
+                    <ui:MenuFlyoutItem.IconSource>
+                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8D2;"/>
+                    </ui:MenuFlyoutItem.IconSource>
+                </ui:MenuFlyoutItem>
+                <ui:MenuFlyoutItem Text="显示 History"
+                                   Classes="WorkspaceContextActionItem"
+                                   Command="{Binding ShowHistoryToolsCommand}">
+                    <ui:MenuFlyoutItem.IconSource>
+                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE81C;"/>
+                    </ui:MenuFlyoutItem.IconSource>
+                </ui:MenuFlyoutItem>
+                <ui:MenuFlyoutItem Text="显示 SFTP"
+                                   Classes="WorkspaceContextActionItem"
+                                   Command="{Binding ShowSftpToolsCommand}">
+                    <ui:MenuFlyoutItem.IconSource>
+                        <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8B7;"/>
+                    </ui:MenuFlyoutItem.IconSource>
+                </ui:MenuFlyoutItem>
+            </ui:FAMenuFlyout>
+        </ui:TabView.ContextFlyout>
+        <ui:TabView.TabStripFooter>
+            <Button Classes="TabStripActionButton"
+                    Command="{Binding CreateWorkspaceTabCommand}"
+                    ToolTip.Tip="新建标签">
+                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                           FontSize="11"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Text="&#xE710;"/>
+            </Button>
+        </ui:TabView.TabStripFooter>
+        <ui:TabView.TabItemTemplate>
+            <DataTemplate DataType="vm:WorkspaceTabItemViewModel">
+                <ui:TabViewItem IsClosable="True">
+                    <ui:TabViewItem.Header>
+                        <Border Margin="0"
+                                Height="28"
+                                Padding="10,0,8,0"
+                                CornerRadius="0"
+                                ClipToBounds="True"
+                                Background="{Binding HeaderBackgroundBrush}"
+                                BorderBrush="{DynamicResource ShellTabSelectionBorderBrush}"
+                                BorderThickness="{Binding HeaderBottomBorderThickness}">
+                            <StackPanel Orientation="Horizontal"
+                                        VerticalAlignment="Center"
+                                        Spacing="5">
+                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                           FontSize="11"
+                                           VerticalAlignment="Center"
+                                           Opacity="{Binding HeaderOpacity}"
+                                           Text="&#xE756;"/>
+                                <TextBlock FontWeight="{Binding HeaderFontWeight}"
+                                           FontSize="12"
+                                           VerticalAlignment="Center"
+                                           Opacity="{Binding HeaderOpacity}"
+                                           Text="{Binding Header}"
+                                           TextTrimming="CharacterEllipsis"
+                                           TextWrapping="NoWrap"
+                                           MaxWidth="420"/>
+                            </StackPanel>
+                        </Border>
+                    </ui:TabViewItem.Header>
+                    <ui:TabViewItem.ContextFlyout>
+                        <ui:FAMenuFlyout FlyoutPresenterClasses="workspace-tabitem-context-flyout">
+                            <ui:MenuFlyoutItem Text="操作"
+                                               IsEnabled="False"
+                                               Classes="WorkspaceContextTitleItem"/>
+                            <ui:MenuFlyoutSeparator/>
+                            <ui:MenuFlyoutItem Text="复制标签"
+                                               Classes="WorkspaceContextActionItem"
+                                               Tag="duplicate"
+                                               Click="OnWorkspaceTabContextActionClick">
+                                <ui:MenuFlyoutItem.IconSource>
+                                    <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8C8;"/>
+                                </ui:MenuFlyoutItem.IconSource>
+                            </ui:MenuFlyoutItem>
+                            <ui:MenuFlyoutSeparator/>
+                            <ui:MenuFlyoutItem Text="关闭当前标签"
+                                               Classes="WorkspaceContextActionItem"
+                                               Tag="close"
+                                               Click="OnWorkspaceTabContextActionClick">
+                                <ui:MenuFlyoutItem.IconSource>
+                                    <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE711;"/>
+                                </ui:MenuFlyoutItem.IconSource>
+                            </ui:MenuFlyoutItem>
+                            <ui:MenuFlyoutItem Text="关闭其他标签"
+                                               Classes="WorkspaceContextActionItem"
+                                               Tag="close-others"
+                                               Click="OnWorkspaceTabContextActionClick">
+                                <ui:MenuFlyoutItem.IconSource>
+                                    <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE74D;"/>
+                                </ui:MenuFlyoutItem.IconSource>
+                            </ui:MenuFlyoutItem>
+                            <ui:MenuFlyoutItem Text="关闭左侧标签页"
+                                               Classes="WorkspaceContextActionItem"
+                                               Tag="close-left"
+                                               Click="OnWorkspaceTabContextActionClick">
+                                <ui:MenuFlyoutItem.IconSource>
+                                    <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE76B;"/>
+                                </ui:MenuFlyoutItem.IconSource>
+                            </ui:MenuFlyoutItem>
+                            <ui:MenuFlyoutItem Text="关闭右侧标签页"
+                                               Classes="WorkspaceContextActionItem"
+                                               Tag="close-right"
+                                               Click="OnWorkspaceTabContextActionClick">
+                                <ui:MenuFlyoutItem.IconSource>
+                                    <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE76C;"/>
+                                </ui:MenuFlyoutItem.IconSource>
+                            </ui:MenuFlyoutItem>
+                            <ui:MenuFlyoutSeparator/>
+                            <ui:MenuFlyoutItem Text="关闭全部标签"
+                                               Classes="WorkspaceContextActionItem"
+                                               Tag="close-all"
+                                               Click="OnWorkspaceTabContextActionClick">
+                                <ui:MenuFlyoutItem.IconSource>
+                                    <ui:FontIconSource FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8BB;"/>
+                                </ui:MenuFlyoutItem.IconSource>
+                            </ui:MenuFlyoutItem>
+                        </ui:FAMenuFlyout>
+                    </ui:TabViewItem.ContextFlyout>
+                    <ui:TabViewItem.Content>
+                        <views:SshTerminalPane Tab="{Binding}"
+                                               DataContext="{Binding}"/>
+                    </ui:TabViewItem.Content>
+                </ui:TabViewItem>
+            </DataTemplate>
+        </ui:TabView.TabItemTemplate>
+    </ui:TabView>
+</UserControl>

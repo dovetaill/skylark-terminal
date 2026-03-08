@@ -1,0 +1,56 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="SkylarkTerminal.Views.WorkspaceDragOverlay"
+             x:CompileBindings="False"
+             IsVisible="{Binding IsWorkspaceDragOverlayVisible}"
+             IsHitTestVisible="False">
+    <UserControl.Styles>
+        <Style Selector="Border.WorkspaceDropSlot">
+            <Setter Property="Background" Value="{DynamicResource Terminal.Overlay.CardBackground}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Terminal.Overlay.CardBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Opacity" Value="0.72"/>
+        </Style>
+        <Style Selector="Border.WorkspaceDropSlot.Hot">
+            <Setter Property="Background" Value="{DynamicResource Terminal.Overlay.PanelBackground}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ShellTerminalAccentTextBrush}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid>
+        <Border Background="{DynamicResource Terminal.Overlay.Background}"
+                Opacity="0.24"/>
+
+        <Border Margin="16"
+                IsVisible="{Binding IsWorkspacePaneHoverActive}"
+                Background="{DynamicResource Terminal.Overlay.PanelBackground}"
+                BorderBrush="{DynamicResource Terminal.Overlay.PanelBorder}"
+                BorderThickness="1"
+                CornerRadius="10"
+                Opacity="0.35"/>
+
+        <Grid Margin="24"
+              RowDefinitions="*,3*,*"
+              ColumnDefinitions="*,3*,*">
+            <Border Grid.Row="0"
+                    Grid.Column="1"
+                    Classes="WorkspaceDropSlot"
+                    Classes.Hot="{Binding IsWorkspaceDropSlotTopHot}"/>
+            <Border Grid.Row="1"
+                    Grid.Column="0"
+                    Classes="WorkspaceDropSlot"
+                    Classes.Hot="{Binding IsWorkspaceDropSlotLeftHot}"/>
+            <Border Grid.Row="1"
+                    Grid.Column="2"
+                    Classes="WorkspaceDropSlot"
+                    Classes.Hot="{Binding IsWorkspaceDropSlotRightHot}"/>
+            <Border Grid.Row="2"
+                    Grid.Column="1"
+                    Classes="WorkspaceDropSlot"
+                    Classes.Hot="{Binding IsWorkspaceDropSlotBottomHot}"/>
+        </Grid>
+    </Grid>
+</UserControl>
