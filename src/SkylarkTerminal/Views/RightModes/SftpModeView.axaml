@@ -4,17 +4,63 @@
              xmlns:views="using:SkylarkTerminal.Views"
              x:Class="SkylarkTerminal.Views.RightModes.SftpModeView"
              x:CompileBindings="False">
-    <ListBox ItemsSource="{Binding DataContext.SftpItems, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
-        <ListBox.ItemTemplate>
-            <DataTemplate DataType="models:RemoteFileNode">
-                <Grid ColumnDefinitions="*,Auto"
-                      Margin="0">
-                    <TextBlock Text="{Binding Name}"/>
-                    <TextBlock Grid.Column="1"
-                               Opacity="0.72"
-                               Text="{Binding FullPath}"/>
-                </Grid>
-            </DataTemplate>
-        </ListBox.ItemTemplate>
-    </ListBox>
+    <Grid RowDefinitions="Auto,*">
+        <Border Grid.Row="0"
+                Padding="0,0,0,8">
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto"
+                  ColumnSpacing="6">
+                <Button Grid.Column="0"
+                        Classes="TitleBarButton"
+                        ToolTip.Tip="Back"
+                        Command="{Binding DataContext.ActiveRightMode.BackCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               Text="&#xE72B;"/>
+                </Button>
+                <Button Grid.Column="1"
+                        Classes="TitleBarButton"
+                        ToolTip.Tip="Forward"
+                        Command="{Binding DataContext.ActiveRightMode.ForwardCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               Text="&#xE72A;"/>
+                </Button>
+                <TextBox Grid.Column="2"
+                         Watermark="/"
+                         Text="{Binding DataContext.ActiveRightMode.AddressInput, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}">
+                    <TextBox.KeyBindings>
+                        <KeyBinding Gesture="Enter"
+                                    Command="{Binding DataContext.ActiveRightMode.AddressCommitCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"/>
+                    </TextBox.KeyBindings>
+                </TextBox>
+                <Button Grid.Column="3"
+                        Classes="TitleBarButton"
+                        ToolTip.Tip="Refresh"
+                        Command="{Binding DataContext.ActiveRightMode.RefreshCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               Text="&#xE72C;"/>
+                </Button>
+                <Button Grid.Column="4"
+                        Classes="TitleBarButton"
+                        ToolTip.Tip="Up"
+                        Command="{Binding DataContext.ActiveRightMode.UpCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               Text="&#xE74A;"/>
+                </Button>
+            </Grid>
+        </Border>
+
+        <ListBox Grid.Row="1"
+                 ItemsSource="{Binding DataContext.SftpItems, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="models:RemoteFileNode">
+                    <Grid ColumnDefinitions="*,Auto"
+                          Margin="0">
+                        <TextBlock Text="{Binding Name}"/>
+                        <TextBlock Grid.Column="1"
+                                   Opacity="0.72"
+                                   Text="{Binding FullPath}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
 </UserControl>
