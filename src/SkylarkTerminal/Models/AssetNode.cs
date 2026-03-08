@@ -36,6 +36,9 @@ public abstract partial class AssetNode : ObservableObject
     [ObservableProperty]
     private string editName = string.Empty;
 
+    [ObservableProperty]
+    private double quickLocateHighlightOpacity;
+
     public ObservableCollection<AssetNode> Children { get; }
 
     public bool IsFolder => this is FolderNode;

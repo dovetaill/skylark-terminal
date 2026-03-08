@@ -1,6 +1,9 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/SkylarkTerminal/SkylarkTerminal.csproj" />
+    <Folder Name="/src/ThirdParty/">
+      <Project Path="src/ThirdParty/Iciclecreek.Avalonia.Terminal.Fork/Iciclecreek.Avalonia.Terminal.Fork.csproj" />
+    </Folder>
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/SkylarkTerminal.Tests/SkylarkTerminal.Tests.csproj" />

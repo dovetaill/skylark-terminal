@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:terminal="using:Iciclecreek.Terminal"
+             xmlns:terminalFork="using:Iciclecreek.Avalonia.Terminal.Fork"
              xmlns:ui="using:FluentAvalonia.UI.Controls"
              xmlns:models="using:SkylarkTerminal.Models"
              x:Class="SkylarkTerminal.Views.SshTerminalPane">
@@ -18,14 +19,14 @@
         </ui:InfoBar>
 
         <Grid Grid.Row="1">
-            <terminal:TerminalView x:Name="TerminalHost"
-                                   Process=""
-                                   Focusable="True"
-                                   FontFamily="Cascadia Mono, Consolas, Microsoft YaHei UI"
-                                   FontSize="13"
-                                   Background="{DynamicResource ShellTerminalBrush}"
-                                   Foreground="{DynamicResource ShellTerminalPrimaryTextBrush}">
-                <terminal:TerminalView.ContextFlyout>
+            <terminalFork:RowStripedTerminalView x:Name="TerminalHost"
+                                                 Process=""
+                                                 Focusable="True"
+                                                 FontFamily="Cascadia Mono, Consolas, Microsoft YaHei UI"
+                                                 FontSize="13"
+                                                 Background="{DynamicResource Terminal.Background}"
+                                                 Foreground="{DynamicResource Terminal.Foreground.Primary}">
+                <terminalFork:RowStripedTerminalView.ContextFlyout>
                     <ui:FAMenuFlyout>
                         <ui:MenuFlyoutItem Text="Copy"
                                           Click="OnCopyClick"/>
@@ -37,12 +38,12 @@
                         <ui:MenuFlyoutItem Text="Reconnect"
                                           Click="OnReconnectClick"/>
                     </ui:FAMenuFlyout>
-                </terminal:TerminalView.ContextFlyout>
-            </terminal:TerminalView>
+                </terminalFork:RowStripedTerminalView.ContextFlyout>
+            </terminalFork:RowStripedTerminalView>
 
             <Border x:Name="QuickStartOverlay"
                     IsVisible="False"
-                    Background="{DynamicResource ShellTerminalBrush}"
+                    Background="{DynamicResource Terminal.Background}"
                     Padding="34,24,34,22">
                 <Grid RowDefinitions="Auto,Auto,*"
                       RowSpacing="16">
@@ -51,10 +52,10 @@
                                    FontSize="30"
                                    FontStyle="Italic"
                                    FontWeight="SemiBold"
-                                   Foreground="{DynamicResource ShellTerminalPrimaryTextBrush}"/>
+                                   Foreground="{DynamicResource Terminal.Foreground.Primary}"/>
                         <TextBlock x:Name="QuickStartText"
                                    TextWrapping="Wrap"
-                                   Foreground="{DynamicResource ShellTerminalPrimaryTextBrush}"
+                                   Foreground="{DynamicResource Terminal.Foreground.Primary}"
                                    Opacity="0.88"
                                    FontSize="13"
                                    Text="选择最近连接，或从左侧 Hosts 资产快速打开 SSH 会话。"/>
@@ -64,10 +65,10 @@
                           ColumnDefinitions="*,Auto"
                           ColumnSpacing="10">
                         <Border Grid.Column="0"
-                                BorderBrush="#34FFFFFF"
+                                BorderBrush="{DynamicResource Terminal.Overlay.PanelBorder}"
                                 BorderThickness="1"
                                 CornerRadius="9"
-                                Background="#12FFFFFF"
+                                Background="{DynamicResource Terminal.Overlay.PanelBackground}"
                                 Padding="10,6">
                             <Grid ColumnDefinitions="Auto,*"
                                   ColumnSpacing="8">
@@ -77,7 +78,7 @@
                                            FontSize="13"
                                            Text="&#xE721;"
                                            Opacity="0.8"
-                                           Foreground="{DynamicResource ShellTerminalPrimaryTextBrush}"/>
+                                           Foreground="{DynamicResource Terminal.Foreground.Primary}"/>
                                 <TextBox x:Name="QuickStartSearchBox"
                                          Grid.Column="1"
                                          Background="Transparent"
@@ -94,27 +95,29 @@
                             <Button MinWidth="40"
                                     Height="36"
                                     Padding="10,0"
-                                    Background="#12FFFFFF"
-                                    BorderBrush="#26FFFFFF"
+                                    Background="{DynamicResource Terminal.Overlay.PanelBackground}"
+                                    BorderBrush="{DynamicResource Terminal.Overlay.PanelBorder}"
                                     BorderThickness="1"
                                     CornerRadius="9"
                                     ToolTip.Tip="定位到 Hosts 资产"
                                     Click="OnQuickStartBrowseHostsClick">
                                 <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                                            FontSize="13"
+                                           Foreground="{DynamicResource Terminal.Foreground.Primary}"
                                            Text="&#xE8A5;"/>
                             </Button>
                             <Button MinWidth="40"
                                     Height="36"
                                     Padding="10,0"
-                                    Background="#12FFFFFF"
-                                    BorderBrush="#26FFFFFF"
+                                    Background="{DynamicResource Terminal.Overlay.PanelBackground}"
+                                    BorderBrush="{DynamicResource Terminal.Overlay.PanelBorder}"
                                     BorderThickness="1"
                                     CornerRadius="9"
                                     ToolTip.Tip="新建标签"
                                     Click="OnQuickStartNewTabClick">
                                 <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                                            FontSize="13"
+                                           Foreground="{DynamicResource Terminal.Foreground.Primary}"
                                            Text="&#xE710;"/>
                             </Button>
                         </StackPanel>
@@ -139,10 +142,11 @@
                                                 Padding="14,12"
                                                 HorizontalContentAlignment="Stretch"
                                                 VerticalContentAlignment="Stretch"
-                                                Background="#18FFFFFF"
-                                                BorderBrush="#26FFFFFF"
+                                                Background="{DynamicResource Terminal.Overlay.CardBackground}"
+                                                BorderBrush="{DynamicResource Terminal.Overlay.CardBorder}"
                                                 BorderThickness="1"
                                                 CornerRadius="10"
+                                                Foreground="{DynamicResource Terminal.Foreground.Primary}"
                                                 Click="OnQuickStartConnectionClick">
                                             <Grid RowDefinitions="Auto,Auto,Auto,Auto"
                                                   RowSpacing="6">
@@ -150,7 +154,7 @@
                                                         Height="30"
                                                         CornerRadius="15"
                                                         HorizontalAlignment="Left"
-                                                        Background="#26FFFFFF">
+                                                        Background="{DynamicResource Terminal.Overlay.PanelBorder}">
                                                     <TextBlock HorizontalAlignment="Center"
                                                                VerticalAlignment="Center"
                                                                FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
@@ -166,12 +170,14 @@
                                                 <TextBlock Grid.Row="2"
                                                            FontSize="12"
                                                            Opacity="0.84"
+                                                           Foreground="{DynamicResource Terminal.Foreground.Muted}"
                                                            Text="{Binding EndpointLabel}"
                                                            TextTrimming="CharacterEllipsis"
                                                            MaxWidth="180"/>
                                                 <TextBlock Grid.Row="3"
                                                            FontSize="11"
                                                            Opacity="0.62"
+                                                           Foreground="{DynamicResource Terminal.Foreground.Muted}"
                                                            Text="{Binding LastUsedLabel}"
                                                            TextTrimming="CharacterEllipsis"
                                                            MaxWidth="180"/>
@@ -186,21 +192,21 @@
                                     Margin="0,36,0,0"
                                     Padding="24,20"
                                     HorizontalAlignment="Left"
-                                    BorderBrush="#24FFFFFF"
+                                    BorderBrush="{DynamicResource Terminal.Overlay.CardBorder}"
                                     BorderThickness="1"
                                     CornerRadius="10"
-                                    Background="#14FFFFFF">
+                                    Background="{DynamicResource Terminal.Overlay.CardBackground}">
                                 <StackPanel Spacing="4">
                                     <TextBlock Text="暂无最近连接"
                                                FontSize="15"
                                                FontWeight="SemiBold"
-                                               Foreground="{DynamicResource ShellTerminalPrimaryTextBrush}"/>
+                                               Foreground="{DynamicResource Terminal.Foreground.Primary}"/>
                                     <TextBlock Text="双击左侧 Hosts 资产中的主机，首次连接后会自动出现在这里。"
                                                FontSize="12"
                                                Opacity="0.76"
                                                TextWrapping="Wrap"
                                                MaxWidth="330"
-                                               Foreground="{DynamicResource ShellTerminalPrimaryTextBrush}"/>
+                                               Foreground="{DynamicResource Terminal.Foreground.Primary}"/>
                                 </StackPanel>
                             </Border>
                         </Grid>
@@ -209,7 +215,7 @@
             </Border>
 
             <Border x:Name="ConnectingOverlay"
-                    Background="#A010141A"
+                    Background="{DynamicResource Terminal.Overlay.Background}"
                     IsVisible="True">
                 <StackPanel HorizontalAlignment="Center"
                             VerticalAlignment="Center"
@@ -219,7 +225,7 @@
                                      Height="32"
                                      IsActive="True"/>
                     <TextBlock x:Name="ConnectingText"
-                               Foreground="{DynamicResource ShellTerminalPrimaryTextBrush}"
+                               Foreground="{DynamicResource Terminal.Foreground.Primary}"
                                FontSize="13"
                                FontWeight="SemiBold"
                                Text="Connecting..."

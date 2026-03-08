@@ -211,6 +211,12 @@ public partial class MainWindow : Window
         {
             ApplyShellVisualMode(_boundViewModel.IsShellTransparent);
         }
+        else if (e.PropertyName == nameof(MainWindowViewModel.PendingQuickStartLocateTarget))
+        {
+            Dispatcher.UIThread.Post(
+                EnsureFlatLocateTargetVisible,
+                DispatcherPriority.Background);
+        }
         else if (e.PropertyName == nameof(MainWindowViewModel.IsAssetsSearchOpen) &&
                  _boundViewModel.IsAssetsSearchOpen)
         {
@@ -355,7 +361,41 @@ public partial class MainWindow : Window
 
     private void ApplyShellPalette(bool isDarkTheme, bool isTransparent)
     {
-        (var window, var topBar, var rail, var assetsToolbar, var assetsHeaderSeparator, var assets, var workspace, var tools, var panel, var border, var divider, var tabActive, var tabInactive, var tabSelectionBorder, var terminal) =
+        (
+            var window,
+            var topBar,
+            var rail,
+            var assetsToolbar,
+            var assetsHeaderSeparator,
+            var assets,
+            var workspace,
+            var tools,
+            var panel,
+            var border,
+            var divider,
+            var tabActive,
+            var tabInactive,
+            var tabSelectionBorder,
+            var terminalBackground,
+            var terminalPrimary,
+            var terminalMuted,
+            var terminalRowEven,
+            var terminalRowOdd,
+            var terminalSelection,
+            var terminalCursor,
+            var terminalKeyword,
+            var terminalString,
+            var terminalNumber,
+            var terminalPath,
+            var terminalError,
+            var terminalWarn,
+            var terminalSuccess,
+            var terminalComment,
+            var terminalOverlayBackground,
+            var terminalOverlayPanelBackground,
+            var terminalOverlayPanelBorder,
+            var terminalOverlayCardBackground,
+            var terminalOverlayCardBorder) =
             (isDarkTheme, isTransparent) switch
             {
                 (true, true) => (
@@ -373,7 +413,26 @@ public partial class MainWindow : Window
                     "#CC2A303B",
                     "#B81C2129",
                     "#FFFFFFFF",
-                    "#CC10141A"),
+                    "#CC10141A",
+                    "#FFE6EDF7",
+                    "#B8E6EDF7",
+                    "#CC10141A",
+                    "#CC141A23",
+                    "#4D6EA8FE",
+                    "#FFE6EDF7",
+                    "#FF87B6FF",
+                    "#FF98D89E",
+                    "#FFF6C177",
+                    "#FF80CBC4",
+                    "#FFFF7B72",
+                    "#FFFFC857",
+                    "#FF6FD3A8",
+                    "#FF8B9BB4",
+                    "#A010141A",
+                    "#12FFFFFF",
+                    "#26FFFFFF",
+                    "#18FFFFFF",
+                    "#26FFFFFF"),
                 (false, true) => (
                     "#1AFFFFFF",
                     "#CCF5F6F8",
@@ -389,7 +448,26 @@ public partial class MainWindow : Window
                     "#CCE5EAF0",
                     "#CCF2F5F8",
                     "#FF000000",
-                    "#CC10141A"),
+                    "#CCFFFFFF",
+                    "#FF1A1F27",
+                    "#99222A33",
+                    "#CCFFFFFF",
+                    "#CCF5F8FC",
+                    "#4D6EA8FE",
+                    "#FF1A1F27",
+                    "#FF005A9C",
+                    "#FF2C7A3F",
+                    "#FF8A5A00",
+                    "#FF0D6E77",
+                    "#FFB42318",
+                    "#FF9A6700",
+                    "#FF027A48",
+                    "#FF6B7785",
+                    "#CCFFFFFF",
+                    "#0F1A1F27",
+                    "#221A1F27",
+                    "#0A1A1F27",
+                    "#1F1A1F27"),
                 (true, false) => (
                     "#FF1A1D24",
                     "#FF1E222A",
@@ -405,7 +483,26 @@ public partial class MainWindow : Window
                     "#FF2A303B",
                     "#FF1C2129",
                     "#FFFFFFFF",
-                    "#FF10141A"),
+                    "#FF10141A",
+                    "#FFE6EDF7",
+                    "#B8E6EDF7",
+                    "#FF10141A",
+                    "#FF141A23",
+                    "#4D6EA8FE",
+                    "#FFE6EDF7",
+                    "#FF87B6FF",
+                    "#FF98D89E",
+                    "#FFF6C177",
+                    "#FF80CBC4",
+                    "#FFFF7B72",
+                    "#FFFFC857",
+                    "#FF6FD3A8",
+                    "#FF8B9BB4",
+                    "#A010141A",
+                    "#12FFFFFF",
+                    "#26FFFFFF",
+                    "#18FFFFFF",
+                    "#26FFFFFF"),
                 _ => (
                     "#FFF2F4F7",
                     "#FFF5F6F8",
@@ -421,7 +518,26 @@ public partial class MainWindow : Window
                     "#FFE5EAF0",
                     "#FFF2F5F8",
                     "#FF000000",
-                    "#FF10141A"),
+                    "#FFFFFFFF",
+                    "#FF1A1F27",
+                    "#99222A33",
+                    "#FFFFFFFF",
+                    "#FFF7F9FC",
+                    "#4D6EA8FE",
+                    "#FF1A1F27",
+                    "#FF005A9C",
+                    "#FF2C7A3F",
+                    "#FF8A5A00",
+                    "#FF0D6E77",
+                    "#FFB42318",
+                    "#FF9A6700",
+                    "#FF027A48",
+                    "#FF6B7785",
+                    "#E6FFFFFF",
+                    "#0F1A1F27",
+                    "#221A1F27",
+                    "#0A1A1F27",
+                    "#1F1A1F27"),
             };
 
         SetBrushResource("ShellWindowBackground", window);
@@ -438,10 +554,32 @@ public partial class MainWindow : Window
         SetBrushResource("ShellTabActiveBrush", tabActive);
         SetBrushResource("ShellTabInactiveBrush", tabInactive);
         SetBrushResource("ShellTabSelectionBorderBrush", tabSelectionBorder);
-        SetBrushResource("ShellTerminalBrush", terminal);
+        SetBrushResource("Terminal.Background", terminalBackground);
+        SetBrushResource("Terminal.Foreground.Primary", terminalPrimary);
+        SetBrushResource("Terminal.Foreground.Muted", terminalMuted);
+        SetBrushResource("Terminal.RowStripe.Even", terminalRowEven);
+        SetBrushResource("Terminal.RowStripe.Odd", terminalRowOdd);
+        SetBrushResource("Terminal.Selection", terminalSelection);
+        SetBrushResource("Terminal.Cursor", terminalCursor);
+        SetBrushResource("Terminal.Syntax.Keyword", terminalKeyword);
+        SetBrushResource("Terminal.Syntax.String", terminalString);
+        SetBrushResource("Terminal.Syntax.Number", terminalNumber);
+        SetBrushResource("Terminal.Syntax.Path", terminalPath);
+        SetBrushResource("Terminal.Syntax.Error", terminalError);
+        SetBrushResource("Terminal.Syntax.Warn", terminalWarn);
+        SetBrushResource("Terminal.Syntax.Success", terminalSuccess);
+        SetBrushResource("Terminal.Syntax.Comment", terminalComment);
+        SetBrushResource("Terminal.Overlay.Background", terminalOverlayBackground);
+        SetBrushResource("Terminal.Overlay.PanelBackground", terminalOverlayPanelBackground);
+        SetBrushResource("Terminal.Overlay.PanelBorder", terminalOverlayPanelBorder);
+        SetBrushResource("Terminal.Overlay.CardBackground", terminalOverlayCardBackground);
+        SetBrushResource("Terminal.Overlay.CardBorder", terminalOverlayCardBorder);
+        SetBrushResource("ShellTerminalBrush", terminalBackground);
+        SetBrushResource("ShellTerminalPrimaryTextBrush", terminalPrimary);
+        SetBrushResource("ShellTerminalAccentTextBrush", terminalKeyword);
         RuntimeLogger.Info(
             "shell-palette",
-            $"Applied palette. dark={isDarkTheme}, transparent={isTransparent}, terminal={terminal}");
+            $"Applied palette. dark={isDarkTheme}, transparent={isTransparent}, terminal={terminalBackground}");
     }
 
     private void SetBrushResource(string key, string hexColor)
@@ -556,6 +694,15 @@ public partial class MainWindow : Window
 
         var selected = listBox.SelectedItems?.OfType<AssetNode>() ?? [];
         _boundViewModel.SetSelectedAssets(selected);
+    }
+
+    private void EnsureFlatLocateTargetVisible()
+    {
+        var listBox = this.FindControl<ListBox>("AssetsFlatListBox");
+        MainWindowInteractionPolicy.TryEnsureFlatLocateTargetVisible(
+            _boundViewModel,
+            listBox,
+            static (targetListBox, targetNode) => targetListBox.ScrollIntoView(targetNode));
     }
 
     private void OnAssetsFlatListPointerPressed(object? sender, PointerPressedEventArgs e)
