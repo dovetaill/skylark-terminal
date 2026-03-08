@@ -49,6 +49,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly IWorkspaceLayoutService _workspaceLayoutService;
     private readonly IDragSessionService _dragSessionService;
     private readonly ISftpService _sftpService;
+    private readonly ISftpNavigationService _sftpNavigationService;
     private readonly IAppDialogService _appDialogService;
     private readonly IClipboardService _clipboardService;
     private readonly Dictionary<AssetsPaneKind, ObservableCollection<AssetNode>> _assetsByPane;
@@ -148,13 +149,15 @@ public partial class MainWindowViewModel : ViewModelBase
         IClipboardService clipboardService,
         ISessionRegistryService sessionRegistryService,
         IWorkspaceLayoutService workspaceLayoutService,
-        IDragSessionService dragSessionService)
+        IDragSessionService dragSessionService,
+        ISftpNavigationService? sftpNavigationService = null)
     {
         _sshConnectionService = sshConnectionService;
         _sessionRegistryService = sessionRegistryService;
         _workspaceLayoutService = workspaceLayoutService;
         _dragSessionService = dragSessionService;
         _sftpService = sftpService;
+        _sftpNavigationService = sftpNavigationService ?? new SftpNavigationService("/");
         _appDialogService = appDialogService;
         _clipboardService = clipboardService;
         _assetsByPane = BuildAssetsMap(assetCatalogService.GetAssets());
@@ -1765,7 +1768,7 @@ public partial class MainWindowViewModel : ViewModelBase
         RightPanelModes.Clear();
         RightPanelModes.Add(new SnippetsModeViewModel(BuildSnippetModeActions()));
         RightPanelModes.Add(new HistoryModeViewModel(BuildHistoryModeActions()));
-        RightPanelModes.Add(new SftpModeViewModel(BuildSftpModeActions()));
+        RightPanelModes.Add(new SftpModeViewModel(_sftpNavigationService, BuildSftpModeActions()));
     }
 
     private IRightPanelModeViewModel ResolveActiveRightMode(RightToolsViewKind kind)
