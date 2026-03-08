@@ -14,6 +14,7 @@
 - 资产面板顶部：紧凑图标工具条（搜索/展开收起/创建/模式切换），支持点击展开搜索框与空查询自动收起
 - 中间工作区：FluentAvalonia `TabView` 多标签；支持双击资产连接开新标签、标签标题显示连接名、右键标签操作（Duplicate/Close Others/Close Left/Close Right/Close All）
 - 启动默认页：`Quick Start` 入口页，支持最近连接卡片、搜索过滤、快捷跳转 Hosts 与新建标签
+- Quick Start 定位策略：最近连接可在 `Tree/Flat` 两种资产视图中自动定位并高亮对应 Host
 - 无连接配置标签会稳定显示 Quick Start，不再出现 `Disconnected / invalid SSH config` 告警条
 - 真实终端会话：已接入 `SSH.NET` + `Iciclecreek.Avalonia.Terminal`，支持连接状态流转（Connecting/Connected/Disconnected/Faulted）
 - 终端交互：支持 ANSI/VT100 基础键位映射、右键复制/粘贴/清屏、窗口尺寸变化同步到远端 PTY
@@ -26,10 +27,12 @@
 
 ## 最近迭代（Git Log 摘要）
 
-- `2f9a20e` (2026-03-05): 修复资产面板显隐状态与 splitter 联动；统一资产模式命名为 `Tree/Flat`；修复右侧栏阈值收缩后不可继续拖拽的问题。
-- `7ac6003` (2026-03-05): 重构主窗口壳层，统一资产视图切换交互，补全 Settings 弹窗返回逻辑与透明度切换状态。
-- `72c9f22` (2026-03-05): 实现自绘顶部状态栏与无边框窗口，完善顶部菜单命令链与窗口交互细节。
-- `830e20a` (2026-03-05): 完善项目 README，并清理误跟踪的 `obj` 噪音文件。
+- `1a5ecfc` (2026-03-08): 补充 Quick Start 优化方案文档（step1），明确后续迭代拆分与验收范围。
+- `e53f610` (2026-03-08): 完成 Quick Start Host 定位逻辑与终端渲染相关测试（含行渲染与主题 token 回退校验）。
+- `3a17b59` (2026-03-08): 重构 Quick Start 页面并接入“最近连接”入口，强化从入口到资产区/工作区的跳转链路。
+- `8bf7c52` (2026-03-06): 接入真实 SSH 终端会话并默认打开 Quick Start，完善连接状态流转与会话初始化。
+- `335c18c` (2026-03-06): 统一右键菜单布局并收紧弹窗宽度，修复上下文菜单视觉与密度不一致问题。
+- `b9c840a` (2026-03-06): 打通 Workspace `TabView` 与资产区联动，新增批量关闭标签等操作闭环。
 
 ## 技术栈
 
@@ -56,7 +59,7 @@
 │   ├── App.axaml.cs           # DI 注册与应用初始化
 │   └── Program.cs             # 桌面应用入口
 ├── tests/SkylarkTerminal.Tests
-│   └── UnitTest1.cs           # ViewModel 行为测试（含菜单弹窗命令）
+│   └── *.cs                   # 交互策略、Quick Start 定位、终端渲染与服务会话等单元测试
 └── SkylarkTerminal.slnx
 ```
 
@@ -107,6 +110,9 @@ dotnet test tests/SkylarkTerminal.Tests/SkylarkTerminal.Tests.csproj
 - 顶部菜单命令（Settings/Language/Help/About）调用链
 - Flat 模式多选后的批量导出与批量打开标签行为
 - 密钥资产面板专属命令行为与可执行状态约束
+- Quick Start 最近连接在 `Tree/Flat` 下的定位与高亮策略
+- 终端行渲染与主题 token 调色板回退行为
+- SSH 终端会话创建、关闭与异常链路验证
 
 ## 核心接口（Mock Driven）
 
