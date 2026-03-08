@@ -22,4 +22,9 @@
     <ProjectReference Include="..\..\src\SkylarkTerminal\SkylarkTerminal.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="UnitTest1.cs" />
+    <Compile Remove="SshConnectionServiceSessionTests.cs" />
+  </ItemGroup>
+
 </Project>

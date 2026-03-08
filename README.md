@@ -19,6 +19,7 @@
 - 真实终端会话：已接入 `SSH.NET` + `Iciclecreek.Avalonia.Terminal`，支持连接状态流转（Connecting/Connected/Disconnected/Faulted）
 - 终端交互：支持 ANSI/VT100 基础键位映射、右键复制/粘贴/清屏、窗口尺寸变化同步到远端 PTY
 - 右侧工具区：Snippet / History / SFTP 视图切换与 Mock 数据展示，支持拖拽与阈值自动收起
+- 右侧工具模式元数据：`RightToolsModeItems` + `CurrentRightToolsContent` 已接入 ViewModel，为后续 `TabStrip + ContentControl` 容器化改造提供绑定基础
 - 左右侧栏可拖拽缩放，收起时 splitter 与内容列保持同步联动
 - 默认深色主题，支持顶部图标按钮切换深浅色，Settings 支持透明/不透明窗口材质切换
 - 日志策略：默认只写入错误级别日志（`ERROR`），用于保留异常与崩溃定位信息

@@ -161,6 +161,7 @@ public partial class MainWindowViewModel : ViewModelBase
         InitializeWorkspaceTabs();
         InitializeQuickStartRecentConnections();
         InitializeRightToolsData();
+        SelectedRightToolsModeItem = RightToolsModeItems.FirstOrDefault(item => item.Kind == SelectedRightToolsView);
         SyncActiveWorkspaceTabs();
         TopStatusBar = new TopStatusBarViewModel(this);
         RuntimeLogger.Info(
@@ -200,6 +201,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     private RightToolsViewKind selectedRightToolsView = RightToolsViewKind.Snippets;
+
+    [ObservableProperty]
+    private RightToolsModeItem? selectedRightToolsModeItem;
 
     [ObservableProperty]
     private string currentLanguageCode = "zh-CN";
@@ -329,6 +333,13 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public ObservableCollection<WorkspacePaneViewModel> WorkspacePanes { get; } = [];
 
+    public ObservableCollection<RightToolsModeItem> RightToolsModeItems { get; } =
+    [
+        new(RightToolsViewKind.Snippets, "Snippets", "\uE8D2"),
+        new(RightToolsViewKind.History, "History", "\uE81C"),
+        new(RightToolsViewKind.Sftp, "SFTP", "\uE8B7"),
+    ];
+
     public WorkspaceLayoutNode WorkspaceLayoutRoot => _workspaceLayoutService.Root;
 
     public ObservableCollection<WorkspaceTabItemViewModel> WorkspaceTabs => ResolveActiveWorkspacePane().Tabs;
@@ -346,6 +357,13 @@ public partial class MainWindowViewModel : ViewModelBase
     public ObservableCollection<CommandHistoryEntry> HistoryItems { get; } = [];
 
     public ObservableCollection<RemoteFileNode> SftpItems { get; } = [];
+
+    public RightToolsContentNode CurrentRightToolsContent => SelectedRightToolsView switch
+    {
+        RightToolsViewKind.Snippets => new SnippetsRightToolsContent(),
+        RightToolsViewKind.History => new HistoryRightToolsContent(),
+        _ => new SftpRightToolsContent(),
+    };
 
     public bool IsKeysAssetsPane => SelectedAssetsPane == AssetsPaneKind.Keys;
 
@@ -1137,6 +1155,21 @@ public partial class MainWindowViewModel : ViewModelBase
         OnPropertyChanged(nameof(IsSnippetsView));
         OnPropertyChanged(nameof(IsHistoryView));
         OnPropertyChanged(nameof(IsSftpView));
+        OnPropertyChanged(nameof(CurrentRightToolsContent));
+
+        var target = RightToolsModeItems.FirstOrDefault(item => item.Kind == value);
+        if (target is not null && !ReferenceEquals(target, SelectedRightToolsModeItem))
+        {
+            SelectedRightToolsModeItem = target;
+        }
+    }
+
+    partial void OnSelectedRightToolsModeItemChanged(RightToolsModeItem? value)
+    {
+        if (value is not null && value.Kind != SelectedRightToolsView)
+        {
+            SelectedRightToolsView = value.Kind;
+        }
     }
 
     partial void OnSelectedWorkspacePaneChanged(WorkspacePaneViewModel? value)
