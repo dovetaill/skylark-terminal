@@ -38,6 +38,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         ResolveMainContentGrid().LayoutUpdated += OnMainContentGridLayoutUpdated;
         AddHandler(PointerPressedEvent, OnWindowPointerPressed, RoutingStrategies.Tunnel);
+        AddHandler(KeyDownEvent, OnWindowKeyDown, RoutingStrategies.Tunnel);
         AddHandler(ContextRequestedEvent, OnWindowContextRequested, RoutingStrategies.Tunnel | RoutingStrategies.Bubble, true);
     }
 
@@ -100,6 +101,7 @@ public partial class MainWindow : Window
         }
 
         RemoveHandler(PointerPressedEvent, OnWindowPointerPressed);
+        RemoveHandler(KeyDownEvent, OnWindowKeyDown);
         RemoveHandler(ContextRequestedEvent, OnWindowContextRequested);
 
         if (_boundViewModel is not null)
@@ -636,6 +638,33 @@ public partial class MainWindow : Window
         if (hasContextMenu || hasContextFlyout)
         {
             _lastContextMenuOpenedAt = DateTimeOffset.UtcNow;
+        }
+    }
+
+    private void OnWindowKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (_boundViewModel is null || !e.KeyModifiers.HasFlag(KeyModifiers.Control))
+        {
+            return;
+        }
+
+        switch (e.Key)
+        {
+            case Key.D1:
+            case Key.NumPad1:
+                _boundViewModel.ShowSnippetsToolsCommand.Execute(null);
+                e.Handled = true;
+                break;
+            case Key.D2:
+            case Key.NumPad2:
+                _boundViewModel.ShowHistoryToolsCommand.Execute(null);
+                e.Handled = true;
+                break;
+            case Key.D3:
+            case Key.NumPad3:
+                _boundViewModel.ShowSftpToolsCommand.Execute(null);
+                e.Handled = true;
+                break;
         }
     }
 

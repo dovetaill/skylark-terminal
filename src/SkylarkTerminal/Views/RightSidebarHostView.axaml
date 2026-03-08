@@ -23,6 +23,7 @@
                 BorderBrush="{DynamicResource ShellDividerBrush}"
                 BorderThickness="0,0,0,1">
             <ListBox ItemsSource="{Binding RightToolsModeItems}"
+                     Classes="RightSidebarModeButton"
                      SelectionMode="Single"
                      SelectedItem="{Binding SelectedRightToolsModeItem}"
                      BorderThickness="0"
@@ -58,6 +59,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="models:ModeActionDescriptor">
                         <Button Classes="TitleBarButton"
+                                Classes.RightSidebarActionButton="True"
                                 Command="{Binding Command}"
                                 ToolTip.Tip="{Binding Tooltip}">
                             <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"

@@ -132,6 +132,43 @@
         <Style Selector="Button.TitleBarButton:pressed">
             <Setter Property="Background" Value="#22000000"/>
         </Style>
+        <Style Selector="ListBox.RightSidebarModeButton">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="ListBox.RightSidebarModeButton ListBoxItem">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+        <Style Selector="ListBox.RightSidebarModeButton ListBoxItem /template/ ContentPresenter">
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style Selector="ListBox.RightSidebarModeButton ListBoxItem:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#14000000"/>
+        </Style>
+        <Style Selector="ListBox.RightSidebarModeButton ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ShellTabActiveBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ShellTabSelectionBorderBrush}"/>
+        </Style>
+        <Style Selector="Button.RightSidebarActionButton">
+            <Setter Property="MinWidth" Value="28"/>
+            <Setter Property="MinHeight" Value="28"/>
+            <Setter Property="Padding" Value="6,2"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="0"/>
+        </Style>
+        <Style Selector="Button.RightSidebarActionButton:pointerover">
+            <Setter Property="Background" Value="#14000000"/>
+        </Style>
+        <Style Selector="Button.RightSidebarActionButton:pressed">
+            <Setter Property="Background" Value="#22000000"/>
+        </Style>
         <Style Selector="ui|TabView">
             <Setter Property="Margin" Value="0"/>
             <Setter Property="Padding" Value="0"/>
