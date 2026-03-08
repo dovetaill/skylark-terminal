@@ -50,9 +50,29 @@
                     <SolidColorBrush x:Key="ShellTabActiveBrush" Color="#FF2A303B"/>
                     <SolidColorBrush x:Key="ShellTabInactiveBrush" Color="#FF1C2129"/>
                     <SolidColorBrush x:Key="ShellTabSelectionBorderBrush" Color="#FFFFFFFF"/>
+                    <SolidColorBrush x:Key="Terminal.Background" Color="#FF10141A"/>
+                    <SolidColorBrush x:Key="Terminal.Foreground.Primary" Color="#FFE6EDF7"/>
+                    <SolidColorBrush x:Key="Terminal.Foreground.Muted" Color="#B8E6EDF7"/>
+                    <SolidColorBrush x:Key="Terminal.RowStripe.Even" Color="#FF10141A"/>
+                    <SolidColorBrush x:Key="Terminal.RowStripe.Odd" Color="#FF141A23"/>
+                    <SolidColorBrush x:Key="Terminal.Selection" Color="#4D6EA8FE"/>
+                    <SolidColorBrush x:Key="Terminal.Cursor" Color="#FFE6EDF7"/>
+                    <SolidColorBrush x:Key="Terminal.Syntax.Keyword" Color="#FF87B6FF"/>
+                    <SolidColorBrush x:Key="Terminal.Syntax.String" Color="#FF98D89E"/>
+                    <SolidColorBrush x:Key="Terminal.Syntax.Number" Color="#FFF6C177"/>
+                    <SolidColorBrush x:Key="Terminal.Syntax.Path" Color="#FF80CBC4"/>
+                    <SolidColorBrush x:Key="Terminal.Syntax.Error" Color="#FFFF7B72"/>
+                    <SolidColorBrush x:Key="Terminal.Syntax.Warn" Color="#FFFFC857"/>
+                    <SolidColorBrush x:Key="Terminal.Syntax.Success" Color="#FF6FD3A8"/>
+                    <SolidColorBrush x:Key="Terminal.Syntax.Comment" Color="#FF8B9BB4"/>
+                    <SolidColorBrush x:Key="Terminal.Overlay.Background" Color="#A010141A"/>
+                    <SolidColorBrush x:Key="Terminal.Overlay.PanelBackground" Color="#12FFFFFF"/>
+                    <SolidColorBrush x:Key="Terminal.Overlay.PanelBorder" Color="#26FFFFFF"/>
+                    <SolidColorBrush x:Key="Terminal.Overlay.CardBackground" Color="#18FFFFFF"/>
+                    <SolidColorBrush x:Key="Terminal.Overlay.CardBorder" Color="#26FFFFFF"/>
                     <SolidColorBrush x:Key="ShellTerminalBrush" Color="#FF10141A"/>
                     <SolidColorBrush x:Key="ShellTerminalPrimaryTextBrush" Color="#FFE6EDF7"/>
-                    <SolidColorBrush x:Key="ShellTerminalAccentTextBrush" Color="#FF94B8FF"/>
+                    <SolidColorBrush x:Key="ShellTerminalAccentTextBrush" Color="#FF87B6FF"/>
                 </ResourceDictionary>
                     <ResourceDictionary x:Key="Light">
                         <SolidColorBrush x:Key="ShellWindowBackground" Color="#FFF2F4F7"/>
@@ -69,6 +89,26 @@
                     <SolidColorBrush x:Key="ShellTabActiveBrush" Color="#FFE5EAF0"/>
                     <SolidColorBrush x:Key="ShellTabInactiveBrush" Color="#FFF2F5F8"/>
                     <SolidColorBrush x:Key="ShellTabSelectionBorderBrush" Color="#FF000000"/>
+                    <SolidColorBrush x:Key="Terminal.Background" Color="#FFFFFFFF"/>
+                    <SolidColorBrush x:Key="Terminal.Foreground.Primary" Color="#FF1A1F27"/>
+                    <SolidColorBrush x:Key="Terminal.Foreground.Muted" Color="#99222A33"/>
+                    <SolidColorBrush x:Key="Terminal.RowStripe.Even" Color="#FFFFFFFF"/>
+                    <SolidColorBrush x:Key="Terminal.RowStripe.Odd" Color="#FFF7F9FC"/>
+                    <SolidColorBrush x:Key="Terminal.Selection" Color="#4D6EA8FE"/>
+                    <SolidColorBrush x:Key="Terminal.Cursor" Color="#FF1A1F27"/>
+                    <SolidColorBrush x:Key="Terminal.Syntax.Keyword" Color="#FF005A9C"/>
+                    <SolidColorBrush x:Key="Terminal.Syntax.String" Color="#FF2C7A3F"/>
+                    <SolidColorBrush x:Key="Terminal.Syntax.Number" Color="#FF8A5A00"/>
+                    <SolidColorBrush x:Key="Terminal.Syntax.Path" Color="#FF0D6E77"/>
+                    <SolidColorBrush x:Key="Terminal.Syntax.Error" Color="#FFB42318"/>
+                    <SolidColorBrush x:Key="Terminal.Syntax.Warn" Color="#FF9A6700"/>
+                    <SolidColorBrush x:Key="Terminal.Syntax.Success" Color="#FF027A48"/>
+                    <SolidColorBrush x:Key="Terminal.Syntax.Comment" Color="#FF6B7785"/>
+                    <SolidColorBrush x:Key="Terminal.Overlay.Background" Color="#E6FFFFFF"/>
+                    <SolidColorBrush x:Key="Terminal.Overlay.PanelBackground" Color="#0F1A1F27"/>
+                    <SolidColorBrush x:Key="Terminal.Overlay.PanelBorder" Color="#221A1F27"/>
+                    <SolidColorBrush x:Key="Terminal.Overlay.CardBackground" Color="#0A1A1F27"/>
+                    <SolidColorBrush x:Key="Terminal.Overlay.CardBorder" Color="#1F1A1F27"/>
                     <SolidColorBrush x:Key="ShellTerminalBrush" Color="#FFFFFFFF"/>
                     <SolidColorBrush x:Key="ShellTerminalPrimaryTextBrush" Color="#FF1A1F27"/>
                     <SolidColorBrush x:Key="ShellTerminalAccentTextBrush" Color="#FF005A9C"/>
@@ -665,22 +705,35 @@
                                                 </ui:MenuFlyoutItem>
                                             </ui:FAMenuFlyout>
                                         </Border.ContextFlyout>
-                                        <StackPanel Orientation="Horizontal"
-                                                    Spacing="8">
-                                            <TextBlock Text="{Binding AssetTypeIcon}"/>
-                                            <Grid MinWidth="160">
-                                                <TextBlock Text="{Binding Name}"
-                                                           IsVisible="{Binding IsDisplayNameVisible}"/>
-                                                <TextBox IsVisible="{Binding IsRenaming}"
-                                                         Text="{Binding EditName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                         BorderThickness="1"
-                                                         Padding="4,0"
-                                                         MinHeight="24"
-                                                         KeyDown="OnAssetRenameTextBoxKeyDown"
-                                                         LostFocus="OnAssetRenameTextBoxLostFocus"
-                                                         AttachedToVisualTree="OnAssetRenameTextBoxAttachedToVisualTree"/>
-                                            </Grid>
-                                        </StackPanel>
+                                        <Grid>
+                                            <Border IsHitTestVisible="False"
+                                                    Background="#2A3B82F6"
+                                                    CornerRadius="4"
+                                                    Opacity="{Binding QuickLocateHighlightOpacity}">
+                                                <Border.Transitions>
+                                                    <Transitions>
+                                                        <DoubleTransition Property="Opacity"
+                                                                          Duration="0:0:0.20"/>
+                                                    </Transitions>
+                                                </Border.Transitions>
+                                            </Border>
+                                            <StackPanel Orientation="Horizontal"
+                                                        Spacing="8">
+                                                <TextBlock Text="{Binding AssetTypeIcon}"/>
+                                                <Grid MinWidth="160">
+                                                    <TextBlock Text="{Binding Name}"
+                                                               IsVisible="{Binding IsDisplayNameVisible}"/>
+                                                    <TextBox IsVisible="{Binding IsRenaming}"
+                                                             Text="{Binding EditName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                             BorderThickness="1"
+                                                             Padding="4,0"
+                                                             MinHeight="24"
+                                                             KeyDown="OnAssetRenameTextBoxKeyDown"
+                                                             LostFocus="OnAssetRenameTextBoxLostFocus"
+                                                             AttachedToVisualTree="OnAssetRenameTextBoxAttachedToVisualTree"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Grid>
                                     </Border>
                                 </TreeDataTemplate>
                             </TreeView.ItemTemplate>
@@ -970,22 +1023,35 @@
                                                 </ui:MenuFlyoutItem>
                                             </ui:FAMenuFlyout>
                                         </Border.ContextFlyout>
-                                        <StackPanel Orientation="Horizontal"
-                                                    Spacing="8">
-                                            <TextBlock Text="{Binding AssetTypeIcon}"/>
-                                            <Grid MinWidth="160">
-                                                <TextBlock Text="{Binding Name}"
-                                                           IsVisible="{Binding IsDisplayNameVisible}"/>
-                                                <TextBox IsVisible="{Binding IsRenaming}"
-                                                         Text="{Binding EditName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                         BorderThickness="1"
-                                                         Padding="4,0"
-                                                         MinHeight="24"
-                                                         KeyDown="OnAssetRenameTextBoxKeyDown"
-                                                         LostFocus="OnAssetRenameTextBoxLostFocus"
-                                                         AttachedToVisualTree="OnAssetRenameTextBoxAttachedToVisualTree"/>
-                                            </Grid>
-                                        </StackPanel>
+                                        <Grid>
+                                            <Border IsHitTestVisible="False"
+                                                    Background="#2A3B82F6"
+                                                    CornerRadius="4"
+                                                    Opacity="{Binding QuickLocateHighlightOpacity}">
+                                                <Border.Transitions>
+                                                    <Transitions>
+                                                        <DoubleTransition Property="Opacity"
+                                                                          Duration="0:0:0.20"/>
+                                                    </Transitions>
+                                                </Border.Transitions>
+                                            </Border>
+                                            <StackPanel Orientation="Horizontal"
+                                                        Spacing="8">
+                                                <TextBlock Text="{Binding AssetTypeIcon}"/>
+                                                <Grid MinWidth="160">
+                                                    <TextBlock Text="{Binding Name}"
+                                                               IsVisible="{Binding IsDisplayNameVisible}"/>
+                                                    <TextBox IsVisible="{Binding IsRenaming}"
+                                                             Text="{Binding EditName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                             BorderThickness="1"
+                                                             Padding="4,0"
+                                                             MinHeight="24"
+                                                             KeyDown="OnAssetRenameTextBoxKeyDown"
+                                                             LostFocus="OnAssetRenameTextBoxLostFocus"
+                                                             AttachedToVisualTree="OnAssetRenameTextBoxAttachedToVisualTree"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Grid>
                                     </Border>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>

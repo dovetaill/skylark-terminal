@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SkylarkTerminal.ViewModels;
@@ -48,6 +49,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private int _newWorkspaceTabSeed = 1;
     private AssetNode? _assetClipboardNode;
     private AssetClipboardMode _assetClipboardMode;
+    private CancellationTokenSource? _quickLocateHighlightCts;
 
     public MainWindowViewModel()
         : this(
@@ -144,6 +146,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     private string quickStartSearchText = string.Empty;
+
+    [ObservableProperty]
+    private ConnectionNode? pendingQuickStartLocateTarget;
 
     public double LeftAssetsPaneWidth => IsAssetsPanelVisible ? ExpandedLeftAssetsPaneWidth : 0d;
 
@@ -355,7 +360,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void ShowHostsAssets()
     {
-        SelectedAssetsPane = AssetsPaneKind.Hosts;
+        ActivateHostsAssetsPane();
     }
 
     [RelayCommand]
@@ -822,6 +827,38 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private void LocateHostFromQuickStart()
+    {
+        ActivateHostsAssetsPane();
+        PendingQuickStartLocateTarget = null;
+
+        var target = ResolveQuickStartLocateTarget();
+
+        if (target is null)
+        {
+            LastAssetActionMessage = "已打开 Hosts 资产，Quick Start 暂无可定位目标";
+            return;
+        }
+
+        if (IsTreeViewMode && TryLocateTargetInTree(target))
+        {
+            PendingQuickStartLocateTarget = target;
+            LastAssetActionMessage = $"Quick Start 已定位到 Host：{target.Name}";
+            return;
+        }
+
+        if (IsFlatViewMode && TryLocateTargetInFlatList(target))
+        {
+            PendingQuickStartLocateTarget = target;
+            LastAssetActionMessage = $"Quick Start 已定位到 Host：{target.Name}";
+            return;
+        }
+
+        PendingQuickStartLocateTarget = target;
+        LastAssetActionMessage = $"Quick Start 已解析目标 Host：{target.Name}";
+    }
+
+    [RelayCommand]
     private void CloseTab(WorkspaceTabItemViewModel? sourceTab)
     {
         var targetTab = sourceTab ?? SelectedWorkspaceTab;
@@ -1180,12 +1217,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        var matched = Flatten(_assetsByPane[AssetsPaneKind.Hosts])
-            .OfType<ConnectionNode>()
-            .FirstOrDefault(node =>
-                node.Port == config.Port &&
-                string.Equals(node.Host, config.Host, StringComparison.OrdinalIgnoreCase) &&
-                string.Equals(node.User, config.Username, StringComparison.OrdinalIgnoreCase));
+        var matched = ResolveConnectionNodeByConfig(config);
 
         if (matched is not null)
         {
@@ -1202,6 +1234,151 @@ public partial class MainWindowViewModel : ViewModelBase
             "SSH Connection",
             config.Password);
         RegisterRecentConnection(fallback);
+    }
+
+    private ConnectionNode? ResolveQuickStartLocateTarget()
+    {
+        var currentTabTarget = ResolveConnectionNodeBySelectedTab();
+        if (currentTabTarget is not null)
+        {
+            return currentTabTarget;
+        }
+
+        var firstRecent = FilteredQuickStartRecentConnections.FirstOrDefault();
+        if (firstRecent is not null)
+        {
+            return ResolveConnectionNodeByRecent(firstRecent);
+        }
+
+        return null;
+    }
+
+    private void ActivateHostsAssetsPane()
+    {
+        IsAssetsPanelVisible = true;
+        SelectedAssetsPane = AssetsPaneKind.Hosts;
+    }
+
+    private ConnectionNode? ResolveConnectionNodeBySelectedTab()
+    {
+        var config = SelectedWorkspaceTab?.ConnectionConfig;
+        if (config is null)
+        {
+            return null;
+        }
+
+        return ResolveConnectionNodeByConfig(config);
+    }
+
+    private ConnectionNode? ResolveConnectionNodeByConfig(ConnectionConfig config)
+    {
+        return Flatten(_assetsByPane[AssetsPaneKind.Hosts])
+            .OfType<ConnectionNode>()
+            .FirstOrDefault(node =>
+                node.Port == config.Port &&
+                string.Equals(node.Host, config.Host, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(node.User, config.Username, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private bool TryLocateTargetInTree(ConnectionNode target)
+    {
+        var treeTarget = FindConnectionNodeInCurrentHostsTree(target);
+        if (treeTarget is null)
+        {
+            return false;
+        }
+
+        ExpandTreeAncestors(treeTarget);
+        SelectedAssetNode = treeTarget;
+        StartQuickLocateHighlight(treeTarget);
+        return true;
+    }
+
+    private bool TryLocateTargetInFlatList(ConnectionNode target)
+    {
+        var flatTarget = FindConnectionNodeInCurrentFlatHosts(target);
+        if (flatTarget is null)
+        {
+            return false;
+        }
+
+        SelectedAssetNode = flatTarget;
+        SetSelectedAssets([flatTarget]);
+        StartQuickLocateHighlight(flatTarget);
+        return true;
+    }
+
+    private ConnectionNode? FindConnectionNodeInCurrentHostsTree(ConnectionNode target)
+    {
+        return Flatten(CurrentAssetTree)
+            .OfType<ConnectionNode>()
+            .FirstOrDefault(node =>
+                string.Equals(node.Id, target.Id, StringComparison.Ordinal) ||
+                (string.Equals(node.Host, target.Host, StringComparison.OrdinalIgnoreCase) &&
+                 string.Equals(node.User, target.User, StringComparison.OrdinalIgnoreCase) &&
+                 node.Port == target.Port));
+    }
+
+    private ConnectionNode? FindConnectionNodeInCurrentFlatHosts(ConnectionNode target)
+    {
+        return CurrentAssetFlatList
+            .OfType<ConnectionNode>()
+            .FirstOrDefault(node =>
+                string.Equals(node.Id, target.Id, StringComparison.Ordinal) ||
+                (string.Equals(node.Host, target.Host, StringComparison.OrdinalIgnoreCase) &&
+                 string.Equals(node.User, target.User, StringComparison.OrdinalIgnoreCase) &&
+                 node.Port == target.Port));
+    }
+
+    private void ExpandTreeAncestors(AssetNode targetNode)
+    {
+        var ancestors = new List<FolderNode>();
+        if (!TryCollectAncestorFolders(CurrentAssetTree, targetNode, ancestors))
+        {
+            return;
+        }
+
+        foreach (var folder in ancestors)
+        {
+            folder.IsExpanded = true;
+        }
+
+        AreAllTreeFoldersExpanded = AreAllFoldersExpanded(CurrentAssetTree);
+    }
+
+    private void StartQuickLocateHighlight(AssetNode targetNode)
+    {
+        _quickLocateHighlightCts?.Cancel();
+        _quickLocateHighlightCts?.Dispose();
+        _quickLocateHighlightCts = new CancellationTokenSource();
+
+        foreach (var node in Flatten(CurrentAssetTree))
+        {
+            if (!ReferenceEquals(node, targetNode) && node.QuickLocateHighlightOpacity > 0d)
+            {
+                node.QuickLocateHighlightOpacity = 0d;
+            }
+        }
+
+        targetNode.QuickLocateHighlightOpacity = 1d;
+        _ = RunQuickLocateHighlightAsync(targetNode, _quickLocateHighlightCts.Token);
+    }
+
+    private static async Task RunQuickLocateHighlightAsync(AssetNode targetNode, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(TimeSpan.FromMilliseconds(1200), cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        if (!cancellationToken.IsCancellationRequested)
+        {
+            targetNode.QuickLocateHighlightOpacity = 0d;
+        }
     }
 
     private void RegisterRecentConnection(ConnectionNode connection)
@@ -1561,6 +1738,34 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         return null;
+    }
+
+    private static bool TryCollectAncestorFolders(
+        IEnumerable<AssetNode> nodes,
+        AssetNode targetNode,
+        ICollection<FolderNode> ancestors)
+    {
+        foreach (var node in nodes)
+        {
+            if (ReferenceEquals(node, targetNode))
+            {
+                return true;
+            }
+
+            if (!TryCollectAncestorFolders(node.Children, targetNode, ancestors))
+            {
+                continue;
+            }
+
+            if (node is FolderNode folder)
+            {
+                ancestors.Add(folder);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     private void CancelAllRenameStates(AssetNode? exceptNode = null)

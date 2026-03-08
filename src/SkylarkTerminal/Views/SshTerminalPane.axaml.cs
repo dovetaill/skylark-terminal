@@ -746,7 +746,7 @@ public partial class SshTerminalPane : UserControl
     {
         _ = sender;
         _ = e;
-        _hostViewModel?.ShowHostsAssetsCommand.Execute(null);
+        _hostViewModel?.LocateHostFromQuickStartCommand.Execute(null);
     }
 
     private void OnQuickStartNewTabClick(object? sender, RoutedEventArgs e)
