@@ -2,26 +2,25 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:models="using:SkylarkTerminal.Models"
              xmlns:ui="using:FluentAvalonia.UI.Controls"
-             xmlns:views="using:SkylarkTerminal.Views"
              x:Class="SkylarkTerminal.Views.RightModes.SnippetsModeView"
              x:CompileBindings="False">
     <Grid Margin="10,10,10,12">
-        <Grid IsVisible="{Binding DataContext.ActiveRightMode.IsBrowseState, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+        <Grid IsVisible="{Binding IsBrowseState}"
               RowDefinitions="Auto,*"
               RowSpacing="12">
             <Grid ColumnDefinitions="Auto,*"
                   ColumnSpacing="8">
                 <Button Classes="RightSidebarCommandButton"
-                        Command="{Binding DataContext.ActiveRightMode.BeginCreateCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                        Command="{Binding BeginCreateCommand}"
                         Content="New Snippet"/>
                 <TextBox Grid.Column="1"
                          Watermark="搜索代码块"
-                         Text="{Binding DataContext.ActiveRightMode.FilterText, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                         Text="{Binding FilterText, Mode=TwoWay}"/>
             </Grid>
 
             <ScrollViewer Grid.Row="1"
                           HorizontalScrollBarVisibility="Disabled">
-                <ItemsControl ItemsSource="{Binding DataContext.ActiveRightMode.VisibleCategories, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+                <ItemsControl ItemsSource="{Binding VisibleCategories}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="models:SnippetCategory">
                             <StackPanel Margin="0,0,0,14"
@@ -128,30 +127,30 @@
             </ScrollViewer>
         </Grid>
 
-        <ScrollViewer IsVisible="{Binding DataContext.ActiveRightMode.IsCreateState, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+        <ScrollViewer IsVisible="{Binding IsCreateState}"
                       HorizontalScrollBarVisibility="Disabled">
             <StackPanel Spacing="12">
                 <TextBlock FontSize="18"
                            FontWeight="SemiBold"
                            Text="Create Snippet"/>
                 <TextBox Watermark="Title"
-                         Text="{Binding DataContext.ActiveRightMode.Draft.Title, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                         Text="{Binding Draft.Title, Mode=TwoWay}"/>
                 <Grid ColumnDefinitions="*,Auto"
                       ColumnSpacing="8">
                     <TextBox Watermark="选择或新建分类"
-                             Text="{Binding DataContext.ActiveRightMode.Draft.CategoryName, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                             Text="{Binding Draft.CategoryName, Mode=TwoWay}"/>
                     <Button Grid.Column="1"
                             Classes="RightSidebarCommandButton"
-                            Command="{Binding DataContext.ActiveRightMode.StartNewCategoryCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                            Command="{Binding StartNewCategoryCommand}"
                             Content="New category"/>
                 </Grid>
                 <TextBox Watermark="标签，使用逗号分隔"
-                         Text="{Binding DataContext.ActiveRightMode.Draft.TagsText, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                         Text="{Binding Draft.TagsText, Mode=TwoWay}"/>
                 <TextBox AcceptsReturn="True"
                          Height="180"
                          TextWrapping="Wrap"
                          Watermark="Snippet content"
-                         Text="{Binding DataContext.ActiveRightMode.Draft.Content, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                         Text="{Binding Draft.Content, Mode=TwoWay}"/>
                 <StackPanel Orientation="Horizontal"
                             Spacing="8">
                     <Button Classes="RightSidebarCommandButton"
@@ -167,30 +166,30 @@
             </StackPanel>
         </ScrollViewer>
 
-        <ScrollViewer IsVisible="{Binding DataContext.ActiveRightMode.IsEditState, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+        <ScrollViewer IsVisible="{Binding IsEditState}"
                       HorizontalScrollBarVisibility="Disabled">
             <StackPanel Spacing="12">
                 <TextBlock FontSize="18"
                            FontWeight="SemiBold"
                            Text="Edit Snippet"/>
                 <TextBox Watermark="Title"
-                         Text="{Binding DataContext.ActiveRightMode.Draft.Title, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                         Text="{Binding Draft.Title, Mode=TwoWay}"/>
                 <Grid ColumnDefinitions="*,Auto"
                       ColumnSpacing="8">
                     <TextBox Watermark="选择或新建分类"
-                             Text="{Binding DataContext.ActiveRightMode.Draft.CategoryName, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                             Text="{Binding Draft.CategoryName, Mode=TwoWay}"/>
                     <Button Grid.Column="1"
                             Classes="RightSidebarCommandButton"
-                            Command="{Binding DataContext.ActiveRightMode.StartNewCategoryCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                            Command="{Binding StartNewCategoryCommand}"
                             Content="New category"/>
                 </Grid>
                 <TextBox Watermark="标签，使用逗号分隔"
-                         Text="{Binding DataContext.ActiveRightMode.Draft.TagsText, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                         Text="{Binding Draft.TagsText, Mode=TwoWay}"/>
                 <TextBox AcceptsReturn="True"
                          Height="180"
                          TextWrapping="Wrap"
                          Watermark="Snippet content"
-                         Text="{Binding DataContext.ActiveRightMode.Draft.Content, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                         Text="{Binding Draft.Content, Mode=TwoWay}"/>
                 <StackPanel Orientation="Horizontal"
                             Spacing="8">
                     <Button Classes="RightSidebarCommandButton"
@@ -206,7 +205,7 @@
             </StackPanel>
         </ScrollViewer>
 
-        <ScrollViewer IsVisible="{Binding DataContext.ActiveRightMode.IsViewMoreState, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+        <ScrollViewer IsVisible="{Binding IsViewMoreState}"
                       HorizontalScrollBarVisibility="Disabled">
             <StackPanel Spacing="12">
                 <StackPanel Orientation="Horizontal"
@@ -221,16 +220,16 @@
                 </StackPanel>
                 <TextBlock FontSize="16"
                            FontWeight="SemiBold"
-                           Text="{Binding DataContext.ActiveRightMode.Draft.Title, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"/>
+                           Text="{Binding Draft.Title}"/>
                 <Border Classes="RightSidebarSnippetTagChip">
-                    <TextBlock Text="{Binding DataContext.ActiveRightMode.Draft.CategoryName, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"/>
+                    <TextBlock Text="{Binding Draft.CategoryName}"/>
                 </Border>
                 <TextBlock Classes="RightSidebarSnippetPreviewText"
-                           Text="{Binding DataContext.ActiveRightMode.Draft.TagsText, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                           Text="{Binding Draft.TagsText}"
                            TextWrapping="Wrap"/>
                 <Border Classes="RightSidebarSnippetCard">
                     <TextBlock FontFamily="Cascadia Mono, Consolas, Microsoft YaHei UI"
-                               Text="{Binding DataContext.ActiveRightMode.Draft.Content, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                               Text="{Binding Draft.Content}"
                                TextWrapping="Wrap"/>
                 </Border>
             </StackPanel>

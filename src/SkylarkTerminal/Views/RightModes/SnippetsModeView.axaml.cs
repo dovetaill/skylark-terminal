@@ -4,7 +4,6 @@ using Avalonia.Interactivity;
 using FluentAvalonia.UI.Controls;
 using SkylarkTerminal.Models;
 using SkylarkTerminal.Services;
-using SkylarkTerminal.ViewModels;
 using SkylarkTerminal.ViewModels.RightPanelModes;
 using System;
 using System.Threading.Tasks;
@@ -153,7 +152,7 @@ public partial class SnippetsModeView : UserControl
         vm = null!;
         item = null!;
 
-        if (DataContext is not MainWindowViewModel { ActiveRightMode: SnippetsModeViewModel snippetsVm })
+        if (!TryGetViewModel(out var snippetsVm))
         {
             return false;
         }
@@ -173,7 +172,7 @@ public partial class SnippetsModeView : UserControl
     {
         vm = null!;
 
-        if (DataContext is not MainWindowViewModel { ActiveRightMode: SnippetsModeViewModel snippetsVm })
+        if (DataContext is not SnippetsModeViewModel snippetsVm)
         {
             return false;
         }

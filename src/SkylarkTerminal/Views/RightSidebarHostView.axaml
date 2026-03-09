@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:models="using:SkylarkTerminal.Models"
              xmlns:vm="using:SkylarkTerminal.ViewModels"
+             xmlns:views="using:SkylarkTerminal.Views"
              xmlns:rightHeaders="using:SkylarkTerminal.Views.RightHeaders"
              xmlns:rightModes="using:SkylarkTerminal.Views.RightModes"
              x:Class="SkylarkTerminal.Views.RightSidebarHostView"
@@ -14,7 +15,8 @@
             <rightHeaders:SftpToolbarHeaderView/>
         </DataTemplate>
         <DataTemplate DataType="models:SnippetsRightToolsContent">
-            <rightModes:SnippetsModeView/>
+            <rightModes:SnippetsModeView DataContext="{Binding DataContext.ActiveRightMode, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                                         x:CompileBindings="False"/>
         </DataTemplate>
         <DataTemplate DataType="models:HistoryRightToolsContent">
             <rightModes:HistoryModeView/>
