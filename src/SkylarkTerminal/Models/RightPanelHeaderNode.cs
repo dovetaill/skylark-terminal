@@ -4,4 +4,4 @@ public abstract record RightPanelHeaderNode;
 
 public sealed record ActionStripRightPanelHeader : RightPanelHeaderNode;
 
-public sealed record SftpCommandBarRightPanelHeader : RightPanelHeaderNode;
+public sealed record SftpToolbarRightPanelHeader : RightPanelHeaderNode;

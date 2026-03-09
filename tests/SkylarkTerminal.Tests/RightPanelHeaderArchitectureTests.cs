@@ -16,6 +16,6 @@ public class RightPanelHeaderArchitectureTests
         Assert.IsType<ActionStripRightPanelHeader>(vm.ActiveRightHeader);
 
         await vm.ShowSftpToolsCommand.ExecuteAsync(null);
-        Assert.IsType<SftpCommandBarRightPanelHeader>(vm.ActiveRightHeader);
+        Assert.IsType<SftpToolbarRightPanelHeader>(vm.ActiveRightHeader);
     }
 }

@@ -2,14 +2,15 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using SkylarkTerminal.ViewModels;
 using SkylarkTerminal.ViewModels.RightPanelModes;
 
 namespace SkylarkTerminal.Views.RightHeaders;
 
-public partial class SftpCommandBarHeaderView : UserControl
+public partial class SftpToolbarHeaderView : UserControl
 {
-    public SftpCommandBarHeaderView()
+    public SftpToolbarHeaderView()
     {
         InitializeComponent();
     }
@@ -60,7 +61,8 @@ public partial class SftpCommandBarHeaderView : UserControl
     {
         vm = null!;
 
-        if (DataContext is not MainWindowViewModel { ActiveRightMode: SftpModeViewModel sftpMode })
+        var host = this.FindAncestorOfType<RightSidebarHostView>();
+        if (host?.DataContext is not MainWindowViewModel { ActiveRightMode: SftpModeViewModel sftpMode })
         {
             return false;
         }

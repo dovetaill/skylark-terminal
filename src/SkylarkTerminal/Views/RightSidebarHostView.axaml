@@ -10,8 +10,8 @@
         <DataTemplate DataType="models:ActionStripRightPanelHeader">
             <rightHeaders:ActionStripHeaderView/>
         </DataTemplate>
-        <DataTemplate DataType="models:SftpCommandBarRightPanelHeader">
-            <rightHeaders:SftpCommandBarHeaderView/>
+        <DataTemplate DataType="models:SftpToolbarRightPanelHeader">
+            <rightHeaders:SftpToolbarHeaderView/>
         </DataTemplate>
         <DataTemplate DataType="models:SnippetsRightToolsContent">
             <rightModes:SnippetsModeView/>

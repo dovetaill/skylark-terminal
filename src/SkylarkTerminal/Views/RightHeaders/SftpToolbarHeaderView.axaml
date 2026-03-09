@@ -1,0 +1,110 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="using:SkylarkTerminal.Models"
+             xmlns:views="using:SkylarkTerminal.Views"
+             x:Class="SkylarkTerminal.Views.RightHeaders.SftpToolbarHeaderView"
+             x:CompileBindings="False">
+    <Grid ColumnDefinitions="Auto,*,Auto"
+          ColumnSpacing="6">
+        <ItemsControl Grid.Column="0"
+                      ItemsSource="{Binding DataContext.ActiveRightMode.LeadingCommands, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="6"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="models:SftpToolbarActionDescriptor">
+                    <Button Classes="TitleBarButton RightSidebarCommandButton"
+                            Command="{Binding Command}"
+                            ToolTip.Tip="{Binding TooltipZh}">
+                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                   Text="{Binding Glyph}"/>
+                    </Button>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <Grid Grid.Column="1"
+              MinWidth="140"
+              ColumnDefinitions="*">
+            <Button x:Name="AddressChipButton"
+                    Classes="TitleBarButton RightSidebarAddressChip"
+                    Padding="10,0"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch"
+                    IsVisible="{Binding DataContext.ActiveRightMode.IsAddressChipVisible, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                    Click="OnAddressChipClick">
+                <TextBlock Text="{Binding DataContext.ActiveRightMode.CurrentPath, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                           TextTrimming="CharacterEllipsis"
+                           TextWrapping="NoWrap"/>
+            </Button>
+            <TextBox x:Name="AddressEditor"
+                     Classes="RightSidebarAddressEditor"
+                     MinWidth="220"
+                     Watermark="/"
+                     IsVisible="{Binding DataContext.ActiveRightMode.IsAddressEditorExpanded, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                     LostFocus="OnAddressEditorLostFocus"
+                     KeyDown="OnAddressEditorKeyDown"
+                     Text="{Binding DataContext.ActiveRightMode.AddressInput, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}">
+                <TextBox.KeyBindings>
+                    <KeyBinding Gesture="Enter"
+                                Command="{Binding DataContext.ActiveRightMode.AddressCommitCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"/>
+                </TextBox.KeyBindings>
+            </TextBox>
+        </Grid>
+
+        <StackPanel Grid.Column="2"
+                    Orientation="Horizontal"
+                    Spacing="6">
+            <ItemsControl ItemsSource="{Binding DataContext.ActiveRightMode.TrailingCommands, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="6"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="models:SftpToolbarActionDescriptor">
+                        <Button Classes="TitleBarButton RightSidebarCommandButton"
+                                Command="{Binding Command}"
+                                ToolTip.Tip="{Binding TooltipZh}">
+                            <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                       Text="{Binding Glyph}"/>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Button Classes="TitleBarButton RightSidebarCommandButton"
+                    ToolTip.Tip="更多操作">
+                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                           Text="&#xE712;"/>
+                <Button.Flyout>
+                    <Flyout Placement="BottomEdgeAlignedRight">
+                        <Border Padding="6">
+                            <ItemsControl ItemsSource="{Binding DataContext.ActiveRightMode.MoreCommands, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="models:SftpToolbarActionDescriptor">
+                                        <Button Classes="TitleBarButton RightSidebarCommandButton"
+                                                Command="{Binding Command}"
+                                                HorizontalContentAlignment="Left"
+                                                ToolTip.Tip="{Binding TooltipZh}">
+                                            <StackPanel Orientation="Horizontal"
+                                                        Spacing="8">
+                                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                           Text="{Binding Glyph}"/>
+                                                <TextBlock Text="{Binding LabelZh}"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+        </StackPanel>
+    </Grid>
+</UserControl>
