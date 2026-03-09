@@ -27,32 +27,64 @@
         </ItemsControl>
 
         <Grid Grid.Column="1"
-              MinWidth="140"
-              ColumnDefinitions="*">
-            <Button x:Name="AddressChipButton"
-                    Classes="TitleBarButton RightSidebarAddressChip"
-                    Padding="10,0"
-                    HorizontalAlignment="Stretch"
-                    HorizontalContentAlignment="Stretch"
-                    IsVisible="{Binding DataContext.ActiveRightMode.IsAddressChipVisible, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
-                    Click="OnAddressChipClick">
-                <TextBlock Text="{Binding DataContext.ActiveRightMode.CurrentPath, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
-                           TextTrimming="CharacterEllipsis"
-                           TextWrapping="NoWrap"/>
-            </Button>
-            <TextBox x:Name="AddressEditor"
-                     Classes="RightSidebarAddressEditor"
-                     MinWidth="220"
-                     Watermark="/"
-                     IsVisible="{Binding DataContext.ActiveRightMode.IsAddressEditorExpanded, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
-                     LostFocus="OnAddressEditorLostFocus"
-                     KeyDown="OnAddressEditorKeyDown"
-                     Text="{Binding DataContext.ActiveRightMode.AddressInput, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}">
-                <TextBox.KeyBindings>
-                    <KeyBinding Gesture="Enter"
-                                Command="{Binding DataContext.ActiveRightMode.AddressCommitCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"/>
-                </TextBox.KeyBindings>
-            </TextBox>
+              MinWidth="0">
+            <Grid x:Name="AddressBrowseSurface"
+                  ColumnDefinitions="*,Auto,Auto"
+                  ColumnSpacing="6"
+                  IsVisible="{Binding DataContext.ActiveRightMode.IsHeaderUtilityStripVisible, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+                <Button x:Name="AddressChipButton"
+                        Grid.Column="0"
+                        Classes="TitleBarButton RightSidebarAddressChip"
+                        Padding="10,0"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch"
+                        Click="OnAddressChipClick">
+                    <TextBlock Text="{Binding DataContext.ActiveRightMode.CurrentPath, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                               TextTrimming="CharacterEllipsis"
+                               TextWrapping="NoWrap"/>
+                </Button>
+                <Button x:Name="AddressHistoryButton"
+                        Grid.Column="1"
+                        Classes="TitleBarButton RightSidebarInlineUtilityButton"
+                        ToolTip.Tip="历史路径">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               Text="&#xE81C;"/>
+                </Button>
+                <Button x:Name="AddressSearchButton"
+                        Grid.Column="2"
+                        Classes="TitleBarButton RightSidebarInlineUtilityButton"
+                        ToolTip.Tip="搜索"
+                        Click="OnSearchButtonClick">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               Text="&#xE721;"/>
+                </Button>
+            </Grid>
+
+            <Border x:Name="AddressOverlayRoot"
+                    Classes="RightSidebarHeaderOverlay"
+                    IsVisible="{Binding DataContext.ActiveRightMode.IsHeaderOverlayVisible, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+                <Grid ColumnDefinitions="*">
+                    <TextBox x:Name="AddressOverlayTextBox"
+                             Classes="RightSidebarAddressEditor"
+                             Watermark="/"
+                             IsVisible="{Binding DataContext.ActiveRightMode.IsAddressOverlayVisible, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                             LostFocus="OnOverlayEditorLostFocus"
+                             KeyDown="OnOverlayEditorKeyDown"
+                             Text="{Binding DataContext.ActiveRightMode.AddressInput, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}">
+                        <TextBox.KeyBindings>
+                            <KeyBinding Gesture="Enter"
+                                        Command="{Binding DataContext.ActiveRightMode.AddressCommitCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"/>
+                        </TextBox.KeyBindings>
+                    </TextBox>
+                    <TextBox x:Name="SearchOverlayTextBox"
+                             Classes="RightSidebarAddressEditor"
+                             Watermark="搜索当前目录"
+                             IsVisible="{Binding DataContext.ActiveRightMode.IsSearchOverlayVisible, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                             LostFocus="OnOverlayEditorLostFocus"
+                             KeyDown="OnOverlayEditorKeyDown"
+                             Text="{Binding DataContext.ActiveRightMode.SearchQuery, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                </Grid>
+            </Border>
         </Grid>
 
         <StackPanel Grid.Column="2"

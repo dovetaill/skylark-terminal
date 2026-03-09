@@ -58,7 +58,11 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
         });
         AddressCommitCommand = new AsyncRelayCommand(CommitAddressAsync);
         OpenAddressOverlayCommand = new RelayCommand(OpenAddressOverlay);
-        OpenSearchOverlayCommand = new RelayCommand(() => HeaderOverlayMode = SftpHeaderOverlayMode.Search);
+        OpenSearchOverlayCommand = new RelayCommand(() =>
+        {
+            IsAddressEditorExpanded = false;
+            HeaderOverlayMode = SftpHeaderOverlayMode.Search;
+        });
         CloseHeaderOverlayCommand = new RelayCommand(() =>
         {
             HeaderOverlayMode = SftpHeaderOverlayMode.None;
@@ -144,6 +148,10 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
 
     public bool IsHeaderUtilityStripVisible => HeaderOverlayMode == SftpHeaderOverlayMode.None;
 
+    public bool IsAddressOverlayVisible => HeaderOverlayMode == SftpHeaderOverlayMode.Address;
+
+    public bool IsSearchOverlayVisible => HeaderOverlayMode == SftpHeaderOverlayMode.Search;
+
     public string AddressInput
     {
         get => _addressInput;
@@ -194,6 +202,8 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
         _ = value;
         OnPropertyChanged(nameof(IsHeaderOverlayVisible));
         OnPropertyChanged(nameof(IsHeaderUtilityStripVisible));
+        OnPropertyChanged(nameof(IsAddressOverlayVisible));
+        OnPropertyChanged(nameof(IsSearchOverlayVisible));
     }
 
     partial void OnLoadStateChanged(SftpPanelLoadState value)

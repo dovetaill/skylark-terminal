@@ -28,4 +28,21 @@ public class SftpAddressInteractionStateTests
         Assert.False(vm.IsAddressEditorExpanded);
         Assert.Contains(vm.Items, item => item.FullPath.Contains("/logs", StringComparison.Ordinal));
     }
+
+    [Fact]
+    public void CloseHeaderOverlayCommand_ShouldRestoreBrowseState()
+    {
+        var vm = new SftpModeViewModel(
+            new MockSftpService(),
+            new SftpNavigationService("/"),
+            []);
+
+        vm.OpenAddressOverlayCommand.Execute(null);
+        Assert.True(vm.IsHeaderOverlayVisible);
+
+        vm.CloseHeaderOverlayCommand.Execute(null);
+
+        Assert.Equal(Models.SftpHeaderOverlayMode.None, vm.HeaderOverlayMode);
+        Assert.True(vm.IsHeaderUtilityStripVisible);
+    }
 }

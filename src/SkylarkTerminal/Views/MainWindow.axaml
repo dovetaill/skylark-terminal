@@ -212,6 +212,25 @@
             <Setter Property="Background" Value="{DynamicResource RightSidebarModeSelectedBackgroundBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource RightSidebarModeSelectedBorderBrush}"/>
         </Style>
+        <Style Selector="Button.RightSidebarInlineUtilityButton">
+            <Setter Property="MinWidth" Value="24"/>
+            <Setter Property="MinHeight" Value="24"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style Selector="Button.RightSidebarInlineUtilityButton:pointerover">
+            <Setter Property="Background" Value="{DynamicResource RightSidebarModeHoverBackgroundBrush}"/>
+        </Style>
+        <Style Selector="Border.RightSidebarHeaderOverlay">
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Background" Value="{DynamicResource ShellPanelBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ShellDividerBrush}"/>
+        </Style>
         <Style Selector="TextBox.RightSidebarAddressEditor">
             <Setter Property="MinHeight" Value="30"/>
             <Setter Property="Padding" Value="10,0"/>

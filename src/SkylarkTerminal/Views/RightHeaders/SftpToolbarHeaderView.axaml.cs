@@ -24,27 +24,44 @@ public partial class SftpToolbarHeaderView : UserControl
             return;
         }
 
-        vm.ExpandAddressEditorCommand.Execute(null);
+        vm.OpenAddressOverlayCommand.Execute(null);
         Dispatcher.UIThread.Post(() =>
         {
-            AddressEditor?.Focus();
-            AddressEditor?.SelectAll();
+            AddressOverlayTextBox?.Focus();
+            AddressOverlayTextBox?.SelectAll();
         }, DispatcherPriority.Background);
     }
 
-    private void OnAddressEditorLostFocus(object? sender, RoutedEventArgs e)
+    private void OnSearchButtonClick(object? sender, RoutedEventArgs e)
     {
         _ = sender;
         _ = e;
-        if (!TryGetSftpModeViewModel(out var vm) || !vm.IsAddressEditorExpanded)
+        if (!TryGetSftpModeViewModel(out var vm))
         {
             return;
         }
 
-        vm.CollapseAddressEditorCommand.Execute(null);
+        vm.OpenSearchOverlayCommand.Execute(null);
+        Dispatcher.UIThread.Post(() =>
+        {
+            SearchOverlayTextBox?.Focus();
+            SearchOverlayTextBox?.SelectAll();
+        }, DispatcherPriority.Background);
     }
 
-    private void OnAddressEditorKeyDown(object? sender, KeyEventArgs e)
+    private void OnOverlayEditorLostFocus(object? sender, RoutedEventArgs e)
+    {
+        _ = sender;
+        _ = e;
+        if (!TryGetSftpModeViewModel(out var vm) || !vm.IsHeaderOverlayVisible)
+        {
+            return;
+        }
+
+        vm.CloseHeaderOverlayCommand.Execute(null);
+    }
+
+    private void OnOverlayEditorKeyDown(object? sender, KeyEventArgs e)
     {
         _ = sender;
         if (e.Key != Key.Escape || !TryGetSftpModeViewModel(out var vm))
@@ -52,7 +69,7 @@ public partial class SftpToolbarHeaderView : UserControl
             return;
         }
 
-        vm.CollapseAddressEditorCommand.Execute(null);
+        vm.CloseHeaderOverlayCommand.Execute(null);
         e.Handled = true;
         Dispatcher.UIThread.Post(() => AddressChipButton?.Focus(), DispatcherPriority.Background);
     }
