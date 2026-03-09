@@ -2,26 +2,42 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:models="using:SkylarkTerminal.Models"
              xmlns:ui="using:FluentAvalonia.UI.Controls"
-             xmlns:views="using:SkylarkTerminal.Views"
              x:Class="SkylarkTerminal.Views.RightModes.SnippetsModeView"
              x:CompileBindings="False">
     <Grid Margin="10,10,10,12">
-        <Grid IsVisible="{Binding DataContext.ActiveRightMode.IsBrowseState, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+        <Grid IsVisible="{Binding IsBrowseState}"
               RowDefinitions="Auto,*"
               RowSpacing="12">
+            <Grid.ContextFlyout>
+                <ui:FAMenuFlyout FlyoutPresenterClasses="snippets-root-context-flyout">
+                    <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                       Command="{Binding BeginCreateCommand}"
+                                       Text="{x:Static models:SnippetsText.NewSnippet}"/>
+                    <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                       Command="{Binding BeginCreateCategoryCommand}"
+                                       Text="{x:Static models:SnippetsText.NewCategory}"/>
+                    <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                       Command="{Binding BeginCreateFromClipboardCommand}"
+                                       Text="{x:Static models:SnippetsText.CreateFromClipboard}"/>
+                    <ui:MenuFlyoutSeparator />
+                    <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                       Command="{Binding ClearFilterCommand}"
+                                       Text="{x:Static models:SnippetsText.ClearSearch}"/>
+                </ui:FAMenuFlyout>
+            </Grid.ContextFlyout>
             <Grid ColumnDefinitions="Auto,*"
                   ColumnSpacing="8">
                 <Button Classes="RightSidebarCommandButton"
-                        Command="{Binding DataContext.ActiveRightMode.BeginCreateCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
-                        Content="New Snippet"/>
+                        Command="{Binding BeginCreateCommand}"
+                        Content="{x:Static models:SnippetsText.NewSnippet}"/>
                 <TextBox Grid.Column="1"
-                         Watermark="搜索代码块"
-                         Text="{Binding DataContext.ActiveRightMode.FilterText, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                         Watermark="{x:Static models:SnippetsText.SearchWatermark}"
+                         Text="{Binding FilterText, Mode=TwoWay}"/>
             </Grid>
 
             <ScrollViewer Grid.Row="1"
                           HorizontalScrollBarVisibility="Disabled">
-                <ItemsControl ItemsSource="{Binding DataContext.ActiveRightMode.VisibleCategories, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+                <ItemsControl ItemsSource="{Binding VisibleCategories}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="models:SnippetCategory">
                             <StackPanel Margin="0,0,0,14"
@@ -48,27 +64,27 @@
                                                     <ui:FAMenuFlyout FlyoutPresenterClasses="snippets-card-context-flyout">
                                                         <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
                                                                            Tag="run"
-                                                                           Text="Run"
+                                                                           Text="{x:Static models:SnippetsText.Run}"
                                                                            Click="OnSnippetContextActionClick"/>
                                                         <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
                                                                            Tag="edit"
-                                                                           Text="Edit"
+                                                                           Text="{x:Static models:SnippetsText.Edit}"
                                                                            Click="OnSnippetContextActionClick"/>
                                                         <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
                                                                            Tag="run-all"
-                                                                           Text="Run in all tabs"
+                                                                           Text="{x:Static models:SnippetsText.RunInAllTabs}"
                                                                            Click="OnSnippetContextActionClick"/>
                                                         <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
                                                                            Tag="copy"
-                                                                           Text="Copy"
+                                                                           Text="{x:Static models:SnippetsText.Copy}"
                                                                            Click="OnSnippetContextActionClick"/>
                                                         <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
                                                                            Tag="view-more"
-                                                                           Text="View more"
+                                                                           Text="{x:Static models:SnippetsText.ViewMore}"
                                                                            Click="OnSnippetContextActionClick"/>
                                                         <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
                                                                            Tag="paste"
-                                                                           Text="Paste"
+                                                                           Text="{x:Static models:SnippetsText.Paste}"
                                                                            Click="OnSnippetContextActionClick"/>
                                                     </ui:FAMenuFlyout>
                                                 </Border.ContextFlyout>
@@ -105,15 +121,15 @@
                                                             <Button Classes="RightSidebarSnippetActionButton"
                                                                     Tag="copy"
                                                                     Click="OnSnippetActionClick"
-                                                                    Content="Copy"/>
+                                                                    Content="{x:Static models:SnippetsText.Copy}"/>
                                                             <Button Classes="RightSidebarSnippetActionButton"
                                                                     Tag="run"
                                                                     Click="OnSnippetActionClick"
-                                                                    Content="Run"/>
+                                                                    Content="{x:Static models:SnippetsText.Run}"/>
                                                             <Button Classes="RightSidebarSnippetActionButton"
                                                                     Tag="paste"
                                                                     Click="OnSnippetActionClick"
-                                                                    Content="Paste"/>
+                                                                    Content="{x:Static models:SnippetsText.Paste}"/>
                                                         </StackPanel>
                                                     </Border>
                                                 </StackPanel>
@@ -128,109 +144,109 @@
             </ScrollViewer>
         </Grid>
 
-        <ScrollViewer IsVisible="{Binding DataContext.ActiveRightMode.IsCreateState, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+        <ScrollViewer IsVisible="{Binding IsCreateState}"
                       HorizontalScrollBarVisibility="Disabled">
             <StackPanel Spacing="12">
                 <TextBlock FontSize="18"
                            FontWeight="SemiBold"
-                           Text="Create Snippet"/>
-                <TextBox Watermark="Title"
-                         Text="{Binding DataContext.ActiveRightMode.Draft.Title, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                           Text="{x:Static models:SnippetsText.CreateSnippet}"/>
+                <TextBox Watermark="{x:Static models:SnippetsText.TitleWatermark}"
+                         Text="{Binding Draft.Title, Mode=TwoWay}"/>
                 <Grid ColumnDefinitions="*,Auto"
                       ColumnSpacing="8">
-                    <TextBox Watermark="选择或新建分类"
-                             Text="{Binding DataContext.ActiveRightMode.Draft.CategoryName, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                    <TextBox Watermark="{x:Static models:SnippetsText.CategoryWatermark}"
+                             Text="{Binding Draft.CategoryName, Mode=TwoWay}"/>
                     <Button Grid.Column="1"
                             Classes="RightSidebarCommandButton"
-                            Command="{Binding DataContext.ActiveRightMode.StartNewCategoryCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
-                            Content="New category"/>
+                            Command="{Binding StartNewCategoryCommand}"
+                            Content="{x:Static models:SnippetsText.NewCategory}"/>
                 </Grid>
-                <TextBox Watermark="标签，使用逗号分隔"
-                         Text="{Binding DataContext.ActiveRightMode.Draft.TagsText, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                <TextBox Watermark="{x:Static models:SnippetsText.TagsWatermark}"
+                         Text="{Binding Draft.TagsText, Mode=TwoWay}"/>
                 <TextBox AcceptsReturn="True"
                          Height="180"
                          TextWrapping="Wrap"
-                         Watermark="Snippet content"
-                         Text="{Binding DataContext.ActiveRightMode.Draft.Content, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                         Watermark="{x:Static models:SnippetsText.ContentWatermark}"
+                         Text="{Binding Draft.Content, Mode=TwoWay}"/>
                 <StackPanel Orientation="Horizontal"
+                            x:Name="CreateEditorFooter"
                             Spacing="8">
                     <Button Classes="RightSidebarCommandButton"
-                            Content="Save"
+                            Content="{x:Static models:SnippetsText.Save}"
                             Click="OnEditorSaveClick"/>
                     <Button Classes="RightSidebarCommandButton"
-                            Content="Cancel"
+                            Content="{x:Static models:SnippetsText.Cancel}"
                             Click="OnEditorCancelClick"/>
-                    <Button Classes="RightSidebarCommandButton"
-                            Content="Remove"
-                            Click="OnEditorRemoveClick"/>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
 
-        <ScrollViewer IsVisible="{Binding DataContext.ActiveRightMode.IsEditState, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+        <ScrollViewer IsVisible="{Binding IsEditState}"
                       HorizontalScrollBarVisibility="Disabled">
             <StackPanel Spacing="12">
                 <TextBlock FontSize="18"
                            FontWeight="SemiBold"
-                           Text="Edit Snippet"/>
-                <TextBox Watermark="Title"
-                         Text="{Binding DataContext.ActiveRightMode.Draft.Title, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                           Text="{x:Static models:SnippetsText.EditSnippet}"/>
+                <TextBox Watermark="{x:Static models:SnippetsText.TitleWatermark}"
+                         Text="{Binding Draft.Title, Mode=TwoWay}"/>
                 <Grid ColumnDefinitions="*,Auto"
                       ColumnSpacing="8">
-                    <TextBox Watermark="选择或新建分类"
-                             Text="{Binding DataContext.ActiveRightMode.Draft.CategoryName, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                    <TextBox Watermark="{x:Static models:SnippetsText.CategoryWatermark}"
+                             Text="{Binding Draft.CategoryName, Mode=TwoWay}"/>
                     <Button Grid.Column="1"
                             Classes="RightSidebarCommandButton"
-                            Command="{Binding DataContext.ActiveRightMode.StartNewCategoryCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
-                            Content="New category"/>
+                            Command="{Binding StartNewCategoryCommand}"
+                            Content="{x:Static models:SnippetsText.NewCategory}"/>
                 </Grid>
-                <TextBox Watermark="标签，使用逗号分隔"
-                         Text="{Binding DataContext.ActiveRightMode.Draft.TagsText, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                <TextBox Watermark="{x:Static models:SnippetsText.TagsWatermark}"
+                         Text="{Binding Draft.TagsText, Mode=TwoWay}"/>
                 <TextBox AcceptsReturn="True"
                          Height="180"
                          TextWrapping="Wrap"
-                         Watermark="Snippet content"
-                         Text="{Binding DataContext.ActiveRightMode.Draft.Content, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                         Watermark="{x:Static models:SnippetsText.ContentWatermark}"
+                         Text="{Binding Draft.Content, Mode=TwoWay}"/>
                 <StackPanel Orientation="Horizontal"
+                            x:Name="EditEditorFooter"
                             Spacing="8">
                     <Button Classes="RightSidebarCommandButton"
-                            Content="Save"
+                            Content="{x:Static models:SnippetsText.Save}"
                             Click="OnEditorSaveClick"/>
                     <Button Classes="RightSidebarCommandButton"
-                            Content="Cancel"
-                            Click="OnEditorCancelClick"/>
-                    <Button Classes="RightSidebarCommandButton"
-                            Content="Remove"
+                            Content="{x:Static models:SnippetsText.Delete}"
                             Click="OnEditorRemoveClick"/>
+                    <Button Classes="RightSidebarCommandButton"
+                            Content="{x:Static models:SnippetsText.Cancel}"
+                            Click="OnEditorCancelClick"/>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
 
-        <ScrollViewer IsVisible="{Binding DataContext.ActiveRightMode.IsViewMoreState, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+        <ScrollViewer IsVisible="{Binding IsViewMoreState}"
                       HorizontalScrollBarVisibility="Disabled">
             <StackPanel Spacing="12">
                 <StackPanel Orientation="Horizontal"
+                            x:Name="ViewMoreHeader"
                             Spacing="8">
                     <Button Classes="RightSidebarCommandButton"
-                            Content="Back"
+                            Content="{x:Static models:SnippetsText.Back}"
                             Click="OnViewMoreBackClick"/>
                     <TextBlock VerticalAlignment="Center"
                                FontSize="18"
                                FontWeight="SemiBold"
-                               Text="View More"/>
+                               Text="{x:Static models:SnippetsText.ViewMore}"/>
                 </StackPanel>
                 <TextBlock FontSize="16"
                            FontWeight="SemiBold"
-                           Text="{Binding DataContext.ActiveRightMode.Draft.Title, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"/>
+                           Text="{Binding Draft.Title}"/>
                 <Border Classes="RightSidebarSnippetTagChip">
-                    <TextBlock Text="{Binding DataContext.ActiveRightMode.Draft.CategoryName, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"/>
+                    <TextBlock Text="{Binding Draft.CategoryName}"/>
                 </Border>
                 <TextBlock Classes="RightSidebarSnippetPreviewText"
-                           Text="{Binding DataContext.ActiveRightMode.Draft.TagsText, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                           Text="{Binding Draft.TagsText}"
                            TextWrapping="Wrap"/>
                 <Border Classes="RightSidebarSnippetCard">
                     <TextBlock FontFamily="Cascadia Mono, Consolas, Microsoft YaHei UI"
-                               Text="{Binding DataContext.ActiveRightMode.Draft.Content, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                               Text="{Binding Draft.Content}"
                                TextWrapping="Wrap"/>
                 </Border>
             </StackPanel>

@@ -48,6 +48,9 @@ public sealed partial class SnippetsModeViewModel : ObservableObject, IRightPane
         this.allTabsAccessor = allTabsAccessor;
 
         BeginCreateCommand = new RelayCommand(BeginCreate);
+        BeginCreateCategoryCommand = new RelayCommand(BeginCreateCategory);
+        BeginCreateFromClipboardCommand = new AsyncRelayCommand(BeginCreateFromClipboardAsync);
+        ClearFilterCommand = new RelayCommand(ClearFilter);
         FocusSearchCommand = new RelayCommand(() => { });
         OpenEditCommand = new RelayCommand<SnippetItem?>(OpenEdit);
         OpenViewMoreCommand = new RelayCommand<SnippetItem?>(OpenViewMore);
@@ -63,7 +66,7 @@ public sealed partial class SnippetsModeViewModel : ObservableObject, IRightPane
 
     public RightToolsViewKind Kind => RightToolsViewKind.Snippets;
 
-    public string Title => "Snippets";
+    public string Title => SnippetsText.ModeTitle;
 
     public string Glyph => "\uE8D2";
 
@@ -90,6 +93,12 @@ public sealed partial class SnippetsModeViewModel : ObservableObject, IRightPane
     private SnippetItem? selectedSnippet;
 
     public IRelayCommand BeginCreateCommand { get; }
+
+    public IRelayCommand BeginCreateCategoryCommand { get; }
+
+    public IAsyncRelayCommand BeginCreateFromClipboardCommand { get; }
+
+    public IRelayCommand ClearFilterCommand { get; }
 
     public IRelayCommand FocusSearchCommand { get; }
 
@@ -226,6 +235,12 @@ public sealed partial class SnippetsModeViewModel : ObservableObject, IRightPane
             .ConfigureAwait(false);
     }
 
+    public Task CopyAsync(SnippetItem item, CancellationToken cancellationToken = default)
+    {
+        _ = cancellationToken;
+        return clipboardService.SetTextAsync(item.Content);
+    }
+
     public async Task RunAsync(SnippetItem item, CancellationToken cancellationToken = default)
     {
         await terminalBridge
@@ -268,6 +283,19 @@ public sealed partial class SnippetsModeViewModel : ObservableObject, IRightPane
         SelectedSnippet = null;
         Draft = SnippetEditDraft.Empty();
         PanelState = SnippetPanelState.Create;
+    }
+
+    private void BeginCreateCategory()
+    {
+        BeginCreate();
+        Draft.CreateNewCategory = true;
+        Draft.CategoryName = string.Empty;
+    }
+
+    private async Task BeginCreateFromClipboardAsync()
+    {
+        BeginCreate();
+        Draft.Content = await clipboardService.GetTextAsync().ConfigureAwait(false) ?? string.Empty;
     }
 
     private void OpenEdit(SnippetItem? item)
@@ -316,6 +344,11 @@ public sealed partial class SnippetsModeViewModel : ObservableObject, IRightPane
     {
         Draft = SnippetEditDraft.Empty();
         PanelState = SnippetPanelState.Browse;
+    }
+
+    private void ClearFilter()
+    {
+        FilterText = string.Empty;
     }
 
     private void StartNewCategory()

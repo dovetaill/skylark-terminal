@@ -3,10 +3,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using FluentAvalonia.UI.Controls;
 using SkylarkTerminal.Models;
-using SkylarkTerminal.Services;
-using SkylarkTerminal.ViewModels;
 using SkylarkTerminal.ViewModels.RightPanelModes;
-using System;
 using System.Threading.Tasks;
 
 namespace SkylarkTerminal.Views.RightModes;
@@ -59,7 +56,7 @@ public partial class SnippetsModeView : UserControl
         switch (action)
         {
             case "copy":
-                await CopySnippetAsync(item);
+                await vm.CopyAsync(item);
                 break;
             case "run":
                 await vm.RunAsync(item);
@@ -127,24 +124,6 @@ public partial class SnippetsModeView : UserControl
         vm.CancelEditCommand.Execute(null);
     }
 
-    private async Task CopySnippetAsync(SnippetItem item)
-    {
-        try
-        {
-            var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
-            if (clipboard is null)
-            {
-                return;
-            }
-
-            await clipboard.SetTextAsync(item.Content);
-        }
-        catch (Exception ex)
-        {
-            RuntimeLogger.Error("snippets-ui", "Copy snippet failed.", ex);
-        }
-    }
-
     private bool TryGetSnippetContext(
         object? sender,
         out SnippetsModeViewModel vm,
@@ -153,7 +132,7 @@ public partial class SnippetsModeView : UserControl
         vm = null!;
         item = null!;
 
-        if (DataContext is not MainWindowViewModel { ActiveRightMode: SnippetsModeViewModel snippetsVm })
+        if (!TryGetViewModel(out var snippetsVm))
         {
             return false;
         }
@@ -173,7 +152,7 @@ public partial class SnippetsModeView : UserControl
     {
         vm = null!;
 
-        if (DataContext is not MainWindowViewModel { ActiveRightMode: SnippetsModeViewModel snippetsVm })
+        if (DataContext is not SnippetsModeViewModel snippetsVm)
         {
             return false;
         }
