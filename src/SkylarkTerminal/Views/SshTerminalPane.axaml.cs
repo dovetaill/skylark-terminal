@@ -787,19 +787,23 @@ public partial class SshTerminalPane : UserControl
     {
         var tab = ResolveTab();
         CaptureTabForLogs(tab);
-        if (tab?.ConnectionConfig is null)
+        if (tab is null)
+        {
+            ShowQuickStart(null);
+            return;
+        }
+
+        var connectionConfig = tab.ConnectionConfig;
+        if (connectionConfig is null)
         {
             ShowQuickStart(tab);
             return;
         }
 
         QuickStartOverlay.IsVisible = false;
-        if (tab is not null)
-        {
-            tab.SessionState = state;
-            tab.SessionStatusMessage = message;
-            tab.PlaceholderText = message;
-        }
+        tab.SessionState = state;
+        tab.SessionStatusMessage = message;
+        tab.PlaceholderText = message;
 
         RuntimeLogger.Info(
             "terminal-state",
@@ -817,7 +821,7 @@ public partial class SshTerminalPane : UserControl
                 ConnectingOverlay.IsVisible = false;
                 ConnectingRing.IsActive = false;
                 SessionInfoBar.IsOpen = false;
-                _hostViewModel?.MarkConnectionAsRecentlyUsed(tab.ConnectionConfig);
+                _hostViewModel?.MarkConnectionAsRecentlyUsed(connectionConfig);
                 break;
             case SessionState.Disconnected:
                 ConnectingOverlay.IsVisible = false;

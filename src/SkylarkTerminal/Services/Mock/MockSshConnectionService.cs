@@ -50,10 +50,17 @@ public sealed class MockSshConnectionService : ISshConnectionService
             SessionId = sessionId;
             _ = Task.Run(async () =>
             {
-                await Task.Delay(50).ConfigureAwait(false);
-                OutputReceived?.Invoke(
-                    this,
-                    "Mock terminal session connected.\r\nType commands here when real SSH is enabled.\r\n");
+                try
+                {
+                    await Task.Delay(50).ConfigureAwait(false);
+                    OutputReceived?.Invoke(
+                        this,
+                        "Mock terminal session connected.\r\nType commands here when real SSH is enabled.\r\n");
+                }
+                catch (Exception ex)
+                {
+                    Faulted?.Invoke(this, ex);
+                }
             });
         }
 
