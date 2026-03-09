@@ -46,6 +46,23 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
             IsAddressEditorExpanded = false;
         });
         AddressCommitCommand = new AsyncRelayCommand(CommitAddressAsync);
+
+        LeadingCommands =
+        [
+            new("sftp.back", "\uE72B", "后退", "后退", BackCommand),
+            new("sftp.forward", "\uE72A", "前进", "前进", ForwardCommand),
+        ];
+        TrailingCommands =
+        [
+            new("sftp.refresh", "\uE72C", "刷新", "刷新", RefreshCommand),
+            new("sftp.up", "\uE74A", "上一级", "上一级", UpCommand),
+        ];
+        MoreCommands =
+        [
+            new("sftp.copy-path", "\uE8C8", "复制当前路径", "复制当前路径", new RelayCommand(() => { })),
+            new("sftp.open-in-tab", "\uE8A5", "在新标签打开", "在新标签打开", new RelayCommand(() => { })),
+            new("sftp.show-hidden", "\uE890", "显示隐藏文件", "显示隐藏文件", new RelayCommand(() => { })),
+        ];
     }
 
     public RightToolsViewKind Kind => RightToolsViewKind.Sftp;
@@ -59,6 +76,12 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
     public RightToolsContentNode ContentNode { get; } = new SftpRightToolsContent();
 
     public IReadOnlyList<ModeActionDescriptor> Actions { get; }
+
+    public IReadOnlyList<SftpToolbarActionDescriptor> LeadingCommands { get; }
+
+    public IReadOnlyList<SftpToolbarActionDescriptor> TrailingCommands { get; }
+
+    public IReadOnlyList<SftpToolbarActionDescriptor> MoreCommands { get; }
 
     public ObservableCollection<RemoteFileNode> Items { get; } = [];
 

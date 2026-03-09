@@ -15,7 +15,7 @@
             <DataTemplate DataType="models:ModeActionDescriptor">
                 <Button Classes="TitleBarButton RightSidebarCommandButton"
                         Command="{Binding Command}"
-                        ToolTip.Tip="{Binding Tooltip}">
+                        ToolTip.Tip="{Binding TooltipZh}">
                     <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                                Text="{Binding Glyph}"/>
                 </Button>

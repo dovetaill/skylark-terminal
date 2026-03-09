@@ -1794,10 +1794,10 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         return
         [
-            new("snippet.new", "\uE710", "New snippet", CreateSnippetCommand),
-            new("snippet.search", "\uE721", "Search snippets", SearchSnippetCommand),
-            new("snippet.sort", "\uE8CB", "Sort snippets", SortSnippetCommand),
-            new("snippet.layout", "\uE8A4", "Toggle layout", ToggleSnippetLayoutCommand, IsToggle: true),
+            new("snippet.new", "\uE710", "新建代码块", "新建代码块", CreateSnippetCommand),
+            new("snippet.search", "\uE721", "搜索代码块", "搜索代码块", SearchSnippetCommand),
+            new("snippet.sort", "\uE8CB", "排序代码块", "排序代码块", SortSnippetCommand),
+            new("snippet.layout", "\uE8A4", "切换布局", "切换布局", ToggleSnippetLayoutCommand, IsToggle: true),
         ];
     }
 
@@ -1805,10 +1805,10 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         return
         [
-            new("history.search", "\uE721", "Search history", SearchHistoryCommand),
-            new("history.sort", "\uE8CB", "Sort history", SortHistoryCommand),
-            new("history.layout", "\uE8A4", "Toggle layout", ToggleHistoryLayoutCommand, IsToggle: true),
-            new("history.clear", "\uE74D", "Clear history", ClearHistoryCommand),
+            new("history.search", "\uE721", "搜索历史", "搜索历史", SearchHistoryCommand),
+            new("history.sort", "\uE8CB", "排序历史", "排序历史", SortHistoryCommand),
+            new("history.layout", "\uE8A4", "切换布局", "切换布局", ToggleHistoryLayoutCommand, IsToggle: true),
+            new("history.clear", "\uE74D", "清空历史", "清空历史", ClearHistoryCommand),
         ];
     }
 
