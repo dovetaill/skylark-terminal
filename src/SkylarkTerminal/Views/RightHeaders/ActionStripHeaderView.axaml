@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="using:SkylarkTerminal.Models"
+             xmlns:views="using:SkylarkTerminal.Views"
+             x:Class="SkylarkTerminal.Views.RightHeaders.ActionStripHeaderView"
+             x:CompileBindings="False">
+    <ItemsControl ItemsSource="{Binding DataContext.ActiveRightMode.Actions, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal"
+                            Spacing="6"/>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="models:ModeActionDescriptor">
+                <Button Classes="TitleBarButton RightSidebarCommandButton"
+                        Command="{Binding Command}"
+                        ToolTip.Tip="{Binding Tooltip}">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               Text="{Binding Glyph}"/>
+                </Button>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>

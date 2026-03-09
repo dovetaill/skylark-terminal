@@ -16,6 +16,8 @@ public sealed class SnippetsModeViewModel : IRightPanelModeViewModel
 
     public string Glyph => "\uE8D2";
 
+    public RightPanelHeaderNode HeaderNode { get; } = new ActionStripRightPanelHeader();
+
     public RightToolsContentNode ContentNode { get; } = new SnippetsRightToolsContent();
 
     public IReadOnlyList<ModeActionDescriptor> Actions { get; }
