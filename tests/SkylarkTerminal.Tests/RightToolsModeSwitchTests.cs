@@ -1,5 +1,7 @@
 using SkylarkTerminal.Models;
 using SkylarkTerminal.ViewModels;
+using System;
+using System.IO;
 
 namespace SkylarkTerminal.Tests;
 
@@ -28,5 +30,15 @@ public class RightToolsModeSwitchTests
 
         Assert.Equal(RightToolsViewKind.History, vm.SelectedRightToolsModeItem!.Kind);
         Assert.IsType<HistoryRightToolsContent>(vm.CurrentRightToolsContent);
+    }
+
+    [Fact]
+    public void RightSidebarHostView_ShouldBindModeTooltip()
+    {
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../"));
+        var path = Path.Combine(root, "src", "SkylarkTerminal", "Views", "RightSidebarHostView.axaml");
+        var xaml = File.ReadAllText(path);
+
+        Assert.Contains("ToolTip.Tip=\"{Binding TooltipZh}\"", xaml, StringComparison.Ordinal);
     }
 }

@@ -43,7 +43,8 @@
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="models:RightToolsModeItem">
-                        <Border Padding="8,6">
+                        <Border Padding="8,6"
+                                ToolTip.Tip="{Binding TooltipZh}">
                             <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                                        Text="{Binding Glyph}"/>
                         </Border>

@@ -342,9 +342,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public ObservableCollection<RightToolsModeItem> RightToolsModeItems { get; } =
     [
-        new(RightToolsViewKind.Snippets, "Snippets", "\uE8D2"),
-        new(RightToolsViewKind.History, "History", "\uE81C"),
-        new(RightToolsViewKind.Sftp, "SFTP", "\uE8B7"),
+        new(RightToolsViewKind.Snippets, "代码块", "代码块", RightModeIconKey.Snippets),
+        new(RightToolsViewKind.History, "历史记录", "历史记录", RightModeIconKey.History),
+        new(RightToolsViewKind.Sftp, "SFTP 文件", "SFTP 文件", RightModeIconKey.RemoteFiles),
     ];
 
     public ObservableCollection<IRightPanelModeViewModel> RightPanelModes { get; } = [];
