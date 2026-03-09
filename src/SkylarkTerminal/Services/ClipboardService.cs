@@ -24,6 +24,19 @@ public sealed class ClipboardService : IClipboardService
         await clipboard.SetTextAsync(text);
     }
 
+    public async Task<string?> GetTextAsync()
+    {
+        var clipboard = ResolveClipboard();
+        if (clipboard is null)
+        {
+            return null;
+        }
+
+#pragma warning disable CS0618
+        return await clipboard.GetTextAsync();
+#pragma warning restore CS0618
+    }
+
     private static IClipboard? ResolveClipboard()
     {
         if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop)
