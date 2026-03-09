@@ -2,10 +2,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:models="using:SkylarkTerminal.Models"
              xmlns:vm="using:SkylarkTerminal.ViewModels"
+             xmlns:rightHeaders="using:SkylarkTerminal.Views.RightHeaders"
              xmlns:rightModes="using:SkylarkTerminal.Views.RightModes"
              x:Class="SkylarkTerminal.Views.RightSidebarHostView"
              x:DataType="vm:MainWindowViewModel">
     <UserControl.DataTemplates>
+        <DataTemplate DataType="models:ActionStripRightPanelHeader">
+            <rightHeaders:ActionStripHeaderView/>
+        </DataTemplate>
+        <DataTemplate DataType="models:SftpCommandBarRightPanelHeader">
+            <rightHeaders:SftpCommandBarHeaderView/>
+        </DataTemplate>
         <DataTemplate DataType="models:SnippetsRightToolsContent">
             <rightModes:SnippetsModeView/>
         </DataTemplate>
@@ -49,25 +56,7 @@
                 Padding="10,6"
                 BorderBrush="{DynamicResource ShellDividerBrush}"
                 BorderThickness="0,0,0,1">
-            <ItemsControl ItemsSource="{Binding ActiveRightMode.Actions}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal"
-                                    Spacing="6"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="models:ModeActionDescriptor">
-                        <Button Classes="TitleBarButton"
-                                Classes.RightSidebarActionButton="True"
-                                Command="{Binding Command}"
-                                ToolTip.Tip="{Binding Tooltip}">
-                            <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                       Text="{Binding Glyph}"/>
-                        </Button>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <ContentControl Content="{Binding ActiveRightHeader}"/>
         </Border>
 
         <TransitioningContentControl Grid.Row="2"
