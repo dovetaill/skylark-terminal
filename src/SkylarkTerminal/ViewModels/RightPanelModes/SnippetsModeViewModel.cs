@@ -66,7 +66,7 @@ public sealed partial class SnippetsModeViewModel : ObservableObject, IRightPane
 
     public RightToolsViewKind Kind => RightToolsViewKind.Snippets;
 
-    public string Title => "Snippets";
+    public string Title => SnippetsText.ModeTitle;
 
     public string Glyph => "\uE8D2";
 

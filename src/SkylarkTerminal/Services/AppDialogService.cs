@@ -4,6 +4,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Layout;
 using Avalonia.Media;
 using FluentAvalonia.UI.Controls;
+using SkylarkTerminal.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -167,15 +168,19 @@ public sealed class AppDialogService : IAppDialogService
     public Task<bool> ShowRunSnippetInAllTabsConfirmAsync(string snippetTitle, int targetCount)
     {
         return ShowConfirmationAsync(
-            "Run in all tabs",
-            $"Run snippet \"{snippetTitle}\" in {targetCount} connected SSH tab(s)?");
+            SnippetsText.RunInAllTabsDialogTitle,
+            SnippetsText.BuildRunInAllTabsMessage(snippetTitle, targetCount),
+            SnippetsText.Run,
+            SnippetsText.Cancel);
     }
 
     public Task<bool> ShowDeleteSnippetConfirmAsync(string snippetTitle)
     {
         return ShowConfirmationAsync(
-            "Delete snippet",
-            $"Delete snippet \"{snippetTitle}\"?");
+            SnippetsText.DeleteDialogTitle,
+            SnippetsText.BuildDeleteMessage(snippetTitle),
+            SnippetsText.Delete,
+            SnippetsText.Cancel);
     }
 
     private static async Task ShowSimpleDialogAsync(string title, Control content)
@@ -197,7 +202,11 @@ public sealed class AppDialogService : IAppDialogService
         await dialog.ShowAsync(host);
     }
 
-    private static async Task<bool> ShowConfirmationAsync(string title, string message)
+    private static async Task<bool> ShowConfirmationAsync(
+        string title,
+        string message,
+        string primaryButtonText = "Confirm",
+        string closeButtonText = "Cancel")
     {
         var host = ResolveHostWindow();
         if (host is null)
@@ -213,8 +222,8 @@ public sealed class AppDialogService : IAppDialogService
                 Text = message,
                 TextWrapping = TextWrapping.Wrap,
             },
-            PrimaryButtonText = "Confirm",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = primaryButtonText,
+            CloseButtonText = closeButtonText,
             DefaultButton = ContentDialogButton.Close,
         };
 
