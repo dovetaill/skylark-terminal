@@ -6,3 +6,5 @@ publish.zip
 tests/*
 src/SkylarkTerminal/obj/project.nuget.cache
 .mcp.json
+src/ThirdParty/**/bin/*
+src/ThirdParty/**/obj/*
