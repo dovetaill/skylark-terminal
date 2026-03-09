@@ -16,7 +16,9 @@ public class RightSidebarHostViewTemplateTests
         Assert.Contains("Content=\"{Binding ActiveRightHeader}\"", xaml, StringComparison.Ordinal);
         Assert.Contains("<rightHeaders:ActionStripHeaderView/>", xaml, StringComparison.Ordinal);
         Assert.Contains("<rightHeaders:SftpToolbarHeaderView/>", xaml, StringComparison.Ordinal);
+        Assert.Contains("Content=\"{Binding ActiveRightMode.ContentNode}\"", xaml, StringComparison.Ordinal);
         Assert.DoesNotContain("<rightHeaders:SftpCommandBarHeaderView/>", xaml, StringComparison.Ordinal);
         Assert.DoesNotContain("ItemsSource=\"{Binding ActiveRightMode.Actions}\"", xaml, StringComparison.Ordinal);
+        Assert.DoesNotContain("TransitioningContentControl", xaml, StringComparison.Ordinal);
     }
 }
