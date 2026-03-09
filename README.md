@@ -104,6 +104,21 @@ xvfb-run -a dotnet run --project src/SkylarkTerminal/SkylarkTerminal.csproj
 dotnet test tests/SkylarkTerminal.Tests/SkylarkTerminal.Tests.csproj
 ```
 
+### Windows x64 发布脚本
+
+发布版与调试版现在使用两个独立脚本，避免混用参数：
+
+```bash
+./build-win-x64.sh
+./build-win-x64-debug.sh
+```
+
+- `./build-win-x64.sh`：生成 `Release` 的 `win-x64` 自包含发布目录，并输出根目录 `publish.zip`
+- `./build-win-x64-debug.sh`：生成 `Debug` 的 `win-x64` 自包含发布目录，并输出根目录 `publish-debug.zip`
+- 两个脚本都支持 `--no-single-file`，用于切换到多文件发布目录
+- `Release` 产物不会包含 `Iciclecreek.Avalonia.Terminal.Fork.pdb`
+- `Debug` 产物会保留 `Iciclecreek.Avalonia.Terminal.Fork.pdb`，便于调试
+
 当前测试覆盖的核心行为包含：
 
 - 左/右侧栏展开收起状态与宽度联动
