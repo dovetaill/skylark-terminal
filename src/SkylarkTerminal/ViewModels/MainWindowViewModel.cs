@@ -1809,14 +1809,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private IReadOnlyList<ModeActionDescriptor> BuildSftpModeActions()
     {
-        return
-        [
-            new("sftp.back", "\uE72B", "Back", NavigateSftpBackCommand),
-            new("sftp.forward", "\uE72A", "Forward", NavigateSftpForwardCommand),
-            new("sftp.refresh", "\uE72C", "Refresh", RefreshSftpCommand),
-            new("sftp.up", "\uE74A", "Up", NavigateSftpUpCommand),
-            new("sftp.address", "\uE8B7", "Address", CommitSftpAddressCommand),
-        ];
+        return [];
     }
 
     private WorkspaceTabItemViewModel BuildWorkspaceTab(ConnectionNode connectionNode)

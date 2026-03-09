@@ -16,9 +16,15 @@ public class RightPanelModeActionsTests
         vm.ShowHistoryToolsCommand.Execute(null);
         Assert.Contains(vm.ActiveRightMode.Actions, a => a.Id == "history.search");
         Assert.Contains(vm.ActiveRightMode.Actions, a => a.Id == "history.sort");
+    }
+
+    [Fact]
+    public async Task SftpMode_ShouldUseCustomHeader_InsteadOfGenericActionStrip()
+    {
+        var vm = new MainWindowViewModel();
 
         await vm.ShowSftpToolsCommand.ExecuteAsync(null);
-        Assert.Contains(vm.ActiveRightMode.Actions, a => a.Id == "sftp.back");
-        Assert.Contains(vm.ActiveRightMode.Actions, a => a.Id == "sftp.up");
+
+        Assert.Empty(vm.ActiveRightMode.Actions);
     }
 }

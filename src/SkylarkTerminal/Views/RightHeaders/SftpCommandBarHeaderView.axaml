@@ -1,26 +1,45 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:models="using:SkylarkTerminal.Models"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
              xmlns:views="using:SkylarkTerminal.Views"
              x:Class="SkylarkTerminal.Views.RightHeaders.SftpCommandBarHeaderView"
              x:CompileBindings="False">
-    <ItemsControl ItemsSource="{Binding DataContext.ActiveRightMode.Actions, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
-        <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-                <StackPanel Orientation="Horizontal"
-                            Spacing="6"/>
-            </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-        <ItemsControl.ItemTemplate>
-            <DataTemplate DataType="models:ModeActionDescriptor">
-                <Button Classes="TitleBarButton"
-                        Classes.RightSidebarActionButton="True"
-                        Command="{Binding Command}"
-                        ToolTip.Tip="{Binding Tooltip}">
-                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                               Text="{Binding Glyph}"/>
-                </Button>
-            </DataTemplate>
-        </ItemsControl.ItemTemplate>
-    </ItemsControl>
+    <ui:CommandBar ClosedDisplayMode="Compact"
+                   DefaultLabelPosition="Collapsed"
+                   IsDynamicOverflowEnabled="True"
+                   ItemsAlignment="Left"
+                   OverflowButtonVisibility="Auto">
+        <ui:CommandBar.PrimaryCommands>
+            <ui:CommandBarButton Command="{Binding DataContext.ActiveRightMode.BackCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                                 Label="Back">
+                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                           Text="&#xE72B;"/>
+            </ui:CommandBarButton>
+            <ui:CommandBarButton Command="{Binding DataContext.ActiveRightMode.ForwardCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                                 Label="Forward">
+                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                           Text="&#xE72A;"/>
+            </ui:CommandBarButton>
+            <ui:CommandBarElementContainer>
+                <TextBox MinWidth="140"
+                         Watermark="/"
+                         Text="{Binding DataContext.ActiveRightMode.AddressInput, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}">
+                    <TextBox.KeyBindings>
+                        <KeyBinding Gesture="Enter"
+                                    Command="{Binding DataContext.ActiveRightMode.AddressCommitCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"/>
+                    </TextBox.KeyBindings>
+                </TextBox>
+            </ui:CommandBarElementContainer>
+            <ui:CommandBarButton Command="{Binding DataContext.ActiveRightMode.RefreshCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                                 Label="Refresh">
+                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                           Text="&#xE72C;"/>
+            </ui:CommandBarButton>
+            <ui:CommandBarButton Command="{Binding DataContext.ActiveRightMode.UpCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                                 Label="Up">
+                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                           Text="&#xE74A;"/>
+            </ui:CommandBarButton>
+        </ui:CommandBar.PrimaryCommands>
+    </ui:CommandBar>
 </UserControl>
