@@ -10,6 +10,9 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
 {
     private readonly ISftpNavigationService _navigationService;
     private string _addressInput;
+    
+    [ObservableProperty]
+    private bool isAddressEditorExpanded;
 
     public SftpModeViewModel(
         ISftpNavigationService? navigationService = null,
@@ -39,10 +42,17 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
             GoUp();
             SyncAddressAndFlags();
         });
+        ExpandAddressEditorCommand = new RelayCommand(() => IsAddressEditorExpanded = true);
+        CollapseAddressEditorCommand = new RelayCommand(() =>
+        {
+            AddressInput = CurrentPath;
+            IsAddressEditorExpanded = false;
+        });
         AddressCommitCommand = new RelayCommand(() =>
         {
             CommitAddress(AddressInput);
             SyncAddressAndFlags();
+            IsAddressEditorExpanded = false;
         });
     }
 
@@ -66,7 +76,13 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
 
     public IRelayCommand UpCommand { get; }
 
+    public IRelayCommand ExpandAddressEditorCommand { get; }
+
+    public IRelayCommand CollapseAddressEditorCommand { get; }
+
     public IRelayCommand AddressCommitCommand { get; }
+
+    public bool IsAddressChipVisible => !IsAddressEditorExpanded;
 
     public string AddressInput
     {
@@ -91,6 +107,11 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
     public string Refresh() => _navigationService.Refresh();
 
     public string CommitAddress(string input) => _navigationService.TryResolveAddressInput(input);
+
+    partial void OnIsAddressEditorExpandedChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsAddressChipVisible));
+    }
 
     private void SyncAddressAndFlags()
     {

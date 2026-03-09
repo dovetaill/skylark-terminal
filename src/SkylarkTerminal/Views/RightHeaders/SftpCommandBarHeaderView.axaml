@@ -21,14 +21,31 @@
                            Text="&#xE72A;"/>
             </ui:CommandBarButton>
             <ui:CommandBarElementContainer>
-                <TextBox MinWidth="140"
-                         Watermark="/"
-                         Text="{Binding DataContext.ActiveRightMode.AddressInput, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}">
-                    <TextBox.KeyBindings>
-                        <KeyBinding Gesture="Enter"
-                                    Command="{Binding DataContext.ActiveRightMode.AddressCommitCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"/>
-                    </TextBox.KeyBindings>
-                </TextBox>
+                <Grid MinWidth="140"
+                      ColumnDefinitions="*">
+                    <Button x:Name="AddressChipButton"
+                            Padding="10,0"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Stretch"
+                            IsVisible="{Binding DataContext.ActiveRightMode.IsAddressChipVisible, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                            Click="OnAddressChipClick">
+                        <TextBlock Text="{Binding DataContext.ActiveRightMode.CurrentPath, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                                   TextTrimming="CharacterEllipsis"
+                                   TextWrapping="NoWrap"/>
+                    </Button>
+                    <TextBox x:Name="AddressEditor"
+                             MinWidth="220"
+                             Watermark="/"
+                             IsVisible="{Binding DataContext.ActiveRightMode.IsAddressEditorExpanded, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                             LostFocus="OnAddressEditorLostFocus"
+                             KeyDown="OnAddressEditorKeyDown"
+                             Text="{Binding DataContext.ActiveRightMode.AddressInput, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}">
+                        <TextBox.KeyBindings>
+                            <KeyBinding Gesture="Enter"
+                                        Command="{Binding DataContext.ActiveRightMode.AddressCommitCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"/>
+                        </TextBox.KeyBindings>
+                    </TextBox>
+                </Grid>
             </ui:CommandBarElementContainer>
             <ui:CommandBarButton Command="{Binding DataContext.ActiveRightMode.RefreshCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
                                  Label="Refresh">
