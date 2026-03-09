@@ -121,6 +121,10 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
 
     public bool IsErrorState => LoadState == SftpPanelLoadState.Error;
 
+    public bool HasVisibleItems => IsLoadedState && VisibleItems.Count > 0;
+
+    public bool IsFilteredEmptyState => IsLoadedState && Items.Count > 0 && VisibleItems.Count == 0;
+
     public IRelayCommand BackCommand { get; }
 
     public IRelayCommand ForwardCommand { get; }
@@ -228,6 +232,8 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
         OnPropertyChanged(nameof(IsLoadedState));
         OnPropertyChanged(nameof(IsEmptyState));
         OnPropertyChanged(nameof(IsErrorState));
+        OnPropertyChanged(nameof(HasVisibleItems));
+        OnPropertyChanged(nameof(IsFilteredEmptyState));
     }
 
     partial void OnShowHiddenFilesChanged(bool value)
@@ -333,6 +339,9 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
         {
             VisibleItems.Add(item);
         }
+
+        OnPropertyChanged(nameof(HasVisibleItems));
+        OnPropertyChanged(nameof(IsFilteredEmptyState));
     }
 
     private bool ShouldIncludeItem(RemoteFileNode item)

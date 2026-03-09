@@ -62,9 +62,21 @@
             </StackPanel>
         </Border>
 
+        <Border x:Name="FilteredEmptyStatePanel"
+                Classes="RightSidebarSftpStateCard"
+                IsVisible="{Binding DataContext.ActiveRightMode.IsFilteredEmptyState, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+            <StackPanel Spacing="6">
+                <TextBlock FontSize="16"
+                           FontWeight="SemiBold"
+                           Text="没有匹配结果"/>
+                <TextBlock Classes="RightSidebarSftpSecondaryText"
+                           Text="请调整搜索关键字或关闭隐藏文件过滤。"/>
+            </StackPanel>
+        </Border>
+
         <ListBox Classes="RightSidebarSftpFileList"
-                 IsVisible="{Binding DataContext.ActiveRightMode.IsLoadedState, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
-                 ItemsSource="{Binding DataContext.ActiveRightMode.Items, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+                 IsVisible="{Binding DataContext.ActiveRightMode.HasVisibleItems, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                 ItemsSource="{Binding DataContext.ActiveRightMode.VisibleItems, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="models:RemoteFileNode">
                     <Border Padding="10,8"

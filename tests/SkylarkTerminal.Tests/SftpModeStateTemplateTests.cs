@@ -17,7 +17,8 @@ public class SftpModeStateTemplateTests
         Assert.Contains("Loading", xaml, StringComparison.Ordinal);
         Assert.Contains("Empty", xaml, StringComparison.Ordinal);
         Assert.Contains("Error", xaml, StringComparison.Ordinal);
-        Assert.Contains("Items", xaml, StringComparison.Ordinal);
+        Assert.Contains("FilteredEmptyStatePanel", xaml, StringComparison.Ordinal);
+        Assert.Contains("VisibleItems", xaml, StringComparison.Ordinal);
         Assert.Contains("RowDefinitions=\"Auto,Auto\"", xaml, StringComparison.Ordinal);
         Assert.Contains("ToolTip.Tip=\"{Binding FullPath}\"", xaml, StringComparison.Ordinal);
     }
