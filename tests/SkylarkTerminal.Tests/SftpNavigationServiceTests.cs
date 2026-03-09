@@ -1,4 +1,5 @@
 using SkylarkTerminal.Services;
+using System.Linq;
 
 namespace SkylarkTerminal.Tests;
 
@@ -22,5 +23,17 @@ public class SftpNavigationServiceTests
     {
         var nav = new SftpNavigationService("/var/log");
         Assert.Equal("/var", nav.GoUp());
+    }
+
+    [Fact]
+    public void NavigateTo_ShouldTrackRecentPaths_WithoutDuplicates()
+    {
+        var nav = new SftpNavigationService("/");
+
+        nav.NavigateTo("/var");
+        nav.NavigateTo("/var/log");
+        nav.NavigateTo("/var");
+
+        Assert.Equal(["/var", "/var/log", "/"], nav.RecentPaths.Take(3).ToArray());
     }
 }

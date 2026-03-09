@@ -1,5 +1,7 @@
 namespace SkylarkTerminal.Services;
 
+using System.Collections.Generic;
+
 public interface ISftpNavigationService
 {
     string CurrentPath { get; }
@@ -7,6 +9,8 @@ public interface ISftpNavigationService
     bool CanGoBack { get; }
 
     bool CanGoForward { get; }
+
+    IReadOnlyList<string> RecentPaths { get; }
 
     string NavigateTo(string path);
 

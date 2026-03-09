@@ -7,10 +7,12 @@ public sealed class SftpNavigationService : ISftpNavigationService
 {
     private readonly Stack<string> _backStack = new();
     private readonly Stack<string> _forwardStack = new();
+    private readonly List<string> _recentPaths = [];
 
     public SftpNavigationService(string initialPath)
     {
         CurrentPath = NormalizePath(initialPath);
+        RememberPath(CurrentPath);
     }
 
     public string CurrentPath { get; private set; }
@@ -18,6 +20,8 @@ public sealed class SftpNavigationService : ISftpNavigationService
     public bool CanGoBack => _backStack.Count > 0;
 
     public bool CanGoForward => _forwardStack.Count > 0;
+
+    public IReadOnlyList<string> RecentPaths => _recentPaths;
 
     public string NavigateTo(string path)
     {
@@ -30,6 +34,7 @@ public sealed class SftpNavigationService : ISftpNavigationService
         _backStack.Push(CurrentPath);
         _forwardStack.Clear();
         CurrentPath = targetPath;
+        RememberPath(CurrentPath);
         return CurrentPath;
     }
 
@@ -42,6 +47,7 @@ public sealed class SftpNavigationService : ISftpNavigationService
 
         _forwardStack.Push(CurrentPath);
         CurrentPath = _backStack.Pop();
+        RememberPath(CurrentPath);
         return CurrentPath;
     }
 
@@ -54,6 +60,7 @@ public sealed class SftpNavigationService : ISftpNavigationService
 
         _backStack.Push(CurrentPath);
         CurrentPath = _forwardStack.Pop();
+        RememberPath(CurrentPath);
         return CurrentPath;
     }
 
@@ -83,6 +90,12 @@ public sealed class SftpNavigationService : ISftpNavigationService
 
         var normalized = NormalizePath(input);
         return NavigateTo(normalized);
+    }
+
+    private void RememberPath(string path)
+    {
+        _recentPaths.RemoveAll(existing => string.Equals(existing, path, StringComparison.Ordinal));
+        _recentPaths.Insert(0, path);
     }
 
     private static string NormalizePath(string? path)

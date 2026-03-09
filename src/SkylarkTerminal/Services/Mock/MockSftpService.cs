@@ -24,6 +24,14 @@ public sealed class MockSftpService : ISftpService
                 IsDirectory = false,
                 Size = 1024,
             },
+            new()
+            {
+                Name = ".env",
+                FullPath = $"{path.TrimEnd('/')}/.env",
+                IsDirectory = false,
+                Size = 128,
+                IsHidden = true,
+            },
         };
 
         return Task.FromResult(nodes);

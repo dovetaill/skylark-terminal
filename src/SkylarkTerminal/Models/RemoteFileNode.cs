@@ -10,6 +10,8 @@ public sealed class RemoteFileNode
 
     public long Size { get; init; }
 
+    public bool IsHidden { get; init; }
+
     public string IconGlyph => IsDirectory ? "\uE8B7" : "\uE7C3";
 
     public string KindLabelZh => IsDirectory ? "目录" : "文件";

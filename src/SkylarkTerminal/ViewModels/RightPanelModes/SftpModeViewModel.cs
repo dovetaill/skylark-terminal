@@ -5,6 +5,7 @@ using SkylarkTerminal.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SkylarkTerminal.ViewModels.RightPanelModes;
@@ -20,10 +21,19 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
     private bool isAddressEditorExpanded;
 
     [ObservableProperty]
+    private SftpHeaderOverlayMode headerOverlayMode;
+
+    [ObservableProperty]
     private SftpPanelLoadState loadState = SftpPanelLoadState.Idle;
 
     [ObservableProperty]
     private string? errorMessage;
+
+    [ObservableProperty]
+    private bool showHiddenFiles;
+
+    [ObservableProperty]
+    private string searchQuery = string.Empty;
 
     public SftpModeViewModel(
         ISftpService sftpService,
@@ -39,13 +49,22 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
         ForwardCommand = new AsyncRelayCommand(GoForwardAsync);
         RefreshCommand = new AsyncRelayCommand(RefreshAsync);
         UpCommand = new AsyncRelayCommand(GoUpAsync);
-        ExpandAddressEditorCommand = new RelayCommand(() => IsAddressEditorExpanded = true);
+        ExpandAddressEditorCommand = new RelayCommand(OpenAddressOverlay);
         CollapseAddressEditorCommand = new RelayCommand(() =>
         {
             AddressInput = CurrentPath;
             IsAddressEditorExpanded = false;
+            HeaderOverlayMode = SftpHeaderOverlayMode.None;
         });
         AddressCommitCommand = new AsyncRelayCommand(CommitAddressAsync);
+        OpenAddressOverlayCommand = new RelayCommand(OpenAddressOverlay);
+        OpenSearchOverlayCommand = new RelayCommand(() => HeaderOverlayMode = SftpHeaderOverlayMode.Search);
+        CloseHeaderOverlayCommand = new RelayCommand(() =>
+        {
+            HeaderOverlayMode = SftpHeaderOverlayMode.None;
+            IsAddressEditorExpanded = false;
+        });
+        ToggleShowHiddenFilesCommand = new RelayCommand(() => ShowHiddenFiles = !ShowHiddenFiles);
 
         LeadingCommands =
         [
@@ -85,6 +104,8 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
 
     public ObservableCollection<RemoteFileNode> Items { get; } = [];
 
+    public ObservableCollection<RemoteFileNode> VisibleItems { get; } = [];
+
     public bool IsIdleState => LoadState == SftpPanelLoadState.Idle;
 
     public bool IsLoadingState => LoadState == SftpPanelLoadState.Loading;
@@ -109,7 +130,19 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
 
     public IRelayCommand AddressCommitCommand { get; }
 
+    public IRelayCommand OpenAddressOverlayCommand { get; }
+
+    public IRelayCommand OpenSearchOverlayCommand { get; }
+
+    public IRelayCommand CloseHeaderOverlayCommand { get; }
+
+    public IRelayCommand ToggleShowHiddenFilesCommand { get; }
+
     public bool IsAddressChipVisible => !IsAddressEditorExpanded;
+
+    public bool IsHeaderOverlayVisible => HeaderOverlayMode != SftpHeaderOverlayMode.None;
+
+    public bool IsHeaderUtilityStripVisible => HeaderOverlayMode == SftpHeaderOverlayMode.None;
 
     public string AddressInput
     {
@@ -122,6 +155,8 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
     public bool CanGoBack => _navigationService.CanGoBack;
 
     public bool CanGoForward => _navigationService.CanGoForward;
+
+    public IReadOnlyList<string> RecentPaths => _navigationService.RecentPaths;
 
     public string NavigateTo(string path) => _navigationService.NavigateTo(path);
 
@@ -146,11 +181,19 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
         CommitAddress(AddressInput);
         await LoadDirectoryAsync(CurrentPath);
         IsAddressEditorExpanded = false;
+        HeaderOverlayMode = SftpHeaderOverlayMode.None;
     }
 
     partial void OnIsAddressEditorExpandedChanged(bool value)
     {
         OnPropertyChanged(nameof(IsAddressChipVisible));
+    }
+
+    partial void OnHeaderOverlayModeChanged(SftpHeaderOverlayMode value)
+    {
+        _ = value;
+        OnPropertyChanged(nameof(IsHeaderOverlayVisible));
+        OnPropertyChanged(nameof(IsHeaderUtilityStripVisible));
     }
 
     partial void OnLoadStateChanged(SftpPanelLoadState value)
@@ -161,6 +204,18 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
         OnPropertyChanged(nameof(IsLoadedState));
         OnPropertyChanged(nameof(IsEmptyState));
         OnPropertyChanged(nameof(IsErrorState));
+    }
+
+    partial void OnShowHiddenFilesChanged(bool value)
+    {
+        _ = value;
+        RebuildVisibleItems();
+    }
+
+    partial void OnSearchQueryChanged(string value)
+    {
+        _ = value;
+        RebuildVisibleItems();
     }
 
     private async Task GoBackAsync()
@@ -192,6 +247,7 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
         if (string.IsNullOrWhiteSpace(_activeConnectionId))
         {
             Items.Clear();
+            VisibleItems.Clear();
             ErrorMessage = "Missing connection context.";
             LoadState = SftpPanelLoadState.Error;
             SyncAddressAndFlags();
@@ -211,6 +267,8 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
                 Items.Add(node);
             }
 
+            RebuildVisibleItems();
+
             LoadState = Items.Count == 0
                 ? SftpPanelLoadState.Empty
                 : SftpPanelLoadState.Loaded;
@@ -218,6 +276,7 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
         catch (Exception ex)
         {
             Items.Clear();
+            VisibleItems.Clear();
             ErrorMessage = ex.Message;
             LoadState = SftpPanelLoadState.Error;
         }
@@ -233,5 +292,38 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
         OnPropertyChanged(nameof(CurrentPath));
         OnPropertyChanged(nameof(CanGoBack));
         OnPropertyChanged(nameof(CanGoForward));
+        OnPropertyChanged(nameof(RecentPaths));
+    }
+
+    private void OpenAddressOverlay()
+    {
+        IsAddressEditorExpanded = true;
+        HeaderOverlayMode = SftpHeaderOverlayMode.Address;
+    }
+
+    private void RebuildVisibleItems()
+    {
+        VisibleItems.Clear();
+
+        foreach (var item in Items.Where(ShouldIncludeItem))
+        {
+            VisibleItems.Add(item);
+        }
+    }
+
+    private bool ShouldIncludeItem(RemoteFileNode item)
+    {
+        if (!ShowHiddenFiles && item.IsHidden)
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(SearchQuery))
+        {
+            return true;
+        }
+
+        return item.Name.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)
+            || item.FullPath.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase);
     }
 }
