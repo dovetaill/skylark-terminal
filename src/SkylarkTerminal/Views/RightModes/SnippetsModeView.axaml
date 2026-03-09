@@ -8,6 +8,23 @@
         <Grid IsVisible="{Binding IsBrowseState}"
               RowDefinitions="Auto,*"
               RowSpacing="12">
+            <Grid.ContextFlyout>
+                <ui:FAMenuFlyout FlyoutPresenterClasses="snippets-root-context-flyout">
+                    <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                       Command="{Binding BeginCreateCommand}"
+                                       Text="{x:Static models:SnippetsText.NewSnippet}"/>
+                    <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                       Command="{Binding BeginCreateCategoryCommand}"
+                                       Text="{x:Static models:SnippetsText.NewCategory}"/>
+                    <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                       Command="{Binding BeginCreateFromClipboardCommand}"
+                                       Text="{x:Static models:SnippetsText.CreateFromClipboard}"/>
+                    <ui:MenuFlyoutSeparator />
+                    <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                       Command="{Binding ClearFilterCommand}"
+                                       Text="{x:Static models:SnippetsText.ClearSearch}"/>
+                </ui:FAMenuFlyout>
+            </Grid.ContextFlyout>
             <Grid ColumnDefinitions="Auto,*"
                   ColumnSpacing="8">
                 <Button Classes="RightSidebarCommandButton"
@@ -152,6 +169,7 @@
                          Watermark="{x:Static models:SnippetsText.ContentWatermark}"
                          Text="{Binding Draft.Content, Mode=TwoWay}"/>
                 <StackPanel Orientation="Horizontal"
+                            x:Name="CreateEditorFooter"
                             Spacing="8">
                     <Button Classes="RightSidebarCommandButton"
                             Content="{x:Static models:SnippetsText.Save}"
@@ -159,9 +177,6 @@
                     <Button Classes="RightSidebarCommandButton"
                             Content="{x:Static models:SnippetsText.Cancel}"
                             Click="OnEditorCancelClick"/>
-                    <Button Classes="RightSidebarCommandButton"
-                            Content="{x:Static models:SnippetsText.Delete}"
-                            Click="OnEditorRemoveClick"/>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
@@ -191,16 +206,17 @@
                          Watermark="{x:Static models:SnippetsText.ContentWatermark}"
                          Text="{Binding Draft.Content, Mode=TwoWay}"/>
                 <StackPanel Orientation="Horizontal"
+                            x:Name="EditEditorFooter"
                             Spacing="8">
                     <Button Classes="RightSidebarCommandButton"
                             Content="{x:Static models:SnippetsText.Save}"
                             Click="OnEditorSaveClick"/>
                     <Button Classes="RightSidebarCommandButton"
-                            Content="{x:Static models:SnippetsText.Cancel}"
-                            Click="OnEditorCancelClick"/>
-                    <Button Classes="RightSidebarCommandButton"
                             Content="{x:Static models:SnippetsText.Delete}"
                             Click="OnEditorRemoveClick"/>
+                    <Button Classes="RightSidebarCommandButton"
+                            Content="{x:Static models:SnippetsText.Cancel}"
+                            Click="OnEditorCancelClick"/>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
@@ -209,6 +225,7 @@
                       HorizontalScrollBarVisibility="Disabled">
             <StackPanel Spacing="12">
                 <StackPanel Orientation="Horizontal"
+                            x:Name="ViewMoreHeader"
                             Spacing="8">
                     <Button Classes="RightSidebarCommandButton"
                             Content="{x:Static models:SnippetsText.Back}"
