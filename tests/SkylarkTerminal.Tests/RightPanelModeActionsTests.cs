@@ -11,7 +11,7 @@ public class RightPanelModeActionsTests
 
         vm.ShowSnippetsToolsCommand.Execute(null);
         Assert.Contains(vm.ActiveRightMode.Actions, a => a.Id == "snippet.new");
-        Assert.Contains(vm.ActiveRightMode.Actions, a => a.Id == "snippet.search");
+        Assert.Contains(vm.ActiveRightMode.Actions, a => a.Id == "snippet.search-focus");
 
         vm.ShowHistoryToolsCommand.Execute(null);
         Assert.Contains(vm.ActiveRightMode.Actions, a => a.Id == "history.search");

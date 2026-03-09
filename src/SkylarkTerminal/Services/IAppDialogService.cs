@@ -17,4 +17,8 @@ public interface IAppDialogService
     Task ShowAboutAsync(string appTitle, string appVersion);
 
     Task<bool> ShowDeleteAssetConfirmAsync(string assetName, bool isFolder);
+
+    Task<bool> ShowRunSnippetInAllTabsConfirmAsync(string snippetTitle, int targetCount);
+
+    Task<bool> ShowDeleteSnippetConfirmAsync(string snippetTitle);
 }

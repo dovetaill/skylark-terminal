@@ -15,6 +15,9 @@ public class RightSidebarStyleConsistencyTests
         Assert.Contains("RightSidebarModeSelectedBackgroundBrush", xaml, StringComparison.Ordinal);
         Assert.Contains("RightSidebarModeSelectedForegroundBrush", xaml, StringComparison.Ordinal);
         Assert.Contains("RightSidebarModeHoverBackgroundBrush", xaml, StringComparison.Ordinal);
+        Assert.Contains("RightSidebarSnippetCardBrush", xaml, StringComparison.Ordinal);
+        Assert.Contains("RightSidebarSnippetCardHoverBrush", xaml, StringComparison.Ordinal);
+        Assert.Contains("RightSidebarSnippetActionBandBrush", xaml, StringComparison.Ordinal);
         Assert.Contains("RightSidebarSftpRowHoverBackgroundBrush", xaml, StringComparison.Ordinal);
         Assert.DoesNotContain("Selector=\"ui|CommandBar.RightSidebarSftpCommandBar\"", xaml, StringComparison.Ordinal);
         Assert.Contains("CornerRadius\" Value=\"8\"", xaml, StringComparison.Ordinal);

@@ -20,6 +20,9 @@
 - 终端交互：支持 ANSI/VT100 基础键位映射、右键复制/粘贴/清屏、窗口尺寸变化同步到远端 PTY
 - 右侧工具区：已完成 `RightSidebarHostView` 容器化（左对齐 icon-only ModeRail + 模式级 HeaderSlot + 静态 `ContentControl`）
 - 右侧工具模式架构：`IRightPanelModeViewModel` + `Snippets/History/Sftp` 子 ViewModel + `ModeActionDescriptor` 元数据动作模型
+- Snippets 面板：支持分类、实时搜索、Create/Edit/ViewMore 三态、双击粘贴、卡片快捷动作与右键菜单
+- Snippets 持久化：数据落地到本地 `LocalApplicationData/SkylarkTerminal/snippets.json`，损坏 JSON 会自动备份为 `.broken`
+- Snippets 执行策略：`Run` 只发送到当前终端并补 `\r`，`Paste` 不补换行，`Run in all tabs` 仅命中已连接 SSH tabs 且会二次确认
 - SFTP 导航：`SftpNavigationService` 已接入（Back/Forward/Address/Refresh/Up），头部为固定 `Grid` toolbar，地址栏采用 `browse surface + overlay editor` 双层结构，`历史路径 / 搜索` 收进 `PathChip` 内部 utility slot
 - SFTP 内容区：模式自身维护 `Idle / Loading / Loaded / Empty / Error` 状态机，文件列表通过 `VisibleItems` 承接搜索与隐藏文件过滤，并补充筛选空状态表达
 - 右侧快捷键：`Ctrl+1/2/3` 快速切换 `Snippets/History/SFTP`
@@ -133,6 +136,7 @@ dotnet test tests/SkylarkTerminal.Tests/SkylarkTerminal.Tests.csproj
 - Quick Start 最近连接在 `Tree/Flat` 下的定位与高亮策略
 - 终端行渲染与主题 token 调色板回退行为
 - SSH 终端会话创建、关闭与异常链路验证
+- Snippets repository、terminal bridge、模式状态机与 browse/editor/detail 模板绑定
 
 ## 核心接口（Mock Driven）
 
@@ -169,6 +173,8 @@ public interface ISftpService
 - 右上角 Tools 按钮：展开/收起右侧工具面板（保留上次选中模式），并支持拖拽到阈值后自动收起
 - 右侧 ModeRail：左对齐 icon-only ghost tile 切换 `Snippets/History/SFTP`
 - 右侧 Header：按模式切换头部；`Snippets/History` 使用轻量动作条，`SFTP` 使用固定 `Grid` toolbar，并移除模式内容切换过渡
+- Snippets：browse 顶部提供 `New Snippet` 与搜索框；分类按 section 展示，双击 snippet 只粘贴不执行，右键菜单顺序为 `Run / Edit / Run in all tabs / Copy / View more / Paste`
+- Snippets 批量执行：`Run in all tabs` 只统计并命中已连接 SSH tabs，执行前弹确认
 - SFTP 地址栏：默认显示带 utility slot 的路径 chip；点击 chip 打开地址 overlay，点击搜索按钮打开搜索 overlay，`Enter` 提交，`Esc` 或失焦收起
 - SFTP More 菜单：使用 Fluent `FAMenuFlyout`，当前仅承载 `显示隐藏文件` 勾选项
 - 右侧快捷键：`Ctrl+1/2/3` 快速切换模式

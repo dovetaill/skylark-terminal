@@ -12,6 +12,9 @@ public class RightPanelHeaderArchitectureTests
 
         Assert.IsType<ActionStripRightPanelHeader>(vm.ActiveRightHeader);
 
+        vm.ShowSnippetsToolsCommand.Execute(null);
+        Assert.IsType<ActionStripRightPanelHeader>(vm.ActiveRightHeader);
+
         vm.ShowHistoryToolsCommand.Execute(null);
         Assert.IsType<ActionStripRightPanelHeader>(vm.ActiveRightHeader);
 

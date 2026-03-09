@@ -10,6 +10,7 @@ using SkylarkTerminal.ViewModels;
 using SkylarkTerminal.Views;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 
 namespace SkylarkTerminal;
@@ -43,12 +44,19 @@ public partial class App : Application
 
     private static void ConfigureServices(IServiceCollection services)
     {
+        var snippetPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "SkylarkTerminal",
+            "snippets.json");
+
         services.AddSingleton<IAssetCatalogService, MockAssetCatalogService>();
         services.AddSingleton<IAppDialogService, AppDialogService>();
         services.AddSingleton<IClipboardService, ClipboardService>();
         services.AddSingleton<ISshConnectionService, SshConnectionService>();
         services.AddSingleton<ISftpService, MockSftpService>();
         services.AddSingleton<ISftpNavigationService>(_ => new SftpNavigationService("/"));
+        services.AddSingleton<ISnippetRepository>(_ => new JsonSnippetRepository(snippetPath));
+        services.AddSingleton<ITerminalCommandBridge, TerminalCommandBridge>();
         services.AddSingleton<IWorkspaceLayoutService, WorkspaceLayoutService>();
         services.AddSingleton<IDragSessionService, DragSessionService>();
         services.AddSingleton<ISessionRegistryService, SessionRegistryService>();

@@ -164,6 +164,20 @@ public sealed class AppDialogService : IAppDialogService
         return result == ContentDialogResult.Primary;
     }
 
+    public Task<bool> ShowRunSnippetInAllTabsConfirmAsync(string snippetTitle, int targetCount)
+    {
+        return ShowConfirmationAsync(
+            "Run in all tabs",
+            $"Run snippet \"{snippetTitle}\" in {targetCount} connected SSH tab(s)?");
+    }
+
+    public Task<bool> ShowDeleteSnippetConfirmAsync(string snippetTitle)
+    {
+        return ShowConfirmationAsync(
+            "Delete snippet",
+            $"Delete snippet \"{snippetTitle}\"?");
+    }
+
     private static async Task ShowSimpleDialogAsync(string title, Control content)
     {
         var host = ResolveHostWindow();
@@ -181,6 +195,31 @@ public sealed class AppDialogService : IAppDialogService
         };
 
         await dialog.ShowAsync(host);
+    }
+
+    private static async Task<bool> ShowConfirmationAsync(string title, string message)
+    {
+        var host = ResolveHostWindow();
+        if (host is null)
+        {
+            return false;
+        }
+
+        var dialog = new ContentDialog
+        {
+            Title = title,
+            Content = new TextBlock
+            {
+                Text = message,
+                TextWrapping = TextWrapping.Wrap,
+            },
+            PrimaryButtonText = "Confirm",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Close,
+        };
+
+        var result = await dialog.ShowAsync(host);
+        return result == ContentDialogResult.Primary;
     }
 
     private static Window? ResolveHostWindow()

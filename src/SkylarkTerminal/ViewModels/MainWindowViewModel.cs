@@ -52,7 +52,10 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly ISftpNavigationService _sftpNavigationService;
     private readonly IAppDialogService _appDialogService;
     private readonly IClipboardService _clipboardService;
+    private readonly ISnippetRepository _snippetRepository;
+    private readonly ITerminalCommandBridge _terminalCommandBridge;
     private SftpModeViewModel _sftpMode = null!;
+    private SnippetsModeViewModel _snippetsMode = null!;
     private readonly Dictionary<AssetsPaneKind, ObservableCollection<AssetNode>> _assetsByPane;
     private int _newFolderSeed = 1;
     private int _newConnectionSeed = 1;
@@ -151,7 +154,9 @@ public partial class MainWindowViewModel : ViewModelBase
         ISessionRegistryService sessionRegistryService,
         IWorkspaceLayoutService workspaceLayoutService,
         IDragSessionService dragSessionService,
-        ISftpNavigationService? sftpNavigationService = null)
+        ISftpNavigationService? sftpNavigationService = null,
+        ISnippetRepository? snippetRepository = null,
+        ITerminalCommandBridge? terminalCommandBridge = null)
     {
         _sshConnectionService = sshConnectionService;
         _sessionRegistryService = sessionRegistryService;
@@ -161,6 +166,8 @@ public partial class MainWindowViewModel : ViewModelBase
         _sftpNavigationService = sftpNavigationService ?? new SftpNavigationService("/");
         _appDialogService = appDialogService;
         _clipboardService = clipboardService;
+        _snippetRepository = snippetRepository ?? new MockSnippetRepository();
+        _terminalCommandBridge = terminalCommandBridge ?? new MockTerminalCommandBridge();
         _assetsByPane = BuildAssetsMap(assetCatalogService.GetAssets());
         ApplyAssetsSearchFilter();
         RebuildCurrentFlatList();
@@ -366,8 +373,6 @@ public partial class MainWindowViewModel : ViewModelBase
         set => SelectedWorkspaceTab = value;
     }
 
-    public ObservableCollection<CommandSnippet> SnippetItems { get; } = [];
-
     public ObservableCollection<CommandHistoryEntry> HistoryItems { get; } = [];
 
     public ObservableCollection<RemoteFileNode> SftpItems => _sftpMode.Items;
@@ -435,26 +440,6 @@ public partial class MainWindowViewModel : ViewModelBase
         IsRightSidebarVisible = true;
         SelectedRightToolsView = RightToolsViewKind.Sftp;
         await ActivateSftpModeAsync();
-    }
-
-    [RelayCommand]
-    private void CreateSnippet()
-    {
-    }
-
-    [RelayCommand]
-    private void SearchSnippet()
-    {
-    }
-
-    [RelayCommand]
-    private void SortSnippet()
-    {
-    }
-
-    [RelayCommand]
-    private void ToggleSnippetLayout()
-    {
     }
 
     [RelayCommand]
@@ -1737,22 +1722,6 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void InitializeRightToolsData()
     {
-        SnippetItems.Add(new CommandSnippet
-        {
-            Name = "Restart Service",
-            Command = "sudo systemctl restart nginx",
-        });
-        SnippetItems.Add(new CommandSnippet
-        {
-            Name = "Tail Logs",
-            Command = "tail -f /var/log/syslog",
-        });
-        SnippetItems.Add(new CommandSnippet
-        {
-            Name = "Disk Usage",
-            Command = "df -h",
-        });
-
         HistoryItems.Add(new CommandHistoryEntry
         {
             Timestamp = DateTime.Now.AddMinutes(-8),
@@ -1768,7 +1737,15 @@ public partial class MainWindowViewModel : ViewModelBase
     private void InitializeRightPanelModes()
     {
         RightPanelModes.Clear();
-        RightPanelModes.Add(new SnippetsModeViewModel(BuildSnippetModeActions()));
+        _snippetsMode = new SnippetsModeViewModel(
+            _snippetRepository,
+            _clipboardService,
+            _terminalCommandBridge,
+            _appDialogService,
+            () => SelectedWorkspaceTab,
+            () => WorkspacePanes.SelectMany(pane => pane.Tabs).ToArray());
+        _snippetsMode.LoadAsync().GetAwaiter().GetResult();
+        RightPanelModes.Add(_snippetsMode);
         RightPanelModes.Add(new HistoryModeViewModel(BuildHistoryModeActions()));
         _sftpMode = new SftpModeViewModel(_sftpService, _sftpNavigationService, BuildSftpModeActions());
         RightPanelModes.Add(_sftpMode);
@@ -1788,17 +1765,6 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         return RightPanelModes.Count > 0 ? RightPanelModes[0] : FallbackRightPanelMode;
-    }
-
-    private IReadOnlyList<ModeActionDescriptor> BuildSnippetModeActions()
-    {
-        return
-        [
-            new("snippet.new", "\uE710", "新建代码块", "新建代码块", CreateSnippetCommand),
-            new("snippet.search", "\uE721", "搜索代码块", "搜索代码块", SearchSnippetCommand),
-            new("snippet.sort", "\uE8CB", "排序代码块", "排序代码块", SortSnippetCommand),
-            new("snippet.layout", "\uE8A4", "切换布局", "切换布局", ToggleSnippetLayoutCommand, IsToggle: true),
-        ];
     }
 
     private IReadOnlyList<ModeActionDescriptor> BuildHistoryModeActions()

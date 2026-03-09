@@ -54,6 +54,11 @@
                     <SolidColorBrush x:Key="RightSidebarModeSelectedBorderBrush" Color="#2D87B6FF"/>
                     <SolidColorBrush x:Key="RightSidebarModeSelectedForegroundBrush" Color="#FFEAF4FF"/>
                     <SolidColorBrush x:Key="RightSidebarModeHoverBackgroundBrush" Color="#1236404E"/>
+                    <SolidColorBrush x:Key="RightSidebarSnippetCardBrush" Color="#0FEEF6FF"/>
+                    <SolidColorBrush x:Key="RightSidebarSnippetCardHoverBrush" Color="#153A495A"/>
+                    <SolidColorBrush x:Key="RightSidebarSnippetPreviewBrush" Color="#B8E6EDF7"/>
+                    <SolidColorBrush x:Key="RightSidebarSnippetTagBrush" Color="#183E546C"/>
+                    <SolidColorBrush x:Key="RightSidebarSnippetActionBandBrush" Color="#12213142"/>
                     <SolidColorBrush x:Key="RightSidebarSftpRowHoverBackgroundBrush" Color="#143F566F"/>
                     <SolidColorBrush x:Key="RightSidebarSftpSecondaryForegroundBrush" Color="#B8E6EDF7"/>
                     <SolidColorBrush x:Key="RightSidebarSftpStateSurfaceBrush" Color="#10FFFFFF"/>
@@ -101,6 +106,11 @@
                     <SolidColorBrush x:Key="RightSidebarModeSelectedBorderBrush" Color="#24005A9C"/>
                     <SolidColorBrush x:Key="RightSidebarModeSelectedForegroundBrush" Color="#FF005A9C"/>
                     <SolidColorBrush x:Key="RightSidebarModeHoverBackgroundBrush" Color="#0F005A9C"/>
+                    <SolidColorBrush x:Key="RightSidebarSnippetCardBrush" Color="#FFFFFFFF"/>
+                    <SolidColorBrush x:Key="RightSidebarSnippetCardHoverBrush" Color="#10005A9C"/>
+                    <SolidColorBrush x:Key="RightSidebarSnippetPreviewBrush" Color="#99222A33"/>
+                    <SolidColorBrush x:Key="RightSidebarSnippetTagBrush" Color="#12005A9C"/>
+                    <SolidColorBrush x:Key="RightSidebarSnippetActionBandBrush" Color="#0A1A1F27"/>
                     <SolidColorBrush x:Key="RightSidebarSftpRowHoverBackgroundBrush" Color="#12005A9C"/>
                     <SolidColorBrush x:Key="RightSidebarSftpSecondaryForegroundBrush" Color="#99222A33"/>
                     <SolidColorBrush x:Key="RightSidebarSftpStateSurfaceBrush" Color="#0A1A1F27"/>
@@ -187,6 +197,47 @@
         </Style>
         <Style Selector="Button.RightSidebarCommandButton:pressed">
             <Setter Property="Background" Value="{DynamicResource RightSidebarModeSelectedBackgroundBrush}"/>
+        </Style>
+        <Style Selector="Border.RightSidebarSnippetCard">
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Background" Value="{DynamicResource RightSidebarSnippetCardBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ShellDividerBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style Selector="Border.RightSidebarSnippetCard:pointerover">
+            <Setter Property="Background" Value="{DynamicResource RightSidebarSnippetCardHoverBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RightSidebarModeSelectedBorderBrush}"/>
+        </Style>
+        <Style Selector="TextBlock.RightSidebarSnippetPreviewText">
+            <Setter Property="Foreground" Value="{DynamicResource RightSidebarSnippetPreviewBrush}"/>
+        </Style>
+        <Style Selector="Border.RightSidebarSnippetTagChip">
+            <Setter Property="Padding" Value="8,3"/>
+            <Setter Property="CornerRadius" Value="999"/>
+            <Setter Property="Background" Value="{DynamicResource RightSidebarSnippetTagBrush}"/>
+        </Style>
+        <Style Selector="Border.RightSidebarSnippetActionBand">
+            <Setter Property="Padding" Value="6"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Background" Value="{DynamicResource RightSidebarSnippetActionBandBrush}"/>
+        </Style>
+        <Style Selector="Button.RightSidebarSnippetActionButton">
+            <Setter Property="MinHeight" Value="28"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style Selector="Button.RightSidebarSnippetActionButton:pointerover">
+            <Setter Property="Background" Value="{DynamicResource RightSidebarModeHoverBackgroundBrush}"/>
+        </Style>
+        <Style Selector="ui|FAMenuFlyoutPresenter.snippets-card-context-flyout">
+            <Setter Property="Width" Value="240"/>
+            <Setter Property="MinWidth" Value="240"/>
+            <Setter Property="MaxWidth" Value="240"/>
         </Style>
         <Style Selector="ui|CommandBarButton.RightSidebarCommandButton">
             <Setter Property="MinWidth" Value="30"/>
