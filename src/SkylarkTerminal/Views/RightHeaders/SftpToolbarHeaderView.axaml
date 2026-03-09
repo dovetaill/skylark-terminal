@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:models="using:SkylarkTerminal.Models"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
              xmlns:views="using:SkylarkTerminal.Views"
              x:Class="SkylarkTerminal.Views.RightHeaders.SftpToolbarHeaderView"
              x:CompileBindings="False">
@@ -49,6 +50,9 @@
                         ToolTip.Tip="历史路径">
                     <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                                Text="&#xE81C;"/>
+                    <Button.Flyout>
+                        <ui:FAMenuFlyout Opening="OnHistoryFlyoutOpening"/>
+                    </Button.Flyout>
                 </Button>
                 <Button x:Name="AddressSearchButton"
                         Grid.Column="2"
@@ -114,27 +118,10 @@
                 <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                            Text="&#xE712;"/>
                 <Button.Flyout>
-                    <Flyout Placement="BottomEdgeAlignedRight">
-                        <Border Padding="6">
-                            <ItemsControl ItemsSource="{Binding DataContext.ActiveRightMode.MoreCommands, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate DataType="models:SftpToolbarActionDescriptor">
-                                        <Button Classes="TitleBarButton RightSidebarCommandButton"
-                                                Command="{Binding Command}"
-                                                HorizontalContentAlignment="Left"
-                                                ToolTip.Tip="{Binding TooltipZh}">
-                                            <StackPanel Orientation="Horizontal"
-                                                        Spacing="8">
-                                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                                           Text="{Binding Glyph}"/>
-                                                <TextBlock Text="{Binding LabelZh}"/>
-                                            </StackPanel>
-                                        </Button>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </Border>
-                    </Flyout>
+                    <ui:FAMenuFlyout>
+                        <ui:ToggleMenuFlyoutItem Text="显示隐藏文件"
+                                                 IsChecked="{Binding DataContext.ActiveRightMode.ShowHiddenFiles, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}, Mode=TwoWay}"/>
+                    </ui:FAMenuFlyout>
                 </Button.Flyout>
             </Button>
         </StackPanel>

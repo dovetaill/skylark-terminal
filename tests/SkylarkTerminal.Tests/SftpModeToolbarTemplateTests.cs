@@ -19,4 +19,17 @@ public class SftpModeToolbarTemplateTests
         Assert.Contains("SearchOverlayTextBox", xaml, StringComparison.Ordinal);
         Assert.DoesNotContain("MinWidth=\"220\"", xaml, StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void SftpHeader_ShouldUseFluentMenus_ForHistoryAndMore()
+    {
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../"));
+        var path = Path.Combine(root, "src", "SkylarkTerminal", "Views", "RightHeaders", "SftpToolbarHeaderView.axaml");
+        var xaml = File.ReadAllText(path);
+
+        Assert.Contains("<ui:FAMenuFlyout", xaml, StringComparison.Ordinal);
+        Assert.Contains("ToggleMenuFlyoutItem", xaml, StringComparison.Ordinal);
+        Assert.Contains("OnHistoryFlyoutOpening", xaml, StringComparison.Ordinal);
+        Assert.DoesNotContain("<Flyout Placement", xaml, StringComparison.Ordinal);
+    }
 }

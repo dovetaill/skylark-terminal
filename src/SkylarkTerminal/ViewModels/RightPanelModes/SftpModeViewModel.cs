@@ -69,6 +69,7 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
             IsAddressEditorExpanded = false;
         });
         ToggleShowHiddenFilesCommand = new RelayCommand(() => ShowHiddenFiles = !ShowHiddenFiles);
+        NavigateHistoryPathCommand = new AsyncRelayCommand<string?>(NavigateHistoryPathAsync);
 
         LeadingCommands =
         [
@@ -142,6 +143,8 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
 
     public IRelayCommand ToggleShowHiddenFilesCommand { get; }
 
+    public IAsyncRelayCommand<string?> NavigateHistoryPathCommand { get; }
+
     public bool IsAddressChipVisible => !IsAddressEditorExpanded;
 
     public bool IsHeaderOverlayVisible => HeaderOverlayMode != SftpHeaderOverlayMode.None;
@@ -190,6 +193,17 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
         await LoadDirectoryAsync(CurrentPath);
         IsAddressEditorExpanded = false;
         HeaderOverlayMode = SftpHeaderOverlayMode.None;
+    }
+
+    public async Task NavigateHistoryPathAsync(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return;
+        }
+
+        NavigateTo(path);
+        await LoadDirectoryAsync(CurrentPath);
     }
 
     partial void OnIsAddressEditorExpandedChanged(bool value)

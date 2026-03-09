@@ -3,8 +3,11 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using FluentAvalonia.UI.Controls;
 using SkylarkTerminal.ViewModels;
 using SkylarkTerminal.ViewModels.RightPanelModes;
+using System;
+using System.Linq;
 
 namespace SkylarkTerminal.Views.RightHeaders;
 
@@ -72,6 +75,32 @@ public partial class SftpToolbarHeaderView : UserControl
         vm.CloseHeaderOverlayCommand.Execute(null);
         e.Handled = true;
         Dispatcher.UIThread.Post(() => AddressChipButton?.Focus(), DispatcherPriority.Background);
+    }
+
+    private void OnHistoryFlyoutOpening(object? sender, EventArgs e)
+    {
+        _ = e;
+        if (sender is not FAMenuFlyout historyFlyout || !TryGetSftpModeViewModel(out var vm))
+        {
+            return;
+        }
+
+        historyFlyout.Items.Clear();
+
+        foreach (var path in vm.RecentPaths.Take(8))
+        {
+            historyFlyout.Items.Add(new MenuFlyoutItem
+            {
+                Text = path,
+                Command = vm.NavigateHistoryPathCommand,
+                CommandParameter = path,
+                IconSource = new FontIconSource
+                {
+                    FontFamily = "Segoe Fluent Icons, Segoe MDL2 Assets",
+                    Glyph = "\uE81C",
+                },
+            });
+        }
     }
 
     private bool TryGetSftpModeViewModel(out SftpModeViewModel vm)
