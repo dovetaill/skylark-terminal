@@ -16,6 +16,8 @@ public sealed class HistoryModeViewModel : IRightPanelModeViewModel
 
     public string Glyph => "\uE81C";
 
+    public RightPanelHeaderNode HeaderNode { get; } = new ActionStripRightPanelHeader();
+
     public RightToolsContentNode ContentNode { get; } = new HistoryRightToolsContent();
 
     public IReadOnlyList<ModeActionDescriptor> Actions { get; }

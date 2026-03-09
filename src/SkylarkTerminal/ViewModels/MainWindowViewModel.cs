@@ -351,6 +351,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public IRightPanelModeViewModel ActiveRightMode => ResolveActiveRightMode(SelectedRightToolsView);
 
+    public RightPanelHeaderNode ActiveRightHeader => ActiveRightMode.HeaderNode;
+
     public WorkspaceLayoutNode WorkspaceLayoutRoot => _workspaceLayoutService.Root;
 
     public ObservableCollection<WorkspaceTabItemViewModel> WorkspaceTabs => ResolveActiveWorkspacePane().Tabs;
@@ -1233,6 +1235,7 @@ public partial class MainWindowViewModel : ViewModelBase
         OnPropertyChanged(nameof(IsSftpView));
         OnPropertyChanged(nameof(CurrentRightToolsContent));
         OnPropertyChanged(nameof(ActiveRightMode));
+        OnPropertyChanged(nameof(ActiveRightHeader));
 
         var target = RightToolsModeItems.FirstOrDefault(item => item.Kind == value);
         if (target is not null && !ReferenceEquals(target, SelectedRightToolsModeItem))

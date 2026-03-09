@@ -11,6 +11,8 @@ public interface IRightPanelModeViewModel
 
     string Glyph { get; }
 
+    RightPanelHeaderNode HeaderNode { get; }
+
     RightToolsContentNode ContentNode { get; }
 
     IReadOnlyList<ModeActionDescriptor> Actions { get; }

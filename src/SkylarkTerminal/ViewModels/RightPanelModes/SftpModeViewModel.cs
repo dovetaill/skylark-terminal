@@ -52,6 +52,8 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
 
     public string Glyph => "\uE8B7";
 
+    public RightPanelHeaderNode HeaderNode { get; } = new SftpCommandBarRightPanelHeader();
+
     public RightToolsContentNode ContentNode { get; } = new SftpRightToolsContent();
 
     public IReadOnlyList<ModeActionDescriptor> Actions { get; }
