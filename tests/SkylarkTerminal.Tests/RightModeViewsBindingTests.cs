@@ -8,7 +8,7 @@ public class RightModeViewsBindingTests
     [Theory]
     [InlineData("SnippetsModeView.axaml", "SnippetItems")]
     [InlineData("HistoryModeView.axaml", "HistoryItems")]
-    [InlineData("SftpModeView.axaml", "SftpItems")]
+    [InlineData("SftpModeView.axaml", "ActiveRightMode.Items")]
     public void ModeViews_ShouldBindExpectedCollections(string file, string bindingKey)
     {
         var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../"));

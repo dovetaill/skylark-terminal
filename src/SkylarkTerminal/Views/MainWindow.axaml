@@ -54,6 +54,10 @@
                     <SolidColorBrush x:Key="RightSidebarModeSelectedBorderBrush" Color="#2D87B6FF"/>
                     <SolidColorBrush x:Key="RightSidebarModeSelectedForegroundBrush" Color="#FFEAF4FF"/>
                     <SolidColorBrush x:Key="RightSidebarModeHoverBackgroundBrush" Color="#1236404E"/>
+                    <SolidColorBrush x:Key="RightSidebarSftpRowHoverBackgroundBrush" Color="#143F566F"/>
+                    <SolidColorBrush x:Key="RightSidebarSftpSecondaryForegroundBrush" Color="#B8E6EDF7"/>
+                    <SolidColorBrush x:Key="RightSidebarSftpStateSurfaceBrush" Color="#10FFFFFF"/>
+                    <SolidColorBrush x:Key="RightSidebarSftpStateBorderBrush" Color="#1FFFFFFF"/>
                     <SolidColorBrush x:Key="Terminal.Background" Color="#FF10141A"/>
                     <SolidColorBrush x:Key="Terminal.Foreground.Primary" Color="#FFE6EDF7"/>
                     <SolidColorBrush x:Key="Terminal.Foreground.Muted" Color="#B8E6EDF7"/>
@@ -97,6 +101,10 @@
                     <SolidColorBrush x:Key="RightSidebarModeSelectedBorderBrush" Color="#24005A9C"/>
                     <SolidColorBrush x:Key="RightSidebarModeSelectedForegroundBrush" Color="#FF005A9C"/>
                     <SolidColorBrush x:Key="RightSidebarModeHoverBackgroundBrush" Color="#0F005A9C"/>
+                    <SolidColorBrush x:Key="RightSidebarSftpRowHoverBackgroundBrush" Color="#12005A9C"/>
+                    <SolidColorBrush x:Key="RightSidebarSftpSecondaryForegroundBrush" Color="#99222A33"/>
+                    <SolidColorBrush x:Key="RightSidebarSftpStateSurfaceBrush" Color="#0A1A1F27"/>
+                    <SolidColorBrush x:Key="RightSidebarSftpStateBorderBrush" Color="#1F1A1F27"/>
                     <SolidColorBrush x:Key="Terminal.Background" Color="#FFFFFFFF"/>
                     <SolidColorBrush x:Key="Terminal.Foreground.Primary" Color="#FF1A1F27"/>
                     <SolidColorBrush x:Key="Terminal.Foreground.Muted" Color="#99222A33"/>
@@ -192,14 +200,6 @@
         <Style Selector="ui|CommandBarButton.RightSidebarCommandButton:pressed">
             <Setter Property="Background" Value="{DynamicResource RightSidebarModeSelectedBackgroundBrush}"/>
         </Style>
-        <Style Selector="ui|CommandBar.RightSidebarSftpCommandBar">
-            <Setter Property="DefaultLabelPosition" Value="Collapsed"/>
-            <Setter Property="ItemsAlignment" Value="Left"/>
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-        </Style>
         <Style Selector="Button.RightSidebarAddressChip">
             <Setter Property="MinHeight" Value="30"/>
             <Setter Property="Padding" Value="10,0"/>
@@ -219,6 +219,32 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderBrush" Value="{DynamicResource ShellDividerBrush}"/>
+        </Style>
+        <Style Selector="Border.RightSidebarSftpStateCard">
+            <Setter Property="Padding" Value="16"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Background" Value="{DynamicResource RightSidebarSftpStateSurfaceBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RightSidebarSftpStateBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style Selector="TextBlock.RightSidebarSftpSecondaryText">
+            <Setter Property="Foreground" Value="{DynamicResource RightSidebarSftpSecondaryForegroundBrush}"/>
+        </Style>
+        <Style Selector="ListBox.RightSidebarSftpFileList">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="ListBox.RightSidebarSftpFileList ListBoxItem">
+            <Setter Property="Margin" Value="0,0,0,6"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+        <Style Selector="ListBox.RightSidebarSftpFileList ListBoxItem /template/ ContentPresenter">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="ListBox.RightSidebarSftpFileList ListBoxItem:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource RightSidebarSftpRowHoverBackgroundBrush}"/>
         </Style>
         <Style Selector="ui|TabView">
             <Setter Property="Margin" Value="0"/>

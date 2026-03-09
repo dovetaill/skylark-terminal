@@ -4,17 +4,107 @@
              xmlns:views="using:SkylarkTerminal.Views"
              x:Class="SkylarkTerminal.Views.RightModes.SftpModeView"
              x:CompileBindings="False">
-    <ListBox ItemsSource="{Binding DataContext.SftpItems, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
-        <ListBox.ItemTemplate>
-            <DataTemplate DataType="models:RemoteFileNode">
-                <Grid ColumnDefinitions="*,Auto"
-                      Margin="0">
-                    <TextBlock Text="{Binding Name}"/>
-                    <TextBlock Grid.Column="1"
-                               Opacity="0.72"
-                               Text="{Binding FullPath}"/>
-                </Grid>
-            </DataTemplate>
-        </ListBox.ItemTemplate>
-    </ListBox>
+    <Grid Margin="10,10,10,12"
+          RowDefinitions="*">
+        <TextBlock IsVisible="False"
+                   Text="{Binding DataContext.ActiveRightMode.LoadState, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"/>
+
+        <Border x:Name="IdleStatePanel"
+                Classes="RightSidebarSftpStateCard"
+                IsVisible="{Binding DataContext.ActiveRightMode.IsIdleState, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+            <StackPanel Spacing="6">
+                <TextBlock FontSize="16"
+                           FontWeight="SemiBold"
+                           Text="SFTP 文件面板"/>
+                <TextBlock Classes="RightSidebarSftpSecondaryText"
+                           Text="选择远程文件模式后，这里会显示当前目录内容。"/>
+            </StackPanel>
+        </Border>
+
+        <Border x:Name="LoadingStatePanel"
+                Classes="RightSidebarSftpStateCard"
+                IsVisible="{Binding DataContext.ActiveRightMode.IsLoadingState, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+            <StackPanel Spacing="6">
+                <TextBlock FontSize="16"
+                           FontWeight="SemiBold"
+                           Text="正在加载"/>
+                <TextBlock Classes="RightSidebarSftpSecondaryText"
+                           Text="正在获取远程目录内容，请稍候。"/>
+            </StackPanel>
+        </Border>
+
+        <Border x:Name="EmptyStatePanel"
+                Classes="RightSidebarSftpStateCard"
+                IsVisible="{Binding DataContext.ActiveRightMode.IsEmptyState, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+            <StackPanel Spacing="6">
+                <TextBlock FontSize="16"
+                           FontWeight="SemiBold"
+                           Text="空目录"/>
+                <TextBlock Classes="RightSidebarSftpSecondaryText"
+                           Text="当前路径下没有可显示的文件或文件夹。"/>
+            </StackPanel>
+        </Border>
+
+        <Border x:Name="ErrorStatePanel"
+                Classes="RightSidebarSftpStateCard"
+                IsVisible="{Binding DataContext.ActiveRightMode.IsErrorState, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+            <StackPanel Spacing="8">
+                <TextBlock FontSize="16"
+                           FontWeight="SemiBold"
+                           Text="加载失败"/>
+                <TextBlock Classes="RightSidebarSftpSecondaryText"
+                           Text="{Binding DataContext.ActiveRightMode.ErrorMessage, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"/>
+                <Button Classes="TitleBarButton RightSidebarCommandButton"
+                        Command="{Binding DataContext.ActiveRightMode.RefreshCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                        HorizontalAlignment="Left">
+                    <TextBlock Text="重试"/>
+                </Button>
+            </StackPanel>
+        </Border>
+
+        <ListBox Classes="RightSidebarSftpFileList"
+                 IsVisible="{Binding DataContext.ActiveRightMode.IsLoadedState, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                 ItemsSource="{Binding DataContext.ActiveRightMode.Items, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}">
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="models:RemoteFileNode">
+                    <Border Padding="10,8"
+                            ToolTip.Tip="{Binding FullPath}">
+                        <Grid ColumnDefinitions="Auto,*"
+                              RowDefinitions="Auto,Auto"
+                              ColumnSpacing="10"
+                              RowSpacing="2">
+                            <Border Grid.RowSpan="2"
+                                    Width="28"
+                                    Height="28"
+                                    CornerRadius="8"
+                                    Background="{DynamicResource RightSidebarModeHoverBackgroundBrush}">
+                                <TextBlock HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                           Text="{Binding IconGlyph}"/>
+                            </Border>
+                            <TextBlock Grid.Column="1"
+                                       FontWeight="SemiBold"
+                                       Text="{Binding Name}"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <Grid Grid.Row="1"
+                                  Grid.Column="1"
+                                  ColumnDefinitions="Auto,Auto,*"
+                                  ColumnSpacing="8">
+                                <TextBlock Classes="RightSidebarSftpSecondaryText"
+                                           Text="{Binding KindLabelZh}"/>
+                                <TextBlock Grid.Column="1"
+                                           Classes="RightSidebarSftpSecondaryText"
+                                           Text="{Binding SizeLabel}"/>
+                                <TextBlock Grid.Column="2"
+                                           Classes="RightSidebarSftpSecondaryText"
+                                           Text="{Binding FullPath}"
+                                           TextTrimming="CharacterEllipsis"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
 </UserControl>

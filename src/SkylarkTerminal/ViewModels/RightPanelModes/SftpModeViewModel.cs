@@ -85,6 +85,16 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
 
     public ObservableCollection<RemoteFileNode> Items { get; } = [];
 
+    public bool IsIdleState => LoadState == SftpPanelLoadState.Idle;
+
+    public bool IsLoadingState => LoadState == SftpPanelLoadState.Loading;
+
+    public bool IsLoadedState => LoadState == SftpPanelLoadState.Loaded;
+
+    public bool IsEmptyState => LoadState == SftpPanelLoadState.Empty;
+
+    public bool IsErrorState => LoadState == SftpPanelLoadState.Error;
+
     public IRelayCommand BackCommand { get; }
 
     public IRelayCommand ForwardCommand { get; }
@@ -141,6 +151,16 @@ public sealed partial class SftpModeViewModel : ObservableObject, IRightPanelMod
     partial void OnIsAddressEditorExpandedChanged(bool value)
     {
         OnPropertyChanged(nameof(IsAddressChipVisible));
+    }
+
+    partial void OnLoadStateChanged(SftpPanelLoadState value)
+    {
+        _ = value;
+        OnPropertyChanged(nameof(IsIdleState));
+        OnPropertyChanged(nameof(IsLoadingState));
+        OnPropertyChanged(nameof(IsLoadedState));
+        OnPropertyChanged(nameof(IsEmptyState));
+        OnPropertyChanged(nameof(IsErrorState));
     }
 
     private async Task GoBackAsync()
