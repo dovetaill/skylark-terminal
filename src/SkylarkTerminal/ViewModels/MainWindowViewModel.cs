@@ -52,6 +52,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly ISftpNavigationService _sftpNavigationService;
     private readonly IAppDialogService _appDialogService;
     private readonly IClipboardService _clipboardService;
+    private SftpModeViewModel _sftpMode = null!;
     private readonly Dictionary<AssetsPaneKind, ObservableCollection<AssetNode>> _assetsByPane;
     private int _newFolderSeed = 1;
     private int _newConnectionSeed = 1;
@@ -369,7 +370,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public ObservableCollection<CommandHistoryEntry> HistoryItems { get; } = [];
 
-    public ObservableCollection<RemoteFileNode> SftpItems { get; } = [];
+    public ObservableCollection<RemoteFileNode> SftpItems => _sftpMode.Items;
 
     public RightToolsContentNode CurrentRightToolsContent => SelectedRightToolsView switch
     {
@@ -433,13 +434,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         IsRightSidebarVisible = true;
         SelectedRightToolsView = RightToolsViewKind.Sftp;
-        SftpItems.Clear();
-
-        var files = await _sftpService.ListDirectoryAsync("mock-conn-01", "/");
-        foreach (var file in files)
-        {
-            SftpItems.Add(file);
-        }
+        await ActivateSftpModeAsync();
     }
 
     [RelayCommand]
@@ -1249,6 +1244,10 @@ public partial class MainWindowViewModel : ViewModelBase
         if (value is not null && value.Kind != SelectedRightToolsView)
         {
             SelectedRightToolsView = value.Kind;
+            if (value.Kind == RightToolsViewKind.Sftp)
+            {
+                _ = ActivateSftpModeAsync();
+            }
         }
     }
 
@@ -1771,7 +1770,13 @@ public partial class MainWindowViewModel : ViewModelBase
         RightPanelModes.Clear();
         RightPanelModes.Add(new SnippetsModeViewModel(BuildSnippetModeActions()));
         RightPanelModes.Add(new HistoryModeViewModel(BuildHistoryModeActions()));
-        RightPanelModes.Add(new SftpModeViewModel(_sftpNavigationService, BuildSftpModeActions()));
+        _sftpMode = new SftpModeViewModel(_sftpService, _sftpNavigationService, BuildSftpModeActions());
+        RightPanelModes.Add(_sftpMode);
+    }
+
+    private Task ActivateSftpModeAsync()
+    {
+        return _sftpMode.ActivateAsync("mock-conn-01");
     }
 
     private IRightPanelModeViewModel ResolveActiveRightMode(RightToolsViewKind kind)

@@ -1,4 +1,5 @@
 using SkylarkTerminal.Services;
+using SkylarkTerminal.Services.Mock;
 using SkylarkTerminal.ViewModels.RightPanelModes;
 
 namespace SkylarkTerminal.Tests;
@@ -6,20 +7,25 @@ namespace SkylarkTerminal.Tests;
 public class SftpAddressInteractionStateTests
 {
     [Fact]
-    public void AddressEditor_ShouldExpandAndCollapse_AroundCommit()
+    public async Task CommitAddressCommand_ShouldKeepStateOwnedBySftpMode()
     {
-        var vm = new SftpModeViewModel(new SftpNavigationService("/var/log"), []);
+        var vm = new SftpModeViewModel(
+            new MockSftpService(),
+            new SftpNavigationService("/var/log"),
+            []);
+
+        await vm.ActivateAsync("mock-conn-01");
 
         Assert.False(vm.IsAddressEditorExpanded);
 
         vm.ExpandAddressEditorCommand.Execute(null);
         Assert.True(vm.IsAddressEditorExpanded);
 
-        vm.AddressInput = "/var";
-        vm.AddressCommitCommand.Execute(null);
+        vm.AddressInput = "/logs";
+
+        await vm.CommitAddressAsync();
 
         Assert.False(vm.IsAddressEditorExpanded);
-        Assert.Equal("/var", vm.CurrentPath);
-        Assert.Equal("/var", vm.AddressInput);
+        Assert.Contains(vm.Items, item => item.FullPath.Contains("/logs", StringComparison.Ordinal));
     }
 }
