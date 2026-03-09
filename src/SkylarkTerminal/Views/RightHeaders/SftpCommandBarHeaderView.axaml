@@ -4,18 +4,21 @@
              xmlns:views="using:SkylarkTerminal.Views"
              x:Class="SkylarkTerminal.Views.RightHeaders.SftpCommandBarHeaderView"
              x:CompileBindings="False">
-    <ui:CommandBar ClosedDisplayMode="Compact"
+    <ui:CommandBar Classes="RightSidebarSftpCommandBar"
+                   ClosedDisplayMode="Compact"
                    DefaultLabelPosition="Collapsed"
                    IsDynamicOverflowEnabled="True"
                    ItemsAlignment="Left"
                    OverflowButtonVisibility="Auto">
         <ui:CommandBar.PrimaryCommands>
             <ui:CommandBarButton Command="{Binding DataContext.ActiveRightMode.BackCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                                 Classes="RightSidebarCommandButton"
                                  Label="Back">
                 <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                            Text="&#xE72B;"/>
             </ui:CommandBarButton>
             <ui:CommandBarButton Command="{Binding DataContext.ActiveRightMode.ForwardCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                                 Classes="RightSidebarCommandButton"
                                  Label="Forward">
                 <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                            Text="&#xE72A;"/>
@@ -24,6 +27,7 @@
                 <Grid MinWidth="140"
                       ColumnDefinitions="*">
                     <Button x:Name="AddressChipButton"
+                            Classes="TitleBarButton RightSidebarAddressChip"
                             Padding="10,0"
                             HorizontalAlignment="Stretch"
                             HorizontalContentAlignment="Stretch"
@@ -34,6 +38,7 @@
                                    TextWrapping="NoWrap"/>
                     </Button>
                     <TextBox x:Name="AddressEditor"
+                             Classes="RightSidebarAddressEditor"
                              MinWidth="220"
                              Watermark="/"
                              IsVisible="{Binding DataContext.ActiveRightMode.IsAddressEditorExpanded, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
@@ -48,15 +53,17 @@
                 </Grid>
             </ui:CommandBarElementContainer>
             <ui:CommandBarButton Command="{Binding DataContext.ActiveRightMode.RefreshCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                                 Classes="RightSidebarCommandButton"
                                  Label="Refresh">
                 <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                            Text="&#xE72C;"/>
             </ui:CommandBarButton>
             <ui:CommandBarButton Command="{Binding DataContext.ActiveRightMode.UpCommand, RelativeSource={RelativeSource AncestorType=views:RightSidebarHostView}}"
+                                 Classes="RightSidebarCommandButton"
                                  Label="Up">
                 <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                            Text="&#xE74A;"/>
-            </ui:CommandBarButton>
+                </ui:CommandBarButton>
         </ui:CommandBar.PrimaryCommands>
     </ui:CommandBar>
 </UserControl>

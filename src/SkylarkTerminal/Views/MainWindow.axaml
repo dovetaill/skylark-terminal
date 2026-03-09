@@ -50,6 +50,10 @@
                     <SolidColorBrush x:Key="ShellTabActiveBrush" Color="#FF2A303B"/>
                     <SolidColorBrush x:Key="ShellTabInactiveBrush" Color="#FF1C2129"/>
                     <SolidColorBrush x:Key="ShellTabSelectionBorderBrush" Color="#FFFFFFFF"/>
+                    <SolidColorBrush x:Key="RightSidebarModeSelectedBackgroundBrush" Color="#1A87B6FF"/>
+                    <SolidColorBrush x:Key="RightSidebarModeSelectedBorderBrush" Color="#2D87B6FF"/>
+                    <SolidColorBrush x:Key="RightSidebarModeSelectedForegroundBrush" Color="#FFEAF4FF"/>
+                    <SolidColorBrush x:Key="RightSidebarModeHoverBackgroundBrush" Color="#1236404E"/>
                     <SolidColorBrush x:Key="Terminal.Background" Color="#FF10141A"/>
                     <SolidColorBrush x:Key="Terminal.Foreground.Primary" Color="#FFE6EDF7"/>
                     <SolidColorBrush x:Key="Terminal.Foreground.Muted" Color="#B8E6EDF7"/>
@@ -89,6 +93,10 @@
                     <SolidColorBrush x:Key="ShellTabActiveBrush" Color="#FFE5EAF0"/>
                     <SolidColorBrush x:Key="ShellTabInactiveBrush" Color="#FFF2F5F8"/>
                     <SolidColorBrush x:Key="ShellTabSelectionBorderBrush" Color="#FF000000"/>
+                    <SolidColorBrush x:Key="RightSidebarModeSelectedBackgroundBrush" Color="#15005A9C"/>
+                    <SolidColorBrush x:Key="RightSidebarModeSelectedBorderBrush" Color="#24005A9C"/>
+                    <SolidColorBrush x:Key="RightSidebarModeSelectedForegroundBrush" Color="#FF005A9C"/>
+                    <SolidColorBrush x:Key="RightSidebarModeHoverBackgroundBrush" Color="#0F005A9C"/>
                     <SolidColorBrush x:Key="Terminal.Background" Color="#FFFFFFFF"/>
                     <SolidColorBrush x:Key="Terminal.Foreground.Primary" Color="#FF1A1F27"/>
                     <SolidColorBrush x:Key="Terminal.Foreground.Muted" Color="#99222A33"/>
@@ -141,33 +149,76 @@
             <Setter Property="Padding" Value="0"/>
         </Style>
         <Style Selector="ListBox.RightSidebarModeButton ListBoxItem /template/ ContentPresenter">
-            <Setter Property="Padding" Value="8,6"/>
-            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Padding" Value="7,7"/>
+            <Setter Property="CornerRadius" Value="8"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="1"/>
         </Style>
         <Style Selector="ListBox.RightSidebarModeButton ListBoxItem:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#14000000"/>
+            <Setter Property="Background" Value="{DynamicResource RightSidebarModeHoverBackgroundBrush}"/>
         </Style>
         <Style Selector="ListBox.RightSidebarModeButton ListBoxItem:selected /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource ShellTabActiveBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource ShellTabSelectionBorderBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource RightSidebarModeSelectedBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RightSidebarModeSelectedBorderBrush}"/>
         </Style>
-        <Style Selector="Button.RightSidebarActionButton">
-            <Setter Property="MinWidth" Value="28"/>
-            <Setter Property="MinHeight" Value="28"/>
-            <Setter Property="Padding" Value="6,2"/>
+        <Style Selector="ListBox.RightSidebarModeButton ListBoxItem:selected TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource RightSidebarModeSelectedForegroundBrush}"/>
+        </Style>
+        <Style Selector="Button.RightSidebarCommandButton">
+            <Setter Property="MinWidth" Value="30"/>
+            <Setter Property="MinHeight" Value="30"/>
+            <Setter Property="Padding" Value="7,0"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="CornerRadius" Value="8"/>
         </Style>
-        <Style Selector="Button.RightSidebarActionButton:pointerover">
-            <Setter Property="Background" Value="#14000000"/>
+        <Style Selector="Button.RightSidebarCommandButton:pointerover">
+            <Setter Property="Background" Value="{DynamicResource RightSidebarModeHoverBackgroundBrush}"/>
         </Style>
-        <Style Selector="Button.RightSidebarActionButton:pressed">
-            <Setter Property="Background" Value="#22000000"/>
+        <Style Selector="Button.RightSidebarCommandButton:pressed">
+            <Setter Property="Background" Value="{DynamicResource RightSidebarModeSelectedBackgroundBrush}"/>
+        </Style>
+        <Style Selector="ui|CommandBarButton.RightSidebarCommandButton">
+            <Setter Property="MinWidth" Value="30"/>
+            <Setter Property="MinHeight" Value="30"/>
+            <Setter Property="Padding" Value="7,0"/>
+            <Setter Property="CornerRadius" Value="8"/>
+        </Style>
+        <Style Selector="ui|CommandBarButton.RightSidebarCommandButton:pointerover">
+            <Setter Property="Background" Value="{DynamicResource RightSidebarModeHoverBackgroundBrush}"/>
+        </Style>
+        <Style Selector="ui|CommandBarButton.RightSidebarCommandButton:pressed">
+            <Setter Property="Background" Value="{DynamicResource RightSidebarModeSelectedBackgroundBrush}"/>
+        </Style>
+        <Style Selector="ui|CommandBar.RightSidebarSftpCommandBar">
+            <Setter Property="DefaultLabelPosition" Value="Collapsed"/>
+            <Setter Property="ItemsAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style Selector="Button.RightSidebarAddressChip">
+            <Setter Property="MinHeight" Value="30"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Background" Value="{DynamicResource RightSidebarModeHoverBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+        <Style Selector="Button.RightSidebarAddressChip:pointerover">
+            <Setter Property="Background" Value="{DynamicResource RightSidebarModeSelectedBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RightSidebarModeSelectedBorderBrush}"/>
+        </Style>
+        <Style Selector="TextBox.RightSidebarAddressEditor">
+            <Setter Property="MinHeight" Value="30"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ShellDividerBrush}"/>
         </Style>
         <Style Selector="ui|TabView">
             <Setter Property="Margin" Value="0"/>

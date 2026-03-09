@@ -13,8 +13,7 @@
         </ItemsControl.ItemsPanel>
         <ItemsControl.ItemTemplate>
             <DataTemplate DataType="models:ModeActionDescriptor">
-                <Button Classes="TitleBarButton"
-                        Classes.RightSidebarActionButton="True"
+                <Button Classes="TitleBarButton RightSidebarCommandButton"
                         Command="{Binding Command}"
                         ToolTip.Tip="{Binding Tooltip}">
                     <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
