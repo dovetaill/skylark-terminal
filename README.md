@@ -20,7 +20,8 @@
 - 终端交互：支持 ANSI/VT100 基础键位映射、右键复制/粘贴/清屏、窗口尺寸变化同步到远端 PTY
 - 右侧工具区：已完成 `RightSidebarHostView` 容器化（左对齐 icon-only ModeRail + 模式级 HeaderSlot + `TransitioningContentControl`）
 - 右侧工具模式架构：`IRightPanelModeViewModel` + `Snippets/History/Sftp` 子 ViewModel + `ModeActionDescriptor` 元数据动作模型
-- SFTP 导航：`SftpNavigationService` 已接入（Back/Forward/Address/Refresh/Up），头部为单行 `CommandBar`，地址栏采用“默认紧凑、聚焦展开、失焦收起”交互
+- SFTP 导航：`SftpNavigationService` 已接入（Back/Forward/Address/Refresh/Up），头部为固定 `Grid` toolbar，地址栏采用“默认紧凑、聚焦展开、失焦收起”交互
+- SFTP 内容区：模式自身维护 `Idle / Loading / Loaded / Empty / Error` 状态机，文件列表使用双层 row 模板显示名称、类型、大小与完整路径
 - 右侧快捷键：`Ctrl+1/2/3` 快速切换 `Snippets/History/SFTP`
 - 左右侧栏可拖拽缩放，收起时 splitter 与内容列保持同步联动
 - 默认深色主题，支持顶部图标按钮切换深浅色，Settings 支持透明/不透明窗口材质切换
@@ -152,7 +153,7 @@ public interface ISftpService
 - 中央 Tab：支持双击左侧连接快速开页签、右键批量管理与会话复制
 - 右上角 Tools 按钮：展开/收起右侧工具面板（保留上次选中模式），并支持拖拽到阈值后自动收起
 - 右侧 ModeRail：左对齐 icon-only ghost tile 切换 `Snippets/History/SFTP`
-- 右侧 Header：按模式切换头部；`Snippets/History` 使用轻量动作条，`SFTP` 使用单行 `CommandBar`
+- 右侧 Header：按模式切换头部；`Snippets/History` 使用轻量动作条，`SFTP` 使用固定 `Grid` toolbar
 - SFTP 地址栏：默认显示紧凑路径 chip，点击后展开编辑，`Enter` 提交，`Esc` 或失焦收起
 - 右侧快捷键：`Ctrl+1/2/3` 快速切换模式
 
