@@ -228,6 +228,40 @@ public sealed partial class SnippetsModeViewModel : ObservableObject, IRightPane
         await PersistAndReturnToBrowseAsync(cancellationToken).ConfigureAwait(false);
     }
 
+    public Task DeleteSnippetAsync(SnippetItem item, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+
+        SelectedSnippet = item;
+        return DeleteSelectedSnippetAsync(cancellationToken);
+    }
+
+    public async Task DeleteCategoryAsync(SnippetCategory category, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(category);
+
+        var owner = Categories.FirstOrDefault(item => item.Id == category.Id);
+        if (owner is null)
+        {
+            return;
+        }
+
+        if (!await dialogService
+                .ShowDeleteSnippetCategoryConfirmAsync(owner.Name, owner.Items.Count)
+                .ConfigureAwait(false))
+        {
+            return;
+        }
+
+        if (SelectedSnippet is not null && owner.Items.Contains(SelectedSnippet))
+        {
+            SelectedSnippet = null;
+        }
+
+        Categories.Remove(owner);
+        await PersistAndReturnToBrowseAsync(cancellationToken).ConfigureAwait(false);
+    }
+
     public async Task PasteAsync(SnippetItem item, CancellationToken cancellationToken = default)
     {
         await terminalBridge
@@ -395,8 +429,7 @@ public sealed partial class SnippetsModeViewModel : ObservableObject, IRightPane
     private static bool Matches(SnippetItem item, string keyword)
     {
         return item.Title.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
-               item.Content.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
-               item.Tags.Any(tag => tag.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+               item.Content.Contains(keyword, StringComparison.OrdinalIgnoreCase);
     }
 
     private async Task PersistAndReturnToBrowseAsync(CancellationToken cancellationToken)

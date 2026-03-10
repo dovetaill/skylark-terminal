@@ -74,19 +74,18 @@ public partial class SnippetsModeView : UserControl
                 vm.OpenViewMoreCommand.Execute(item);
                 break;
             case "delete-snippet":
-                vm.SelectedSnippet = item;
-                await vm.DeleteSelectedSnippetAsync();
+                await vm.DeleteSnippetAsync(item);
                 break;
         }
     }
 
-    private void OnCategoryContextActionClick(object? sender, RoutedEventArgs e)
+    private async void OnCategoryContextActionClick(object? sender, RoutedEventArgs e)
     {
         _ = e;
-        HandleCategoryAction(sender);
+        await HandleCategoryActionAsync(sender);
     }
 
-    private void HandleCategoryAction(object? sender)
+    private async Task HandleCategoryActionAsync(object? sender)
     {
         if (!TryGetCategoryContext(sender, out var vm, out var category))
         {
@@ -113,6 +112,7 @@ public partial class SnippetsModeView : UserControl
                 vm.BeginCreateCategoryCommand.Execute(null);
                 break;
             case "delete-category":
+                await vm.DeleteCategoryAsync(category);
                 break;
         }
     }

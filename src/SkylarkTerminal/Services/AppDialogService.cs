@@ -183,6 +183,15 @@ public sealed class AppDialogService : IAppDialogService
             SnippetsText.Cancel);
     }
 
+    public Task<bool> ShowDeleteSnippetCategoryConfirmAsync(string categoryName, int snippetCount)
+    {
+        return ShowConfirmationAsync(
+            SnippetsText.DeleteCategoryDialogTitle,
+            SnippetsText.BuildDeleteCategoryMessage(categoryName, snippetCount),
+            SnippetsText.Delete,
+            SnippetsText.Cancel);
+    }
+
     private static async Task ShowSimpleDialogAsync(string title, Control content)
     {
         var host = ResolveHostWindow();
