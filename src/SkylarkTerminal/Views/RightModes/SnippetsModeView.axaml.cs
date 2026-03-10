@@ -73,6 +73,47 @@ public partial class SnippetsModeView : UserControl
             case "view-more":
                 vm.OpenViewMoreCommand.Execute(item);
                 break;
+            case "delete-snippet":
+                vm.SelectedSnippet = item;
+                await vm.DeleteSelectedSnippetAsync();
+                break;
+        }
+    }
+
+    private void OnCategoryContextActionClick(object? sender, RoutedEventArgs e)
+    {
+        _ = e;
+        HandleCategoryAction(sender);
+    }
+
+    private void HandleCategoryAction(object? sender)
+    {
+        if (!TryGetCategoryContext(sender, out var vm, out var category))
+        {
+            return;
+        }
+
+        var action = sender switch
+        {
+            Button button => button.Tag?.ToString(),
+            MenuFlyoutItem flyoutItem => flyoutItem.Tag?.ToString(),
+            MenuItem menuItem => menuItem.Tag?.ToString(),
+            _ => null,
+        };
+
+        switch (action)
+        {
+            case "new-snippet":
+                vm.BeginCreateCommand.Execute(null);
+                vm.Draft.CategoryId = category.Id;
+                vm.Draft.CategoryName = category.Name;
+                vm.Draft.CreateNewCategory = false;
+                break;
+            case "new-category":
+                vm.BeginCreateCategoryCommand.Execute(null);
+                break;
+            case "delete-category":
+                break;
         }
     }
 
@@ -145,6 +186,30 @@ public partial class SnippetsModeView : UserControl
 
         vm = snippetsVm;
         item = snippetItem;
+        return true;
+    }
+
+    private bool TryGetCategoryContext(
+        object? sender,
+        out SnippetsModeViewModel vm,
+        out SnippetCategory category)
+    {
+        vm = null!;
+        category = null!;
+
+        if (!TryGetViewModel(out var snippetsVm))
+        {
+            return false;
+        }
+
+        var control = sender as Control;
+        if (control?.DataContext is not SnippetCategory snippetCategory)
+        {
+            return false;
+        }
+
+        vm = snippetsVm;
+        category = snippetCategory;
         return true;
     }
 

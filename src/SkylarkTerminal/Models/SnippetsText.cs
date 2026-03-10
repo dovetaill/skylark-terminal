@@ -23,6 +23,7 @@ public static class SnippetsText
     public const string Save = "保存";
     public const string Cancel = "取消";
     public const string Delete = "删除";
+    public const string DeleteCategory = "删除分类";
     public const string Back = "返回";
     public const string RunInAllTabsDialogTitle = "在全部标签页运行";
     public const string DeleteDialogTitle = "删除代码块";

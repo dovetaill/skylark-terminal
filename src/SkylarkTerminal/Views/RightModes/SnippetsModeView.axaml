@@ -6,43 +6,75 @@
              x:CompileBindings="False">
     <UserControl.DataTemplates>
         <TreeDataTemplate DataType="models:SnippetCategory" ItemsSource="{Binding Items}">
-            <TextBlock FontSize="13"
-                       FontWeight="SemiBold"
-                       Text="{Binding Name}"/>
+            <Border Background="Transparent"
+                    Padding="4,2">
+                <Border.ContextFlyout>
+                    <ui:FAMenuFlyout FlyoutPresenterClasses="snippets-category-context-flyout">
+                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                           Tag="new-snippet"
+                                           Text="{x:Static models:SnippetsText.NewSnippet}"
+                                           Click="OnCategoryContextActionClick"/>
+                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                           Tag="new-category"
+                                           Text="{x:Static models:SnippetsText.NewCategory}"
+                                           Click="OnCategoryContextActionClick"/>
+                        <ui:MenuFlyoutSeparator />
+                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                           Tag="delete-category"
+                                           Text="{x:Static models:SnippetsText.DeleteCategory}"
+                                           Click="OnCategoryContextActionClick"/>
+                    </ui:FAMenuFlyout>
+                </Border.ContextFlyout>
+                <Grid ColumnDefinitions="Auto,*"
+                      ColumnSpacing="8">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               Text="&#xE8B7;"/>
+                    <TextBlock Grid.Column="1"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               Text="{Binding Name}"/>
+                </Grid>
+            </Border>
         </TreeDataTemplate>
         <DataTemplate DataType="models:SnippetItem">
             <Border Background="Transparent"
                     DoubleTapped="OnSnippetCardDoubleTapped"
                     Padding="4,2">
                 <Border.ContextFlyout>
-                    <ui:FAMenuFlyout FlyoutPresenterClasses="snippets-card-context-flyout">
+                    <ui:FAMenuFlyout FlyoutPresenterClasses="snippets-item-context-flyout">
+                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                           Tag="paste"
+                                           Text="{x:Static models:SnippetsText.Paste}"
+                                           Click="OnSnippetContextActionClick"/>
                         <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
                                            Tag="run"
                                            Text="{x:Static models:SnippetsText.Run}"
-                                           Click="OnSnippetContextActionClick"/>
-                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
-                                           Tag="edit"
-                                           Text="{x:Static models:SnippetsText.Edit}"
                                            Click="OnSnippetContextActionClick"/>
                         <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
                                            Tag="run-all"
                                            Text="{x:Static models:SnippetsText.RunInAllTabs}"
                                            Click="OnSnippetContextActionClick"/>
                         <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
-                                           Tag="copy"
-                                           Text="{x:Static models:SnippetsText.Copy}"
+                                           Tag="edit"
+                                           Text="{x:Static models:SnippetsText.Edit}"
                                            Click="OnSnippetContextActionClick"/>
                         <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
                                            Tag="view-more"
                                            Text="{x:Static models:SnippetsText.ViewMore}"
                                            Click="OnSnippetContextActionClick"/>
                         <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
-                                           Tag="paste"
-                                           Text="{x:Static models:SnippetsText.Paste}"
+                                           Tag="delete-snippet"
+                                           Text="{x:Static models:SnippetsText.Delete}"
                                            Click="OnSnippetContextActionClick"/>
                     </ui:FAMenuFlyout>
                 </Border.ContextFlyout>
-                <TextBlock Text="{Binding Title}"/>
+                <Grid ColumnDefinitions="Auto,*"
+                      ColumnSpacing="8">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               Text="&#xE943;"/>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding Title}"/>
+                </Grid>
             </Border>
         </DataTemplate>
     </UserControl.DataTemplates>
@@ -61,6 +93,15 @@
             </Grid>
 
             <TreeView ItemsSource="{Binding VisibleCategories}" Grid.Row="1">
+                <TreeView.Styles>
+                    <Style Selector="TreeViewItem"
+                           x:DataType="models:SnippetCategory">
+                        <Setter Property="IsExpanded"
+                                Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                        <Setter Property="HorizontalAlignment"
+                                Value="Stretch"/>
+                    </Style>
+                </TreeView.Styles>
                 <TreeView.ContextFlyout>
                     <ui:FAMenuFlyout FlyoutPresenterClasses="snippets-root-context-flyout">
                         <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
