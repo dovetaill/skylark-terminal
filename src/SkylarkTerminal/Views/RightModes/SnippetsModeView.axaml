@@ -130,17 +130,9 @@
                            Text="{x:Static models:SnippetsText.CreateSnippet}"/>
                 <TextBox Watermark="{x:Static models:SnippetsText.TitleWatermark}"
                          Text="{Binding Draft.Title, Mode=TwoWay}"/>
-                <Grid ColumnDefinitions="*,Auto"
-                      ColumnSpacing="8">
-                    <TextBox Watermark="{x:Static models:SnippetsText.CategoryWatermark}"
-                             Text="{Binding Draft.CategoryName, Mode=TwoWay}"/>
-                    <Button Grid.Column="1"
-                            Classes="RightSidebarCommandButton"
-                            Command="{Binding StartNewCategoryCommand}"
-                            Content="{x:Static models:SnippetsText.NewCategory}"/>
-                </Grid>
-                <TextBox Watermark="{x:Static models:SnippetsText.TagsWatermark}"
-                         Text="{Binding Draft.TagsText, Mode=TwoWay}"/>
+                <ComboBox IsEditable="True"
+                          ItemsSource="{Binding CategoryOptions}"
+                          Text="{Binding Draft.CategoryName, Mode=TwoWay}"/>
                 <TextBox AcceptsReturn="True"
                          Height="180"
                          TextWrapping="Wrap"
@@ -167,17 +159,9 @@
                            Text="{x:Static models:SnippetsText.EditSnippet}"/>
                 <TextBox Watermark="{x:Static models:SnippetsText.TitleWatermark}"
                          Text="{Binding Draft.Title, Mode=TwoWay}"/>
-                <Grid ColumnDefinitions="*,Auto"
-                      ColumnSpacing="8">
-                    <TextBox Watermark="{x:Static models:SnippetsText.CategoryWatermark}"
-                             Text="{Binding Draft.CategoryName, Mode=TwoWay}"/>
-                    <Button Grid.Column="1"
-                            Classes="RightSidebarCommandButton"
-                            Command="{Binding StartNewCategoryCommand}"
-                            Content="{x:Static models:SnippetsText.NewCategory}"/>
-                </Grid>
-                <TextBox Watermark="{x:Static models:SnippetsText.TagsWatermark}"
-                         Text="{Binding Draft.TagsText, Mode=TwoWay}"/>
+                <ComboBox IsEditable="True"
+                          ItemsSource="{Binding CategoryOptions}"
+                          Text="{Binding Draft.CategoryName, Mode=TwoWay}"/>
                 <TextBox AcceptsReturn="True"
                          Height="180"
                          TextWrapping="Wrap"
@@ -219,9 +203,6 @@
                 <Border Classes="RightSidebarSnippetTagChip">
                     <TextBlock Text="{Binding Draft.CategoryName}"/>
                 </Border>
-                <TextBlock Classes="RightSidebarSnippetPreviewText"
-                           Text="{Binding Draft.TagsText}"
-                           TextWrapping="Wrap"/>
                 <Border Background="{DynamicResource ShellPanelBrush}"
                         BorderBrush="{DynamicResource ShellDividerBrush}"
                         BorderThickness="1"

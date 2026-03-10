@@ -80,6 +80,8 @@ public sealed partial class SnippetsModeViewModel : ObservableObject, IRightPane
 
     public ObservableCollection<SnippetCategory> VisibleCategories { get; } = [];
 
+    public ObservableCollection<string> CategoryOptions { get; } = [];
+
     [ObservableProperty]
     private string filterText = string.Empty;
 
@@ -128,6 +130,7 @@ public sealed partial class SnippetsModeViewModel : ObservableObject, IRightPane
             Categories.Add(category);
         }
 
+        RebuildCategoryOptions();
         RebuildVisibleCategories();
     }
 
@@ -435,8 +438,21 @@ public sealed partial class SnippetsModeViewModel : ObservableObject, IRightPane
     private async Task PersistAndReturnToBrowseAsync(CancellationToken cancellationToken)
     {
         await repository.SaveAsync(Categories.ToArray(), cancellationToken).ConfigureAwait(false);
+        RebuildCategoryOptions();
         RebuildVisibleCategories();
         Draft = SnippetEditDraft.Empty();
         PanelState = SnippetPanelState.Browse;
+    }
+
+    private void RebuildCategoryOptions()
+    {
+        CategoryOptions.Clear();
+        foreach (var categoryName in Categories
+                     .Select(category => category.Name.Trim())
+                     .Where(name => !string.IsNullOrWhiteSpace(name))
+                     .Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            CategoryOptions.Add(categoryName);
+        }
     }
 }
