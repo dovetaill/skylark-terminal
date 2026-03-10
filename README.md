@@ -20,10 +20,10 @@
 - 终端交互：支持 ANSI/VT100 基础键位映射、右键复制/粘贴/清屏、窗口尺寸变化同步到远端 PTY
 - 右侧工具区：已完成 `RightSidebarHostView` 容器化（左对齐 icon-only ModeRail + 模式级 HeaderSlot + 静态 `ContentControl`）
 - 右侧工具模式架构：`IRightPanelModeViewModel` + `Snippets/History/Sftp` 子 ViewModel + `ModeActionDescriptor` 元数据动作模型
-- Snippets 面板：支持分类、实时搜索、Create/Edit/ViewMore 三态、双击粘贴、卡片快捷动作、卡片右键菜单与 browse 空白区 root 菜单
+- Snippets 面板：browse 已切到 `TreeView`，支持分类树、实时搜索、Create/Edit/ViewMore 三态、双击粘贴、root/category/item 三层右键菜单
 - Snippets 持久化：数据落地到本地 `LocalApplicationData/SkylarkTerminal/snippets.json`，损坏 JSON 会自动备份为 `.broken`
 - Snippets 执行策略：`Run` 只发送到当前终端并补 `\r`，`Paste` 不补换行，`Run in all tabs` 仅命中已连接 SSH tabs 且会二次确认
-- Snippets 编辑流：界面文案已统一为中文；`Create` 显示 `保存/取消`，`Edit` 显示 `保存/删除/取消`，`ViewMore` 提供 `返回`
+- Snippets 编辑流：界面文案已统一为中文；`Create` 显示 `保存/取消`，`Edit` 显示 `保存/删除/取消`，`ViewMore` 提供 `返回`；分类字段支持选择已有分类或直接输入新名称，tags 不再暴露在 UI
 - SFTP 导航：`SftpNavigationService` 已接入（Back/Forward/Address/Refresh/Up），头部为固定 `Grid` toolbar，地址栏采用 `browse surface + overlay editor` 双层结构，`历史路径 / 搜索` 收进 `PathChip` 内部 utility slot
 - SFTP 内容区：模式自身维护 `Idle / Loading / Loaded / Empty / Error` 状态机，文件列表通过 `VisibleItems` 承接搜索与隐藏文件过滤，并补充筛选空状态表达
 - 右侧快捷键：`Ctrl+1/2/3` 快速切换 `Snippets/History/SFTP`
@@ -174,7 +174,7 @@ public interface ISftpService
 - 右上角 Tools 按钮：展开/收起右侧工具面板（保留上次选中模式），并支持拖拽到阈值后自动收起
 - 右侧 ModeRail：左对齐 icon-only ghost tile 切换 `Snippets/History/SFTP`
 - 右侧 Header：按模式切换头部；`Snippets/History` 使用轻量动作条，`SFTP` 使用固定 `Grid` toolbar，并移除模式内容切换过渡
-- Snippets：browse 顶部提供 `新建代码块` 与搜索框；分类按 section 展示，双击 snippet 只粘贴不执行，卡片右键菜单顺序为 `运行 / 编辑 / 在全部标签页运行 / 复制 / 查看详情 / 粘贴`
+- Snippets：browse 顶部提供 `新建代码块` 与搜索框；分类与代码块以树节点呈现，双击代码块只粘贴不执行，root/category/item 都有独立右键菜单，分类/代码块都支持删除
 - Snippets 批量执行：`Run in all tabs` 只统计并命中已连接 SSH tabs，执行前弹确认
 - Snippets 空白区右键：browse 空白区域支持 `新建代码块 / 新建分类 / 从剪贴板创建 / 清空搜索`
 - SFTP 地址栏：默认显示带 utility slot 的路径 chip；点击 chip 打开地址 overlay，点击搜索按钮打开搜索 overlay，`Enter` 提交，`Esc` 或失焦收起

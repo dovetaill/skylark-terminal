@@ -4,27 +4,84 @@
              xmlns:ui="using:FluentAvalonia.UI.Controls"
              x:Class="SkylarkTerminal.Views.RightModes.SnippetsModeView"
              x:CompileBindings="False">
+    <UserControl.DataTemplates>
+        <TreeDataTemplate DataType="models:SnippetCategory" ItemsSource="{Binding Items}">
+            <Border Background="Transparent"
+                    Padding="4,2">
+                <Border.ContextFlyout>
+                    <ui:FAMenuFlyout FlyoutPresenterClasses="snippets-category-context-flyout">
+                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                           Tag="new-snippet"
+                                           Text="{x:Static models:SnippetsText.NewSnippet}"
+                                           Click="OnCategoryContextActionClick"/>
+                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                           Tag="new-category"
+                                           Text="{x:Static models:SnippetsText.NewCategory}"
+                                           Click="OnCategoryContextActionClick"/>
+                        <ui:MenuFlyoutSeparator />
+                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                           Tag="delete-category"
+                                           Text="{x:Static models:SnippetsText.DeleteCategory}"
+                                           Click="OnCategoryContextActionClick"/>
+                    </ui:FAMenuFlyout>
+                </Border.ContextFlyout>
+                <Grid ColumnDefinitions="Auto,*"
+                      ColumnSpacing="8">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               Text="&#xE8B7;"/>
+                    <TextBlock Grid.Column="1"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               Text="{Binding Name}"/>
+                </Grid>
+            </Border>
+        </TreeDataTemplate>
+        <DataTemplate DataType="models:SnippetItem">
+            <Border Background="Transparent"
+                    DoubleTapped="OnSnippetCardDoubleTapped"
+                    Padding="4,2">
+                <Border.ContextFlyout>
+                    <ui:FAMenuFlyout FlyoutPresenterClasses="snippets-item-context-flyout">
+                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                           Tag="paste"
+                                           Text="{x:Static models:SnippetsText.Paste}"
+                                           Click="OnSnippetContextActionClick"/>
+                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                           Tag="run"
+                                           Text="{x:Static models:SnippetsText.Run}"
+                                           Click="OnSnippetContextActionClick"/>
+                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                           Tag="run-all"
+                                           Text="{x:Static models:SnippetsText.RunInAllTabs}"
+                                           Click="OnSnippetContextActionClick"/>
+                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                           Tag="edit"
+                                           Text="{x:Static models:SnippetsText.Edit}"
+                                           Click="OnSnippetContextActionClick"/>
+                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                           Tag="view-more"
+                                           Text="{x:Static models:SnippetsText.ViewMore}"
+                                           Click="OnSnippetContextActionClick"/>
+                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                           Tag="delete-snippet"
+                                           Text="{x:Static models:SnippetsText.Delete}"
+                                           Click="OnSnippetContextActionClick"/>
+                    </ui:FAMenuFlyout>
+                </Border.ContextFlyout>
+                <Grid ColumnDefinitions="Auto,*"
+                      ColumnSpacing="8">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               Text="&#xE943;"/>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding Title}"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </UserControl.DataTemplates>
     <Grid Margin="10,10,10,12">
         <Grid IsVisible="{Binding IsBrowseState}"
               RowDefinitions="Auto,*"
               RowSpacing="12">
-            <Grid.ContextFlyout>
-                <ui:FAMenuFlyout FlyoutPresenterClasses="snippets-root-context-flyout">
-                    <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
-                                       Command="{Binding BeginCreateCommand}"
-                                       Text="{x:Static models:SnippetsText.NewSnippet}"/>
-                    <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
-                                       Command="{Binding BeginCreateCategoryCommand}"
-                                       Text="{x:Static models:SnippetsText.NewCategory}"/>
-                    <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
-                                       Command="{Binding BeginCreateFromClipboardCommand}"
-                                       Text="{x:Static models:SnippetsText.CreateFromClipboard}"/>
-                    <ui:MenuFlyoutSeparator />
-                    <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
-                                       Command="{Binding ClearFilterCommand}"
-                                       Text="{x:Static models:SnippetsText.ClearSearch}"/>
-                </ui:FAMenuFlyout>
-            </Grid.ContextFlyout>
             <Grid ColumnDefinitions="Auto,*"
                   ColumnSpacing="8">
                 <Button Classes="RightSidebarCommandButton"
@@ -35,113 +92,34 @@
                          Text="{Binding FilterText, Mode=TwoWay}"/>
             </Grid>
 
-            <ScrollViewer Grid.Row="1"
-                          HorizontalScrollBarVisibility="Disabled">
-                <ItemsControl ItemsSource="{Binding VisibleCategories}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="models:SnippetCategory">
-                            <StackPanel Margin="0,0,0,14"
-                                        Spacing="8">
-                                <Grid ColumnDefinitions="*,Auto"
-                                      ColumnSpacing="8">
-                                    <TextBlock FontSize="13"
-                                               FontWeight="SemiBold"
-                                               Text="{Binding Name}"/>
-                                    <Border Grid.Column="1"
-                                            Classes="RightSidebarSnippetTagChip"
-                                            MinWidth="24">
-                                        <TextBlock HorizontalAlignment="Center"
-                                                   Text="{Binding Items.Count}"/>
-                                    </Border>
-                                </Grid>
-
-                                <ItemsControl ItemsSource="{Binding Items}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate DataType="models:SnippetItem">
-                                            <Border Classes="RightSidebarSnippetCard"
-                                                    DoubleTapped="OnSnippetCardDoubleTapped">
-                                                <Border.ContextFlyout>
-                                                    <ui:FAMenuFlyout FlyoutPresenterClasses="snippets-card-context-flyout">
-                                                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
-                                                                           Tag="run"
-                                                                           Text="{x:Static models:SnippetsText.Run}"
-                                                                           Click="OnSnippetContextActionClick"/>
-                                                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
-                                                                           Tag="edit"
-                                                                           Text="{x:Static models:SnippetsText.Edit}"
-                                                                           Click="OnSnippetContextActionClick"/>
-                                                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
-                                                                           Tag="run-all"
-                                                                           Text="{x:Static models:SnippetsText.RunInAllTabs}"
-                                                                           Click="OnSnippetContextActionClick"/>
-                                                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
-                                                                           Tag="copy"
-                                                                           Text="{x:Static models:SnippetsText.Copy}"
-                                                                           Click="OnSnippetContextActionClick"/>
-                                                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
-                                                                           Tag="view-more"
-                                                                           Text="{x:Static models:SnippetsText.ViewMore}"
-                                                                           Click="OnSnippetContextActionClick"/>
-                                                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
-                                                                           Tag="paste"
-                                                                           Text="{x:Static models:SnippetsText.Paste}"
-                                                                           Click="OnSnippetContextActionClick"/>
-                                                    </ui:FAMenuFlyout>
-                                                </Border.ContextFlyout>
-
-                                                <StackPanel Spacing="10">
-                                                    <TextBlock FontSize="14"
-                                                               FontWeight="SemiBold"
-                                                               Text="{Binding Title}"/>
-
-                                                    <TextBlock Classes="RightSidebarSnippetPreviewText"
-                                                               FontFamily="Cascadia Mono, Consolas, Microsoft YaHei UI"
-                                                               Text="{Binding PreviewText}"
-                                                               TextWrapping="Wrap"/>
-
-                                                    <ItemsControl ItemsSource="{Binding Tags}">
-                                                        <ItemsControl.ItemsPanel>
-                                                            <ItemsPanelTemplate>
-                                                                <WrapPanel Orientation="Horizontal"/>
-                                                            </ItemsPanelTemplate>
-                                                        </ItemsControl.ItemsPanel>
-                                                        <ItemsControl.ItemTemplate>
-                                                            <DataTemplate>
-                                                                <Border Classes="RightSidebarSnippetTagChip"
-                                                                        Margin="0,0,6,6">
-                                                                    <TextBlock Text="{Binding .}"/>
-                                                                </Border>
-                                                            </DataTemplate>
-                                                        </ItemsControl.ItemTemplate>
-                                                    </ItemsControl>
-
-                                                    <Border Classes="RightSidebarSnippetActionBand">
-                                                        <StackPanel Orientation="Horizontal"
-                                                                    Spacing="6">
-                                                            <Button Classes="RightSidebarSnippetActionButton"
-                                                                    Tag="copy"
-                                                                    Click="OnSnippetActionClick"
-                                                                    Content="{x:Static models:SnippetsText.Copy}"/>
-                                                            <Button Classes="RightSidebarSnippetActionButton"
-                                                                    Tag="run"
-                                                                    Click="OnSnippetActionClick"
-                                                                    Content="{x:Static models:SnippetsText.Run}"/>
-                                                            <Button Classes="RightSidebarSnippetActionButton"
-                                                                    Tag="paste"
-                                                                    Click="OnSnippetActionClick"
-                                                                    Content="{x:Static models:SnippetsText.Paste}"/>
-                                                        </StackPanel>
-                                                    </Border>
-                                                </StackPanel>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+            <TreeView ItemsSource="{Binding VisibleCategories}" Grid.Row="1">
+                <TreeView.Styles>
+                    <Style Selector="TreeViewItem"
+                           x:DataType="models:SnippetCategory">
+                        <Setter Property="IsExpanded"
+                                Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                        <Setter Property="HorizontalAlignment"
+                                Value="Stretch"/>
+                    </Style>
+                </TreeView.Styles>
+                <TreeView.ContextFlyout>
+                    <ui:FAMenuFlyout FlyoutPresenterClasses="snippets-root-context-flyout">
+                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                           Command="{Binding BeginCreateCommand}"
+                                           Text="{x:Static models:SnippetsText.NewSnippet}"/>
+                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                           Command="{Binding BeginCreateCategoryCommand}"
+                                           Text="{x:Static models:SnippetsText.NewCategory}"/>
+                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                           Command="{Binding BeginCreateFromClipboardCommand}"
+                                           Text="{x:Static models:SnippetsText.CreateFromClipboard}"/>
+                        <ui:MenuFlyoutSeparator />
+                        <ui:MenuFlyoutItem Classes="ToolsContextActionItem"
+                                           Command="{Binding ClearFilterCommand}"
+                                           Text="{x:Static models:SnippetsText.ClearSearch}"/>
+                    </ui:FAMenuFlyout>
+                </TreeView.ContextFlyout>
+            </TreeView>
         </Grid>
 
         <ScrollViewer IsVisible="{Binding IsCreateState}"
@@ -152,17 +130,9 @@
                            Text="{x:Static models:SnippetsText.CreateSnippet}"/>
                 <TextBox Watermark="{x:Static models:SnippetsText.TitleWatermark}"
                          Text="{Binding Draft.Title, Mode=TwoWay}"/>
-                <Grid ColumnDefinitions="*,Auto"
-                      ColumnSpacing="8">
-                    <TextBox Watermark="{x:Static models:SnippetsText.CategoryWatermark}"
-                             Text="{Binding Draft.CategoryName, Mode=TwoWay}"/>
-                    <Button Grid.Column="1"
-                            Classes="RightSidebarCommandButton"
-                            Command="{Binding StartNewCategoryCommand}"
-                            Content="{x:Static models:SnippetsText.NewCategory}"/>
-                </Grid>
-                <TextBox Watermark="{x:Static models:SnippetsText.TagsWatermark}"
-                         Text="{Binding Draft.TagsText, Mode=TwoWay}"/>
+                <ComboBox IsEditable="True"
+                          ItemsSource="{Binding CategoryOptions}"
+                          Text="{Binding Draft.CategoryName, Mode=TwoWay}"/>
                 <TextBox AcceptsReturn="True"
                          Height="180"
                          TextWrapping="Wrap"
@@ -189,17 +159,9 @@
                            Text="{x:Static models:SnippetsText.EditSnippet}"/>
                 <TextBox Watermark="{x:Static models:SnippetsText.TitleWatermark}"
                          Text="{Binding Draft.Title, Mode=TwoWay}"/>
-                <Grid ColumnDefinitions="*,Auto"
-                      ColumnSpacing="8">
-                    <TextBox Watermark="{x:Static models:SnippetsText.CategoryWatermark}"
-                             Text="{Binding Draft.CategoryName, Mode=TwoWay}"/>
-                    <Button Grid.Column="1"
-                            Classes="RightSidebarCommandButton"
-                            Command="{Binding StartNewCategoryCommand}"
-                            Content="{x:Static models:SnippetsText.NewCategory}"/>
-                </Grid>
-                <TextBox Watermark="{x:Static models:SnippetsText.TagsWatermark}"
-                         Text="{Binding Draft.TagsText, Mode=TwoWay}"/>
+                <ComboBox IsEditable="True"
+                          ItemsSource="{Binding CategoryOptions}"
+                          Text="{Binding Draft.CategoryName, Mode=TwoWay}"/>
                 <TextBox AcceptsReturn="True"
                          Height="180"
                          TextWrapping="Wrap"
@@ -241,10 +203,12 @@
                 <Border Classes="RightSidebarSnippetTagChip">
                     <TextBlock Text="{Binding Draft.CategoryName}"/>
                 </Border>
-                <TextBlock Classes="RightSidebarSnippetPreviewText"
-                           Text="{Binding Draft.TagsText}"
-                           TextWrapping="Wrap"/>
-                <Border Classes="RightSidebarSnippetCard">
+                <Border Background="{DynamicResource ShellPanelBrush}"
+                        BorderBrush="{DynamicResource ShellDividerBrush}"
+                        BorderThickness="1"
+                        CornerRadius="12"
+                        Margin="0,0,0,8"
+                        Padding="12">
                     <TextBlock FontFamily="Cascadia Mono, Consolas, Microsoft YaHei UI"
                                Text="{Binding Draft.Content}"
                                TextWrapping="Wrap"/>

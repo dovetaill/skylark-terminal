@@ -10,6 +10,10 @@ public sealed class MockAppDialogService : IAppDialogService
 
     public bool DeleteSnippetConfirmResult { get; set; } = true;
 
+    public bool DeleteSnippetCategoryConfirmResult { get; set; } = true;
+
+    public bool LastDeleteCategoryIncludesChildren { get; private set; }
+
     public Task<bool?> ShowSettingsAsync(
         string themeMode,
         bool isLeftAssetsPaneOpen,
@@ -52,5 +56,12 @@ public sealed class MockAppDialogService : IAppDialogService
     {
         _ = snippetTitle;
         return Task.FromResult(DeleteSnippetConfirmResult);
+    }
+
+    public Task<bool> ShowDeleteSnippetCategoryConfirmAsync(string categoryName, int snippetCount)
+    {
+        _ = categoryName;
+        LastDeleteCategoryIncludesChildren = snippetCount > 0;
+        return Task.FromResult(DeleteSnippetCategoryConfirmResult);
     }
 }

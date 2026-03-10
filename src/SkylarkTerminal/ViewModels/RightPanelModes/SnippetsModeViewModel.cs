@@ -80,6 +80,8 @@ public sealed partial class SnippetsModeViewModel : ObservableObject, IRightPane
 
     public ObservableCollection<SnippetCategory> VisibleCategories { get; } = [];
 
+    public ObservableCollection<string> CategoryOptions { get; } = [];
+
     [ObservableProperty]
     private string filterText = string.Empty;
 
@@ -128,6 +130,7 @@ public sealed partial class SnippetsModeViewModel : ObservableObject, IRightPane
             Categories.Add(category);
         }
 
+        RebuildCategoryOptions();
         RebuildVisibleCategories();
     }
 
@@ -225,6 +228,40 @@ public sealed partial class SnippetsModeViewModel : ObservableObject, IRightPane
 
         owner.Items.Remove(SelectedSnippet);
         SelectedSnippet = null;
+        await PersistAndReturnToBrowseAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public Task DeleteSnippetAsync(SnippetItem item, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+
+        SelectedSnippet = item;
+        return DeleteSelectedSnippetAsync(cancellationToken);
+    }
+
+    public async Task DeleteCategoryAsync(SnippetCategory category, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(category);
+
+        var owner = Categories.FirstOrDefault(item => item.Id == category.Id);
+        if (owner is null)
+        {
+            return;
+        }
+
+        if (!await dialogService
+                .ShowDeleteSnippetCategoryConfirmAsync(owner.Name, owner.Items.Count)
+                .ConfigureAwait(false))
+        {
+            return;
+        }
+
+        if (SelectedSnippet is not null && owner.Items.Contains(SelectedSnippet))
+        {
+            SelectedSnippet = null;
+        }
+
+        Categories.Remove(owner);
         await PersistAndReturnToBrowseAsync(cancellationToken).ConfigureAwait(false);
     }
 
@@ -395,15 +432,27 @@ public sealed partial class SnippetsModeViewModel : ObservableObject, IRightPane
     private static bool Matches(SnippetItem item, string keyword)
     {
         return item.Title.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
-               item.Content.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
-               item.Tags.Any(tag => tag.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+               item.Content.Contains(keyword, StringComparison.OrdinalIgnoreCase);
     }
 
     private async Task PersistAndReturnToBrowseAsync(CancellationToken cancellationToken)
     {
         await repository.SaveAsync(Categories.ToArray(), cancellationToken).ConfigureAwait(false);
+        RebuildCategoryOptions();
         RebuildVisibleCategories();
         Draft = SnippetEditDraft.Empty();
         PanelState = SnippetPanelState.Browse;
+    }
+
+    private void RebuildCategoryOptions()
+    {
+        CategoryOptions.Clear();
+        foreach (var categoryName in Categories
+                     .Select(category => category.Name.Trim())
+                     .Where(name => !string.IsNullOrWhiteSpace(name))
+                     .Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            CategoryOptions.Add(categoryName);
+        }
     }
 }

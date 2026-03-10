@@ -6,7 +6,7 @@ namespace SkylarkTerminal.Tests;
 public class RightModeViewsBindingTests
 {
     [Theory]
-    [InlineData("SnippetsModeView.axaml", "ItemsSource=\"{Binding VisibleCategories}\"")]
+    [InlineData("SnippetsModeView.axaml", "<TreeView ItemsSource=\"{Binding VisibleCategories}\"")]
     [InlineData("HistoryModeView.axaml", "HistoryItems")]
     [InlineData("SftpModeView.axaml", "ActiveRightMode.VisibleItems")]
     public void ModeViews_ShouldBindExpectedCollections(string file, string bindingKey)

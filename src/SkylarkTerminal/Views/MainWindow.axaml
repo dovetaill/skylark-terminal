@@ -244,6 +244,16 @@
             <Setter Property="MinWidth" Value="232"/>
             <Setter Property="MaxWidth" Value="232"/>
         </Style>
+        <Style Selector="ui|FAMenuFlyoutPresenter.snippets-category-context-flyout">
+            <Setter Property="Width" Value="232"/>
+            <Setter Property="MinWidth" Value="232"/>
+            <Setter Property="MaxWidth" Value="232"/>
+        </Style>
+        <Style Selector="ui|FAMenuFlyoutPresenter.snippets-item-context-flyout">
+            <Setter Property="Width" Value="240"/>
+            <Setter Property="MinWidth" Value="240"/>
+            <Setter Property="MaxWidth" Value="240"/>
+        </Style>
         <Style Selector="ui|CommandBarButton.RightSidebarCommandButton">
             <Setter Property="MinWidth" Value="30"/>
             <Setter Property="MinHeight" Value="30"/>

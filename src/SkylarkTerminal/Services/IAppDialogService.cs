@@ -21,4 +21,6 @@ public interface IAppDialogService
     Task<bool> ShowRunSnippetInAllTabsConfirmAsync(string snippetTitle, int targetCount);
 
     Task<bool> ShowDeleteSnippetConfirmAsync(string snippetTitle);
+
+    Task<bool> ShowDeleteSnippetCategoryConfirmAsync(string categoryName, int snippetCount);
 }
